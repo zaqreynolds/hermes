@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [search, setSearch] = useState("");
   const debouncedValue = useDebounce(search, 500);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (debouncedValue) {
@@ -26,7 +27,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-full w-full items-center">
-      <p>Hello Hermes</p>
+      <h1>Hello Hermes</h1>
       <Label htmlFor="origin_search">Origin:</Label>
       <Input
         id="origin_search"
