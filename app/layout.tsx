@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { AmadeusProvider } from "./AmadeusContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,9 +29,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="flex flex-col items-center sm:items-start h-screen">
-          {children}
-        </main>
+        <AmadeusProvider>
+          <main className="flex flex-col items-center sm:items-start h-screen">
+            {children}
+          </main>
+        </AmadeusProvider>
       </body>
     </html>
   );
