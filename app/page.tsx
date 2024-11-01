@@ -1,51 +1,57 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+// import { AmadeusContext } from "./AmadeusContext";
 
 export default function Home() {
-  const [search, setSearch] = useState("");
-  const debouncedValue = useDebounce(search, 500);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [searchOrigin, setSearchOrigin] = useState("");
+  const [searchDestination, setSearchDestination] = useState("");
+  const debouncedOrigin = useDebounce(searchOrigin, 500);
+  const debouncedDestination = useDebounce(searchDestination, 500);
+  // const amadeusToken = useContext(AmadeusContext);
+  // const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (debouncedValue) {
+    if (debouncedOrigin) {
       const fetchLocations = async () => {
-        // try {
-        //   const response = await fetch(`https://partners.api.skyscanner.net/apiservices/autosuggest/v1.0/US/en-US?query=${debouncedValue}&apiKey=${process.env.NEXT_PUBLIC_SKYSCANNER_API_KEY}`);
-        //   const data = await response.json();
-        //   console.log(data);
-        // } catch (error) {
-        //   console.error("Error fetching data:", error);
-        // }
+        //use amadeus city and airport search api
+        try {
+          const response = await fetch(
+            `/api/amadeus/locations?keyword=${debouncedOrigin}`
+          );
+          const data = await response.json();
+          console.log(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       };
 
       fetchLocations();
     }
-  }, [debouncedValue]);
+  }, [debouncedOrigin]);
 
   return (
     <div className="flex flex-col h-full w-full items-center">
       <h1>Hello Hermes</h1>
-      <Label htmlFor="origin_search">Origin:</Label>
-      <Input
-        id="origin_search"
-        className="w-44"
-        type="text"
-        value={search}
-        placeholder="Search for a location..."
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      <Label htmlFor="destination_search">Destination:</Label>
-      <Input
-        id="destination_search"
-        className="w-44"
-        type="text"
-        value={search}
-        placeholder="Search for a location..."
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="flex w-full h-full flex-col px-4">
+        <Input
+          id="origin_search"
+          className="w-full mb-2"
+          type="text"
+          value={searchOrigin}
+          placeholder="From"
+          onChange={(e) => setSearchOrigin(e.target.value)}
+        />
+        <Input
+          id="destination_search"
+          className="w-full"
+          type="text"
+          value={searchDestination}
+          placeholder="To"
+          onChange={(e) => setSearchDestination(e.target.value)}
+        />
+      </div>
     </div>
   );
 }
