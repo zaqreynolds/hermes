@@ -16,7 +16,7 @@ export const GET = async (req: NextRequest) => {
   try {
     const response = await amadeus.referenceData.locations.get({
       keyword,
-      subType: "AIRPORT",
+      subType: "AIRPORT,CITY",
     });
 
     return NextResponse.json(response.data, { status: 200 });
