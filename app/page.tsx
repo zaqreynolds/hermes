@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import {
   faPlaneArrival,
   faPlaneDeparture,
+  faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [searchOrigin, setSearchOrigin] = useState("");
@@ -15,22 +17,29 @@ export default function Home() {
   const debouncedDestination = useDebounce(searchDestination, 500);
 
   useEffect(() => {
-    if (debouncedOrigin) {
-      const fetchLocations = async () => {
-        try {
-          const response = await fetch(
-            `/api/amadeus/locations?keyword=${debouncedOrigin}`
-          );
-          const data = await response.json();
-          console.log(data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
+    const fetchLocations = async (keyword: string) => {
+      try {
+        const response = await fetch(
+          `/api/amadeus/locations?keyword=${keyword}`
+        );
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-      fetchLocations();
+    if (debouncedOrigin) {
+      fetchLocations(debouncedOrigin);
     }
-  }, [debouncedOrigin]);
+
+    if (debouncedDestination) {
+      fetchLocations(debouncedDestination);
+    }
+  }, [debouncedOrigin, debouncedDestination]);
+
+  const handleOriginClear = () => setSearchOrigin("");
+  const handleDestinationClear = () => setSearchDestination("");
 
   return (
     <div className="flex flex-col h-full w-full items-center">
@@ -44,12 +53,22 @@ export default function Home() {
           />
           <Input
             id="origin_search"
-            className="w-full mb-2 pl-10"
+            className="w-full mb-2 px-10"
             type="text"
             value={searchOrigin}
             placeholder="From"
             onChange={(e) => setSearchOrigin(e.target.value)}
           />
+          <Button
+            type="button"
+            onClick={handleOriginClear}
+            variant="ghost"
+            className={`absolute right-1 bottom-2 text-gray-500 ${
+              searchOrigin ? "flex" : "hidden"
+            }`}
+          >
+            <FontAwesomeIcon icon={faTimesCircle} className="" />
+          </Button>
         </div>
         <div className="relative flex items-center ">
           <FontAwesomeIcon
@@ -62,8 +81,18 @@ export default function Home() {
             type="text"
             value={searchDestination}
             placeholder="To"
-            onChange={(e) => setSearchOrigin(e.target.value)}
+            onChange={(e) => setSearchDestination(e.target.value)}
           />
+          <Button
+            type="button"
+            onClick={handleDestinationClear}
+            variant="ghost"
+            className={`absolute right-1 bottom-2 text-gray-500 ${
+              searchDestination ? "flex" : "hidden"
+            }`}
+          >
+            <FontAwesomeIcon icon={faTimesCircle} className="" />
+          </Button>
         </div>
       </div>
     </div>
