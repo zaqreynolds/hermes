@@ -22,7 +22,7 @@ interface Address {
   countryName: string;
   countryCode: string;
   stateCode: string;
-  [key: string]: any; // Add other properties as needed
+  // [key: string]: any; // Add other properties as needed
 }
 
 interface Analytics {
@@ -53,18 +53,19 @@ interface AmadeusLocation {
   subType: string;
   timeZoneOffset: string;
   type: string;
-  [key: string]: any; // Add other properties as needed
+  // [key: string]: any; // Add other properties as needed
 }
 
 export default function Home() {
   const [searchOrigin, setSearchOrigin] = useState("");
   const [searchDestination, setSearchDestination] = useState("");
-  const [locationData, setLocationData] = useState<[AmadeusLocation | null]>([
-    null,
-  ]);
+  const [locationData, setLocationData] = useState<AmadeusLocation[]>([]);
   const [activeInput, setActiveInput] = useState<
     "origin" | "destination" | null
   >(null);
+  const [originPopoverOpen, setOriginPopoverOpen] = useState(false);
+  const [destinationPopoverOpen, setDestinationPopoverOpen] = useState(false);
+
   const debouncedOrigin = useDebounce(searchOrigin, 500);
   const debouncedDestination = useDebounce(searchDestination, 500);
 
@@ -75,6 +76,7 @@ export default function Home() {
           `/api/amadeus/locations?keyword=${keyword}`
         );
         const data = await response.json();
+        console.log("data", data);
         setLocationData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -83,17 +85,26 @@ export default function Home() {
 
     if (debouncedOrigin) {
       fetchLocations(debouncedOrigin);
-      setActiveInput("origin");
+      // setActiveInput("origin");
+      setOriginPopoverOpen(true);
     }
 
     if (debouncedDestination) {
       fetchLocations(debouncedDestination);
-      setActiveInput("destination");
+      // setActiveInput("destination");
+      setDestinationPopoverOpen(true);
     }
   }, [debouncedOrigin, debouncedDestination]);
 
-  const handleOriginClear = () => setSearchOrigin("");
-  const handleDestinationClear = () => setSearchDestination("");
+  const handleOriginClear = () => {
+    setSearchOrigin("");
+    setLocationData([]);
+  };
+
+  const handleDestinationClear = () => {
+    setSearchDestination("");
+    // setLocationData([null]);
+  };
 
   return (
     <div className="flex flex-col h-full w-full items-center">
@@ -101,7 +112,7 @@ export default function Home() {
       <div className="flex w-full h-full flex-col px-4">
         <h3>Where would you like to fly to?</h3>
         <div className="relative flex items-center ">
-          <Popover>
+          <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
             <FontAwesomeIcon
               icon={faPlaneDeparture}
               className="absolute left-3 h-5 w-5 mb-1"
@@ -114,6 +125,11 @@ export default function Home() {
                 value={searchOrigin}
                 placeholder="From"
                 onChange={(e) => setSearchOrigin(e.target.value)}
+                onFocus={() => {
+                  setActiveInput("origin");
+                  setOriginPopoverOpen(true);
+                }}
+                onBlur={() => setOriginPopoverOpen(false)}
               />
             </PopoverTrigger>
             <Button
@@ -127,37 +143,55 @@ export default function Home() {
               <FontAwesomeIcon icon={faTimesCircle} className="" />
             </Button>
             <PopoverContent>
-              <ul className="w-96">
-                {locationData.map((location) => (
-                  <li key={location?.iataCode}>{location?.name}</li>
-                ))}
-              </ul>
+              {locationData.length > 0 && (
+                <ul className="w-96">
+                  {locationData.map((location) => (
+                    <li key={location.id}>{location.name}</li>
+                  ))}
+                </ul>
+              )}
             </PopoverContent>
           </Popover>
         </div>
         <div className="relative flex items-center ">
-          <FontAwesomeIcon
-            icon={faPlaneArrival}
-            className="absolute left-3 h-5 w-5 mb-1"
-          />
-          <Input
-            id="departure_search"
-            className="w-full mb-2 pl-10"
-            type="text"
-            value={searchDestination}
-            placeholder="To"
-            onChange={(e) => setSearchDestination(e.target.value)}
-          />
-          <Button
-            type="button"
-            onClick={handleDestinationClear}
-            variant="ghost"
-            className={`absolute right-1 bottom-2 text-gray-500 ${
-              searchDestination ? "flex" : "hidden"
-            }`}
+          <Popover
+            open={destinationPopoverOpen}
+            onOpenChange={setDestinationPopoverOpen}
           >
-            <FontAwesomeIcon icon={faTimesCircle} className="" />
-          </Button>
+            <FontAwesomeIcon
+              icon={faPlaneArrival}
+              className="absolute left-3 h-5 w-5 mb-1"
+            />
+            <PopoverTrigger asChild>
+              <Input
+                id="departure_search"
+                className="w-full mb-2 pl-10"
+                type="text"
+                value={searchDestination}
+                placeholder="To"
+                onChange={(e) => setSearchDestination(e.target.value)}
+              />
+            </PopoverTrigger>
+            <Button
+              type="button"
+              onClick={handleDestinationClear}
+              variant="ghost"
+              className={`absolute right-1 bottom-2 text-gray-500 ${
+                searchDestination ? "flex" : "hidden"
+              }`}
+            >
+              <FontAwesomeIcon icon={faTimesCircle} className="" />
+            </Button>
+            <PopoverContent>
+              {locationData.length > 0 && (
+                <ul className="w-96">
+                  {locationData.map((location) => (
+                    <li key={location.id}>{location.name}</li>
+                  ))}
+                </ul>
+              )}
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>
