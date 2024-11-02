@@ -115,12 +115,12 @@ export default function Home() {
           <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
             <FontAwesomeIcon
               icon={faPlaneDeparture}
-              className="absolute left-3 h-5 w-5 mb-1"
+              className="absolute left-3 h-5 w-5 mb-2"
             />
             <PopoverTrigger asChild>
               <Input
                 id="origin_search"
-                className="w-full mb-2 px-10"
+                className="w-full h-12 mb-2 px-10"
                 type="text"
                 value={searchOrigin}
                 placeholder="From"
@@ -136,7 +136,7 @@ export default function Home() {
               type="button"
               onClick={handleOriginClear}
               variant="ghost"
-              className={`absolute right-1 bottom-2 text-gray-500 ${
+              className={`absolute right-1 mb-2 text-gray-400 ${
                 searchOrigin ? "flex" : "hidden"
               }`}
             >
@@ -160,12 +160,12 @@ export default function Home() {
           >
             <FontAwesomeIcon
               icon={faPlaneArrival}
-              className="absolute left-3 h-5 w-5 mb-1"
+              className="absolute left-3 h-5 w-5 mb-2"
             />
             <PopoverTrigger asChild>
               <Input
                 id="departure_search"
-                className="w-full mb-2 pl-10"
+                className="w-full h-12 mb-2 pl-10"
                 type="text"
                 value={searchDestination}
                 placeholder="To"
@@ -176,7 +176,7 @@ export default function Home() {
               type="button"
               onClick={handleDestinationClear}
               variant="ghost"
-              className={`absolute right-1 bottom-2 text-gray-500 ${
+              className={`absolute right-1  mb-2 text-gray-400 ${
                 searchDestination ? "flex" : "hidden"
               }`}
             >
