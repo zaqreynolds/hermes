@@ -169,7 +169,7 @@ export default function Home() {
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPlaneDeparture}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700"
                 />
                 <Input
                   className="w-full h-12 pl-10 pr-10"
@@ -188,7 +188,7 @@ export default function Home() {
                   >
                     <FontAwesomeIcon
                       icon={faTimesCircle}
-                      className="text-gray-400"
+                      className="text-foreground"
                     />
                   </Button>
                 )}
@@ -214,7 +214,7 @@ export default function Home() {
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPlaneArrival}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700"
                 />
                 <Input
                   className="w-full h-12 pl-10 pr-10"
@@ -233,7 +233,7 @@ export default function Home() {
                   >
                     <FontAwesomeIcon
                       icon={faTimesCircle}
-                      className="text-gray-400"
+                      className="text-foreground"
                     />
                   </Button>
                 )}

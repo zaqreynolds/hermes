@@ -15,7 +15,7 @@ body {
 @layer base {
   :root {
     --background: 30 20% 85%; /* Warm beige for background */
-    --foreground: 30 10% 15%; /* Dark brown for text */
+    --foreground: 30 10% 30%; /* Dark brown for text */
     --card: 30 20% 90%;
     --card-foreground: 30 10% 15%;
     --popover: 30 20% 90%;
