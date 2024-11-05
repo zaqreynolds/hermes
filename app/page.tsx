@@ -72,12 +72,11 @@ export default function Home() {
   const debouncedDestination = useDebounce(searchDestination, 500);
 
   useEffect(() => {
+    if (!debouncedOrigin && !debouncedDestination) {
+      setLocationData([]);
+      return;
+    }
     const fetchLocations = async (keyword: string): Promise<void> => {
-      if (!keyword.trim()) {
-        setLocationData([]);
-        return;
-      }
-
       setIsLoading(true);
       setError(null);
 
@@ -198,6 +197,7 @@ export default function Home() {
             <PopoverContent
               className="w-[var(--radix-popover-trigger-width)] p-0"
               sideOffset={4}
+              onOpenAutoFocus={(e) => e.preventDefault()}
             >
               {renderLocationList("origin")}
             </PopoverContent>
@@ -242,6 +242,7 @@ export default function Home() {
             <PopoverContent
               className="w-[var(--radix-popover-trigger-width)] p-0"
               sideOffset={4}
+              onOpenAutoFocus={(e) => e.preventDefault()}
             >
               {renderLocationList("destination")}
             </PopoverContent>
