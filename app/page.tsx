@@ -4,6 +4,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useEffect, useState } from "react";
 import {
   faCity,
+  faExchangeAlt,
   faPlaneArrival,
   faPlaneDeparture,
   faPlaneUp,
@@ -85,6 +86,7 @@ export default function Home() {
     useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [isRotated, setIsRotated] = useState<boolean>(false);
 
   const debouncedOrigin = useDebounce(searchOriginQuery, 500);
   const debouncedDestination = useDebounce(searchDestinationQuery, 500);
@@ -264,6 +266,19 @@ export default function Home() {
     }
   }, [originPopoverOpen, destinationPopoverOpen]);
 
+  const swapLocations = () => {
+    setSelectedOrigin((prevOrigin) => {
+      setSelectedDestination(prevOrigin);
+      return selectedDestination;
+    });
+
+    setSearchOriginQuery((prevQuery) => {
+      setSearchDestinationQuery(prevQuery);
+      return searchDestinationQuery;
+    });
+    setIsRotated((prev) => !prev);
+  };
+
   const renderLocationList = (
     travelDirection: TravelDirection
   ): React.ReactNode => {
@@ -326,7 +341,7 @@ export default function Home() {
     <div className="w-full max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
-      <div className="space-y-4">
+      <div className="relative flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-2">
         {/* Origin Input */}
         <div className="relative">
           <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
@@ -381,7 +396,18 @@ export default function Home() {
             </PopoverContent>
           </Popover>
         </div>
-
+        <Button
+          onClick={swapLocations}
+          variant="outline"
+          className="absolute top-[35%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-auto"
+        >
+          <FontAwesomeIcon
+            icon={faExchangeAlt}
+            className={`transition-transform duration-300 transform ${
+              isRotated ? "rotate-180" : "rotate-0"
+            }`}
+          />
+        </Button>
         {/* Destination Input */}
         <div className="relative">
           <Popover
