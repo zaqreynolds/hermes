@@ -338,15 +338,27 @@ export default function Home() {
                   icon={faPlaneDeparture}
                   className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 "
                 />
-                <Input
-                  className="w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted"
-                  placeholder="From"
-                  value={searchOriginQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSearchOriginQuery(e.target.value)
-                  }
-                  onKeyDown={(e) => handleKeyDown(e, "origin")}
-                />
+                <div className="relative">
+                  <Input
+                    className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
+                      selectedOrigin?.subType === "AIRPORT" ? "pt-5 pb-1" : ""
+                    }`}
+                    placeholder="From"
+                    value={searchOriginQuery}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchOriginQuery(e.target.value)
+                    }
+                    onKeyDown={(e) => handleKeyDown(e, "origin")}
+                  />
+                  {selectedOrigin?.subType === "AIRPORT" && (
+                    <div className="absolute left-10 top-1.5 right-10">
+                      <div className="text-[10px] text-muted-foreground">
+                        {selectedOrigin.address.cityName},{" "}
+                        {selectedOrigin.address.countryName}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {searchOriginQuery && (
                   <Button
                     type="button"
@@ -384,15 +396,29 @@ export default function Home() {
                   icon={faPlaneArrival}
                   className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700"
                 />
-                <Input
-                  className="w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted"
-                  placeholder="To"
-                  value={searchDestinationQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSearchDestinationQuery(e.target.value)
-                  }
-                  onKeyDown={(e) => handleKeyDown(e, "destination")}
-                />
+                <div className="relative">
+                  <Input
+                    className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
+                      selectedDestination?.subType === "AIRPORT"
+                        ? "pt-5 pb-1"
+                        : ""
+                    }`}
+                    placeholder="To"
+                    value={searchDestinationQuery}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchDestinationQuery(e.target.value)
+                    }
+                    onKeyDown={(e) => handleKeyDown(e, "destination")}
+                  />
+                  {selectedDestination?.subType === "AIRPORT" && (
+                    <div className="absolute left-10 top-1.5 right-10">
+                      <div className="text-[10px] text-muted-foreground">
+                        {selectedDestination.address.cityName},{" "}
+                        {selectedDestination.address.countryName}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {searchDestinationQuery && (
                   <Button
                     type="button"
