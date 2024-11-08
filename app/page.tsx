@@ -68,9 +68,7 @@ export default function Home() {
   const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
   const [searchDestinationQuery, setSearchDestinationQuery] =
     useState<string>("");
-  const [originQueryData, setOriginnQueryData] = useState<AmadeusLocation[]>(
-    []
-  );
+  const [originQueryData, setOriginQueryData] = useState<AmadeusLocation[]>([]);
   const [destinationQueryData, setDestinationQueryData] = useState<
     AmadeusLocation[]
   >([]);
@@ -104,89 +102,78 @@ export default function Home() {
   // and then this for the button click
   // router.push(pathname + '?' + createQueryString('key', 'value'));
 
+  const fetchLocations = async (
+    keyword: string,
+    travelDirection: TravelDirection,
+    cityCode?: string
+  ): Promise<void> => {
+    console.log(
+      `fetchLocations called with keyword: ${keyword}, travelDirection: ${travelDirection}, cityCode: ${cityCode}`
+    );
+    if (travelDirection === "origin") {
+      setIsLoadingOrigin(true);
+    } else {
+      setIsLoadingDestination(true);
+    }
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/amadeus/locations?keyword=${encodeURIComponent(keyword)}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch locations");
+      }
+
+      const data: AmadeusLocation[] = await response.json();
+      if (travelDirection === "origin") {
+        console.log("Setting originQueryData:", data);
+        setOriginQueryData(data);
+      } else {
+        setDestinationQueryData(data);
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error("Error fetching data:", error);
+    } finally {
+      if (travelDirection === "origin") {
+        setIsLoadingOrigin(false);
+      } else {
+        setIsLoadingDestination(false);
+      }
+    }
+    console.log("fetchLocations completed");
+  };
+
   useEffect(() => {
-    if (!searchOriginQuery) {
-      setOriginnQueryData([]);
+    console.log("useEffect triggered");
+    console.log("debouncedOrigin:", debouncedOrigin);
+    console.log("debouncedDestination:", debouncedDestination);
+    console.log("selectedOrigin:", selectedOrigin);
+    console.log("selectedDestination:", selectedDestination);
+
+    if (debouncedOrigin === "") {
+      setOriginQueryData([]);
       setOriginPopoverOpen(false);
-    }
-    if (!searchDestinationQuery) {
-      setDestinationQueryData([]);
-      setDestinationPopoverOpen(false);
-    }
-    if (!debouncedOrigin && !debouncedDestination) {
-      setOriginnQueryData([]);
-      setDestinationQueryData([]);
-      return;
-    }
-
-    const fetchLocations = async (
-      keyword: string,
-      travelDirection: TravelDirection,
-      cityCode?: string
-    ): Promise<void> => {
-      if (
-        travelDirection === "origin" &&
-        (!selectedOrigin || selectedOrigin.subType === "CITY")
-      ) {
-        setIsLoadingOrigin(true);
-      } else if (
-        travelDirection === "destination" &&
-        (!selectedDestination || selectedDestination.subType === "CITY")
-      ) {
-        setIsLoadingDestination(true);
-      }
-      setError(null);
-
-      try {
-        let url = `/api/amadeus/locations?keyword=${encodeURIComponent(
-          keyword
-        )}`;
-        if (cityCode) {
-          url += `&cityCode=${encodeURIComponent(cityCode)}`;
-        }
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch locations");
-        }
-
-        const data: AmadeusLocation[] = await response.json();
-        if (travelDirection === "origin") {
-          setOriginnQueryData(data);
-        } else if (travelDirection === "destination") {
-          setDestinationQueryData(data);
-        }
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "An error occurred");
-        console.error("Error fetching data:", error);
-      } finally {
-        if (
-          travelDirection === "origin" &&
-          (!selectedOrigin || selectedOrigin.subType === "CITY")
-        ) {
-          setIsLoadingOrigin(false);
-        } else if (
-          travelDirection === "destination" &&
-          (!selectedDestination || selectedDestination.subType === "CITY")
-        ) {
-          setIsLoadingDestination(false);
-        }
-      }
-    };
-
-    if (
+    } else if (
       debouncedOrigin &&
-      (!selectedOrigin || selectedOrigin.subType === "CITY")
+      ((searchOriginQuery && !selectedOrigin) ||
+        selectedOrigin?.subType === "CITY")
     ) {
+      console.log("Fetching origin locations");
       fetchLocations(debouncedOrigin, "origin", selectedOrigin?.iataCode);
       setOriginPopoverOpen(true);
     }
 
-    if (
+    if (debouncedDestination === "") {
+      setDestinationQueryData([]);
+      setDestinationPopoverOpen(false);
+    } else if (
       debouncedDestination &&
-      (!selectedDestination || selectedDestination.subType === "CITY")
+      ((searchDestinationQuery && !selectedDestination) ||
+        selectedDestination?.subType === "CITY")
     ) {
+      console.log("Fetching destination locations");
       fetchLocations(
         debouncedDestination,
         "destination",
@@ -197,8 +184,8 @@ export default function Home() {
   }, [
     debouncedOrigin,
     debouncedDestination,
-    selectedOrigin,
-    selectedDestination,
+    JSON.stringify(selectedOrigin),
+    JSON.stringify(selectedDestination),
   ]);
 
   const handleLocationSelect = (
@@ -230,15 +217,26 @@ export default function Home() {
     if (travelDirection === "origin") {
       setSearchOriginQuery("");
       setSelectedOrigin(null);
-      setOriginnQueryData([]);
+      setOriginQueryData([]);
       setOriginPopoverOpen(false);
+      console.log("Cleared originQueryData:", originQueryData);
     } else {
       setSearchDestinationQuery("");
       setSelectedDestination(null);
       setDestinationQueryData([]);
       setDestinationPopoverOpen(false);
+      console.log("Cleared destinationQueryData:", destinationQueryData);
     }
   };
+
+  // console.log("searchOriginQuery", searchOriginQuery);
+  // console.log("searchDestinationQuery", searchDestinationQuery);
+  // console.log("originQueryData", originQueryData);
+  // console.log("destinationQueryData", destinationQueryData);
+  // console.log("selectedOrigin", selectedOrigin);
+  // console.log("selectedDestination", selectedDestination);
+  // console.log("debouncedOrigin", debouncedOrigin);
+  // console.log("debouncedDestination", debouncedDestination);
 
   const handleKeyDown = (
     e: React.KeyboardEvent,
