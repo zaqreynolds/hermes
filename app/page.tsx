@@ -3,8 +3,10 @@ import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useEffect, useState } from "react";
 import {
+  faCity,
   faPlaneArrival,
   faPlaneDeparture,
+  faPlaneUp,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+// import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Address {
   cityName: string;
@@ -59,6 +62,9 @@ interface AmadeusLocation {
 type TravelDirection = "origin" | "destination";
 
 export default function Home() {
+  // const router = useRouter();
+  // const pathname = usePathname();
+  // const searchParams = useSearchParams();
   const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
   const [searchDestinationQuery, setSearchDestinationQuery] =
     useState<string>("");
@@ -68,6 +74,11 @@ export default function Home() {
   const [destinationQueryData, setDestinationQueryData] = useState<
     AmadeusLocation[]
   >([]);
+  const [selectedOrigin, setSelectedOrigin] = useState<AmadeusLocation | null>(
+    null
+  );
+  const [selectedDestination, setSelectedDestination] =
+    useState<AmadeusLocation | null>(null);
   const [originPopoverOpen, setOriginPopoverOpen] = useState<boolean>(false);
   const [destinationPopoverOpen, setDestinationPopoverOpen] =
     useState<boolean>(false);
@@ -79,11 +90,28 @@ export default function Home() {
   const debouncedOrigin = useDebounce(searchOriginQuery, 500);
   const debouncedDestination = useDebounce(searchDestinationQuery, 500);
 
+  // const createQueryString = useCallback(
+  //   (name: string, value: string) => {
+  //     const params = new URLSearchParams(searchParams.toString());
+  //     params.set(name, value);
+
+  //     return params.toString();
+  //   },
+  //   [searchParams]
+  // );
+
+  // and then this for the button click
+  // router.push(pathname + '?' + createQueryString('key', 'value'));
+
   useEffect(() => {
-    // if (!debouncedOrigin && !debouncedDestination) {
-    //   setLocationData([]);
-    //   return;
-    // }
+    if (!searchOriginQuery) {
+      setOriginnQueryData([]);
+      setOriginPopoverOpen(false);
+    }
+    if (!searchDestinationQuery) {
+      setDestinationQueryData([]);
+      setDestinationPopoverOpen(false);
+    }
     if (!debouncedOrigin && !debouncedDestination) {
       setOriginnQueryData([]);
       setDestinationQueryData([]);
@@ -92,19 +120,31 @@ export default function Home() {
 
     const fetchLocations = async (
       keyword: string,
-      travelDirection: TravelDirection
+      travelDirection: TravelDirection,
+      cityCode?: string
     ): Promise<void> => {
-      if (travelDirection === "origin") {
+      if (
+        travelDirection === "origin" &&
+        (!selectedOrigin || selectedOrigin.subType === "CITY")
+      ) {
         setIsLoadingOrigin(true);
-      } else {
+      } else if (
+        travelDirection === "destination" &&
+        (!selectedDestination || selectedDestination.subType === "CITY")
+      ) {
         setIsLoadingDestination(true);
       }
       setError(null);
 
       try {
-        const response = await fetch(
-          `/api/amadeus/locations?keyword=${encodeURIComponent(keyword)}`
-        );
+        let url = `/api/amadeus/locations?keyword=${encodeURIComponent(
+          keyword
+        )}`;
+        if (cityCode) {
+          url += `&cityCode=${encodeURIComponent(cityCode)}`;
+        }
+
+        const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error("Failed to fetch locations");
@@ -120,45 +160,80 @@ export default function Home() {
         setError(error instanceof Error ? error.message : "An error occurred");
         console.error("Error fetching data:", error);
       } finally {
-        if (travelDirection === "origin") {
+        if (
+          travelDirection === "origin" &&
+          (!selectedOrigin || selectedOrigin.subType === "CITY")
+        ) {
           setIsLoadingOrigin(false);
-        } else {
+        } else if (
+          travelDirection === "destination" &&
+          (!selectedDestination || selectedDestination.subType === "CITY")
+        ) {
           setIsLoadingDestination(false);
         }
       }
     };
 
-    if (debouncedOrigin) {
-      fetchLocations(debouncedOrigin, "origin");
+    if (
+      debouncedOrigin &&
+      (!selectedOrigin || selectedOrigin.subType === "CITY")
+    ) {
+      fetchLocations(debouncedOrigin, "origin", selectedOrigin?.iataCode);
       setOriginPopoverOpen(true);
     }
 
-    if (debouncedDestination) {
-      fetchLocations(debouncedDestination, "destination");
+    if (
+      debouncedDestination &&
+      (!selectedDestination || selectedDestination.subType === "CITY")
+    ) {
+      fetchLocations(
+        debouncedDestination,
+        "destination",
+        selectedDestination?.iataCode
+      );
       setDestinationPopoverOpen(true);
     }
-  }, [debouncedOrigin, debouncedDestination]);
+  }, [
+    debouncedOrigin,
+    debouncedDestination,
+    selectedOrigin,
+    selectedDestination,
+  ]);
 
   const handleLocationSelect = (
     location: AmadeusLocation,
     travelDirection: TravelDirection
   ): void => {
     if (travelDirection === "origin") {
-      setSearchOriginQuery(location.name);
-      setOriginPopoverOpen(false);
+      if (location.subType === "CITY") {
+        setSearchOriginQuery(location.name);
+        setOriginPopoverOpen(true);
+      } else {
+        setSelectedOrigin(location);
+        setSearchOriginQuery(location.name);
+        setOriginPopoverOpen(false);
+      }
     } else {
-      setSearchDestinationQuery(location.name);
-      setDestinationPopoverOpen(false);
+      if (location.subType === "CITY") {
+        setSearchDestinationQuery(location.name);
+        setDestinationPopoverOpen(true);
+      } else {
+        setSelectedDestination(location);
+        setSearchDestinationQuery(location.name);
+        setDestinationPopoverOpen(false);
+      }
     }
   };
 
   const handleClearInput = (travelDirection: TravelDirection): void => {
     if (travelDirection === "origin") {
       setSearchOriginQuery("");
+      setSelectedOrigin(null);
       setOriginnQueryData([]);
       setOriginPopoverOpen(false);
     } else {
       setSearchDestinationQuery("");
+      setSelectedDestination(null);
       setDestinationQueryData([]);
       setDestinationPopoverOpen(false);
     }
@@ -188,7 +263,15 @@ export default function Home() {
               >
                 <div className="flex items-center">
                   <div>
-                    <p className="font-medium">{location.name}</p>
+                    <p className="font-medium flex items-center">
+                      {location.name}
+                      <FontAwesomeIcon
+                        icon={
+                          location.subType === "AIRPORT" ? faPlaneUp : faCity
+                        }
+                        className="h-3 w-3 pl-2"
+                      />
+                    </p>
                     <p className="text-sm text-gray-500">
                       {location.address.cityName},{" "}
                       {location.address.countryName}
