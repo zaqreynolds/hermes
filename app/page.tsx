@@ -86,6 +86,7 @@ export default function Home() {
   const [isLoadingDestination, setIsLoadingDestination] =
     useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   const debouncedOrigin = useDebounce(searchOriginQuery, 500);
   const debouncedDestination = useDebounce(searchDestinationQuery, 500);
@@ -239,6 +240,32 @@ export default function Home() {
     }
   };
 
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+    travelDirection: TravelDirection
+  ) => {
+    const locationData =
+      travelDirection === "origin" ? originQueryData : destinationQueryData;
+
+    if (e.key === "ArrowDown") {
+      setSelectedIndex((prevIndex) => (prevIndex + 1) % locationData.length);
+    } else if (e.key === "ArrowUp") {
+      setSelectedIndex(
+        (prevIndex) =>
+          (prevIndex - 1 + locationData.length) % locationData.length
+      );
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      handleLocationSelect(locationData[selectedIndex], travelDirection);
+      setSelectedIndex(-1);
+    }
+  };
+
+  useEffect(() => {
+    if (!originPopoverOpen && !destinationPopoverOpen) {
+      setSelectedIndex(-1);
+    }
+  }, [originPopoverOpen, destinationPopoverOpen]);
+
   const renderLocationList = (
     travelDirection: TravelDirection
   ): React.ReactNode => {
@@ -258,7 +285,11 @@ export default function Home() {
             {locationData.map((location) => (
               <li
                 key={location.id}
-                className="p-3 hover:bg-accent cursor-pointer hover:shadow-lg"
+                className={`p-3 hover:bg-accent cursor-pointer hover:shadow-lg ${
+                  selectedIndex === locationData.indexOf(location)
+                    ? "bg-accent"
+                    : ""
+                }`}
                 onClick={() => handleLocationSelect(location, travelDirection)}
               >
                 <div className="flex items-center">
@@ -295,8 +326,8 @@ export default function Home() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Flight Search</h1>
-
+      <h1 className="text-2xl font-bold mb-6">Hermes</h1>
+      <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <div className="space-y-4">
         {/* Origin Input */}
         <div className="relative">
@@ -314,6 +345,7 @@ export default function Home() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setSearchOriginQuery(e.target.value)
                   }
+                  onKeyDown={(e) => handleKeyDown(e, "origin")}
                 />
                 {searchOriginQuery && (
                   <Button
@@ -359,6 +391,7 @@ export default function Home() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setSearchDestinationQuery(e.target.value)
                   }
+                  onKeyDown={(e) => handleKeyDown(e, "destination")}
                 />
                 {searchDestinationQuery && (
                   <Button
