@@ -341,15 +341,15 @@ export default function Home() {
     <div className="w-full max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
-      <div className="relative flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-2">
+      <div className="relative flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-2">
         {/* Origin Input */}
-        <div className="relative">
+        <div className="w-full sm:flex-1">
           <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
             <PopoverTrigger asChild>
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPlaneDeparture}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 "
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700"
                 />
                 <div className="relative">
                   <Input
@@ -358,9 +358,7 @@ export default function Home() {
                     }`}
                     placeholder="From"
                     value={searchOriginQuery}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSearchOriginQuery(e.target.value)
-                    }
+                    onChange={(e) => setSearchOriginQuery(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, "origin")}
                   />
                   {selectedOrigin?.subType === "AIRPORT" && (
@@ -396,10 +394,12 @@ export default function Home() {
             </PopoverContent>
           </Popover>
         </div>
+
+        {/* Swap Button */}
         <Button
           onClick={swapLocations}
           variant="outline"
-          className="absolute top-[35%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-auto"
+          className="absolute top-[50%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
         >
           <FontAwesomeIcon
             icon={faExchangeAlt}
@@ -408,8 +408,9 @@ export default function Home() {
             }`}
           />
         </Button>
+
         {/* Destination Input */}
-        <div className="relative">
+        <div className="w-full sm:flex-1">
           <Popover
             open={destinationPopoverOpen}
             onOpenChange={setDestinationPopoverOpen}
@@ -429,9 +430,7 @@ export default function Home() {
                     }`}
                     placeholder="To"
                     value={searchDestinationQuery}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSearchDestinationQuery(e.target.value)
-                    }
+                    onChange={(e) => setSearchDestinationQuery(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, "destination")}
                   />
                   {selectedDestination?.subType === "AIRPORT" && (
