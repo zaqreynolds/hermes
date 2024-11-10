@@ -349,7 +349,7 @@ export default function Home() {
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPlaneDeparture}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
                 />
                 <div className="relative">
                   <Input
@@ -419,7 +419,7 @@ export default function Home() {
               <div className="relative">
                 <FontAwesomeIcon
                   icon={faPlaneArrival}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
                 />
                 <div className="relative">
                   <Input
