@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useScreenSize } from "@/hooks/useScreenSize";
 // import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Address {
@@ -88,6 +89,8 @@ export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isRotated, setIsRotated] = useState<boolean>(false);
 
+  const { isMobile } = useScreenSize();
+
   const debouncedOrigin = useDebounce(searchOriginQuery, 500);
   const debouncedDestination = useDebounce(searchDestinationQuery, 500);
 
@@ -106,12 +109,8 @@ export default function Home() {
 
   const fetchLocations = async (
     keyword: string,
-    travelDirection: TravelDirection,
-    cityCode?: string
+    travelDirection: TravelDirection
   ): Promise<void> => {
-    console.log(
-      `fetchLocations called with keyword: ${keyword}, travelDirection: ${travelDirection}, cityCode: ${cityCode}`
-    );
     if (travelDirection === "origin") {
       setIsLoadingOrigin(true);
     } else {
@@ -144,26 +143,14 @@ export default function Home() {
         setIsLoadingDestination(false);
       }
     }
-    console.log("fetchLocations completed");
   };
 
   useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("debouncedOrigin:", debouncedOrigin);
-    console.log("debouncedDestination:", debouncedDestination);
-    console.log("selectedOrigin:", selectedOrigin);
-    console.log("selectedDestination:", selectedDestination);
-
     if (debouncedOrigin === "") {
       setOriginQueryData([]);
       setOriginPopoverOpen(false);
-    } else if (
-      debouncedOrigin &&
-      ((searchOriginQuery && !selectedOrigin) ||
-        selectedOrigin?.subType === "CITY")
-    ) {
-      console.log("Fetching origin locations");
-      fetchLocations(debouncedOrigin, "origin", selectedOrigin?.iataCode);
+    } else if (debouncedOrigin && searchOriginQuery && !selectedOrigin) {
+      fetchLocations(debouncedOrigin, "origin");
       setOriginPopoverOpen(true);
     }
 
@@ -172,15 +159,10 @@ export default function Home() {
       setDestinationPopoverOpen(false);
     } else if (
       debouncedDestination &&
-      ((searchDestinationQuery && !selectedDestination) ||
-        selectedDestination?.subType === "CITY")
+      searchDestinationQuery &&
+      !selectedDestination
     ) {
-      console.log("Fetching destination locations");
-      fetchLocations(
-        debouncedDestination,
-        "destination",
-        selectedDestination?.iataCode
-      );
+      fetchLocations(debouncedDestination, "destination");
       setDestinationPopoverOpen(true);
     }
   }, [
@@ -195,23 +177,13 @@ export default function Home() {
     travelDirection: TravelDirection
   ): void => {
     if (travelDirection === "origin") {
-      if (location.subType === "CITY") {
-        setSearchOriginQuery(location.name);
-        setOriginPopoverOpen(true);
-      } else {
-        setSelectedOrigin(location);
-        setSearchOriginQuery(location.name);
-        setOriginPopoverOpen(false);
-      }
+      setSelectedOrigin(location);
+      setSearchOriginQuery(location.name);
+      setOriginPopoverOpen(false);
     } else {
-      if (location.subType === "CITY") {
-        setSearchDestinationQuery(location.name);
-        setDestinationPopoverOpen(true);
-      } else {
-        setSelectedDestination(location);
-        setSearchDestinationQuery(location.name);
-        setDestinationPopoverOpen(false);
-      }
+      setSelectedDestination(location);
+      setSearchDestinationQuery(location.name);
+      setDestinationPopoverOpen(false);
     }
   };
 
@@ -221,24 +193,13 @@ export default function Home() {
       setSelectedOrigin(null);
       setOriginQueryData([]);
       setOriginPopoverOpen(false);
-      console.log("Cleared originQueryData:", originQueryData);
     } else {
       setSearchDestinationQuery("");
       setSelectedDestination(null);
       setDestinationQueryData([]);
       setDestinationPopoverOpen(false);
-      console.log("Cleared destinationQueryData:", destinationQueryData);
     }
   };
-
-  // console.log("searchOriginQuery", searchOriginQuery);
-  // console.log("searchDestinationQuery", searchDestinationQuery);
-  // console.log("originQueryData", originQueryData);
-  // console.log("destinationQueryData", destinationQueryData);
-  // console.log("selectedOrigin", selectedOrigin);
-  // console.log("selectedDestination", selectedDestination);
-  // console.log("debouncedOrigin", debouncedOrigin);
-  // console.log("debouncedDestination", debouncedDestination);
 
   const handleKeyDown = (
     e: React.KeyboardEvent,
@@ -277,6 +238,13 @@ export default function Home() {
       return searchDestinationQuery;
     });
     setIsRotated((prev) => !prev);
+  };
+
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
   };
 
   const renderLocationList = (
@@ -337,13 +305,16 @@ export default function Home() {
     );
   };
 
+  console.log("Selected Origin:", selectedOrigin);
+  console.log("Selected Destination:", selectedDestination);
+
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <div className="relative flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-2">
         {/* Origin Input */}
-        <div className="w-full sm:flex-1">
+        <div className="w-full flex-1">
           <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
             <PopoverTrigger asChild>
               <div className="relative">
@@ -354,19 +325,21 @@ export default function Home() {
                 <div className="relative">
                   <Input
                     className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
-                      selectedOrigin?.subType === "AIRPORT" ? "pt-5 pb-1" : ""
+                      selectedOrigin ? `pt-5 pb-1` : ""
                     }`}
                     placeholder="From"
                     value={searchOriginQuery}
                     onChange={(e) => setSearchOriginQuery(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, "origin")}
                   />
-                  {selectedOrigin?.subType === "AIRPORT" && (
-                    <div className="absolute left-10 top-1.5 right-10">
-                      <div className="text-[10px] text-muted-foreground">
-                        {selectedOrigin.address.cityName},{" "}
-                        {selectedOrigin.address.countryName}
-                      </div>
+                  {selectedOrigin && (
+                    <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
+                      {truncateText(
+                        `${selectedOrigin.address.cityName}, ${" "} ${
+                          selectedOrigin.address.countryName
+                        }`,
+                        isMobile ? 64 : 34
+                      )}
                     </div>
                   )}
                 </div>
@@ -410,7 +383,7 @@ export default function Home() {
         </Button>
 
         {/* Destination Input */}
-        <div className="w-full sm:flex-1">
+        <div className="w-full flex-1">
           <Popover
             open={destinationPopoverOpen}
             onOpenChange={setDestinationPopoverOpen}
@@ -424,21 +397,21 @@ export default function Home() {
                 <div className="relative">
                   <Input
                     className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
-                      selectedDestination?.subType === "AIRPORT"
-                        ? "pt-5 pb-1"
-                        : ""
+                      selectedDestination ? `pt-5 pb-1` : ""
                     }`}
                     placeholder="To"
                     value={searchDestinationQuery}
                     onChange={(e) => setSearchDestinationQuery(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, "destination")}
                   />
-                  {selectedDestination?.subType === "AIRPORT" && (
-                    <div className="absolute left-10 top-1.5 right-10">
-                      <div className="text-[10px] text-muted-foreground">
-                        {selectedDestination.address.cityName},{" "}
-                        {selectedDestination.address.countryName}
-                      </div>
+                  {selectedDestination && (
+                    <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
+                      {truncateText(
+                        `${selectedDestination.address.cityName}, ${" "} ${
+                          selectedDestination.address.countryName
+                        }`,
+                        isMobile ? 64 : 34
+                      )}
                     </div>
                   )}
                 </div>
