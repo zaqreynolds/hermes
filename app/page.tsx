@@ -19,6 +19,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useScreenSize } from "@/hooks/useScreenSize";
+import { cn } from "@/lib/utils";
+import { Calendar1Icon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 // import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Address {
@@ -88,6 +92,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isRotated, setIsRotated] = useState<boolean>(false);
+  const [departureDate, setDepartureDate] = useState<Date | null>(null);
+  const [returnDate, setReturnDate] = useState<Date | null>(null);
 
   const { isMobile } = useScreenSize();
 
@@ -312,130 +318,209 @@ export default function Home() {
     <div className="w-full flex flex-col p-4 overflow-auto">
       <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
-      <div className="relative flex flex-col justify-center sm:flex-row sm:items-center gap-4 sm:gap-2">
-        {/* Origin Input */}
-        <div className="flex w-full flex-1 justify-end">
-          <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
-            <PopoverTrigger asChild>
-              <div className="relative w-full max-w-[358px]">
-                <FontAwesomeIcon
-                  icon={faPlaneDeparture}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
-                />
-                <div className="relative">
-                  <Input
-                    className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
-                      selectedOrigin ? `pt-5 pb-1` : ""
-                    }`}
-                    placeholder="From"
-                    value={searchOriginQuery}
-                    onChange={(e) => setSearchOriginQuery(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, "origin")}
+      <div className="flex flex-col">
+        <div className="relative flex flex-col justify-center pb-2 sm:flex-row gap-4 sm:gap-2">
+          {/* Origin Input */}
+          <div className="flex w-full flex-1 justify-end">
+            <Popover
+              open={originPopoverOpen}
+              onOpenChange={setOriginPopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <div className="relative w-full max-w-[358px]">
+                  <FontAwesomeIcon
+                    icon={faPlaneDeparture}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
                   />
-                  {selectedOrigin && (
-                    <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
-                      {truncateText(
-                        `${selectedOrigin.address.cityName}, ${" "} ${
-                          selectedOrigin.address.countryName
-                        }`,
-                        isMobile ? 64 : 34
-                      )}
-                    </div>
+                  <div className="relative">
+                    <Input
+                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
+                        selectedOrigin ? `pt-5 pb-1` : ""
+                      }`}
+                      placeholder="From"
+                      value={searchOriginQuery}
+                      onChange={(e) => setSearchOriginQuery(e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, "origin")}
+                    />
+                    {selectedOrigin && (
+                      <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
+                        {truncateText(
+                          `${selectedOrigin.address.cityName}, ${" "} ${
+                            selectedOrigin.address.countryName
+                          }`,
+                          isMobile ? 64 : 34
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {searchOriginQuery && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => handleClearInput("origin")}
+                    >
+                      <FontAwesomeIcon
+                        icon={faTimesCircle}
+                        className="text-foreground"
+                      />
+                    </Button>
                   )}
                 </div>
-                {searchOriginQuery && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                    onClick={() => handleClearInput("origin")}
-                  >
-                    <FontAwesomeIcon
-                      icon={faTimesCircle}
-                      className="text-foreground"
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-[var(--radix-popover-trigger-width)] p-0"
+                sideOffset={4}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+              >
+                {renderLocationList("origin")}
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Swap Button */}
+          <Button
+            onClick={swapLocations}
+            variant="outline"
+            className="absolute top-[50%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
+          >
+            <FontAwesomeIcon
+              icon={faExchangeAlt}
+              className={`transition-transform duration-300 transform ${
+                isRotated ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </Button>
+
+          {/* Destination Input */}
+          <div className="flex w-full flex-1 justify-start">
+            <Popover
+              open={destinationPopoverOpen}
+              onOpenChange={setDestinationPopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <div className="relative w-full max-w-[358px]">
+                  <FontAwesomeIcon
+                    icon={faPlaneArrival}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
+                  />
+                  <div className="relative">
+                    <Input
+                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
+                        selectedDestination ? `pt-5 pb-1` : ""
+                      }`}
+                      placeholder="To"
+                      value={searchDestinationQuery}
+                      onChange={(e) =>
+                        setSearchDestinationQuery(e.target.value)
+                      }
+                      onKeyDown={(e) => handleKeyDown(e, "destination")}
                     />
-                  </Button>
+                    {selectedDestination && (
+                      <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
+                        {truncateText(
+                          `${selectedDestination.address.cityName}, ${" "} ${
+                            selectedDestination.address.countryName
+                          }`,
+                          isMobile ? 64 : 34
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {searchDestinationQuery && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => handleClearInput("destination")}
+                    >
+                      <FontAwesomeIcon
+                        icon={faTimesCircle}
+                        className="text-foreground"
+                      />
+                    </Button>
+                  )}
+                </div>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-[var(--radix-popover-trigger-width)] p-0"
+                sideOffset={4}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+              >
+                {renderLocationList("destination")}
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        <div className="flex w-full justify-around">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-44 justify-start text-left text-xs"
+              >
+                <Calendar1Icon />
+                {departureDate ? (
+                  format(departureDate, "PPP")
+                ) : (
+                  <span className="opacity-70">Pick a date to depart</span>
                 )}
-              </div>
+              </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="w-[var(--radix-popover-trigger-width)] p-0"
-              sideOffset={4}
-              onOpenAutoFocus={(e) => e.preventDefault()}
+              align="start"
+              className="flex w-auto flex-col space-y-2 p-2"
             >
-              {renderLocationList("origin")}
+              <Calendar
+                mode="single"
+                selected={departureDate ?? undefined}
+                onSelect={(day) => setDepartureDate(day ?? null)}
+                fromDate={new Date()}
+                toDate={returnDate ?? undefined}
+                initialFocus
+              />
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  className="w-fit text-xs"
+                  onClick={() => setDepartureDate(null)}
+                >
+                  Clear Date
+                </Button>
+              </div>
             </PopoverContent>
           </Popover>
-        </div>
-
-        {/* Swap Button */}
-        <Button
-          onClick={swapLocations}
-          variant="outline"
-          className="absolute top-[50%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
-        >
-          <FontAwesomeIcon
-            icon={faExchangeAlt}
-            className={`transition-transform duration-300 transform ${
-              isRotated ? "rotate-180" : "rotate-0"
-            }`}
-          />
-        </Button>
-
-        {/* Destination Input */}
-        <div className="flex w-full flex-1 justify-start">
-          <Popover
-            open={destinationPopoverOpen}
-            onOpenChange={setDestinationPopoverOpen}
-          >
+          <Popover>
             <PopoverTrigger asChild>
-              <div className="relative w-full max-w-[358px]">
-                <FontAwesomeIcon
-                  icon={faPlaneArrival}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
-                />
-                <div className="relative">
-                  <Input
-                    className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
-                      selectedDestination ? `pt-5 pb-1` : ""
-                    }`}
-                    placeholder="To"
-                    value={searchDestinationQuery}
-                    onChange={(e) => setSearchDestinationQuery(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, "destination")}
-                  />
-                  {selectedDestination && (
-                    <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
-                      {truncateText(
-                        `${selectedDestination.address.cityName}, ${" "} ${
-                          selectedDestination.address.countryName
-                        }`,
-                        isMobile ? 64 : 34
-                      )}
-                    </div>
-                  )}
-                </div>
-                {searchDestinationQuery && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                    onClick={() => handleClearInput("destination")}
-                  >
-                    <FontAwesomeIcon
-                      icon={faTimesCircle}
-                      className="text-foreground"
-                    />
-                  </Button>
+              <Button
+                variant="outline"
+                className="w-44 justify-start text-left text-xs"
+              >
+                <Calendar1Icon />
+                {returnDate ? (
+                  format(returnDate, "PPP")
+                ) : (
+                  <span className="opacity-70">Pick a date to return</span>
                 )}
-              </div>
+              </Button>
             </PopoverTrigger>
-            <PopoverContent
-              className="w-[var(--radix-popover-trigger-width)] p-0"
-              sideOffset={4}
-              onOpenAutoFocus={(e) => e.preventDefault()}
-            >
-              {renderLocationList("destination")}
+            <PopoverContent align="start" className="flex w-auto flex-col p-2">
+              <Calendar
+                mode="single"
+                selected={returnDate ?? undefined}
+                onSelect={(day) => setReturnDate(day ?? null)}
+                fromDate={departureDate ?? new Date()}
+                initialFocus
+              />
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  className="w-fit text-xs"
+                  onClick={() => setReturnDate(null)}
+                >
+                  Clear Date
+                </Button>
+              </div>
             </PopoverContent>
           </Popover>
         </div>
