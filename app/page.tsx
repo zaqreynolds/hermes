@@ -334,7 +334,7 @@ export default function Home() {
                   />
                   <div className="relative">
                     <Input
-                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
+                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted ${
                         selectedOrigin ? `pt-5 pb-1` : ""
                       }`}
                       placeholder="From"
@@ -406,7 +406,7 @@ export default function Home() {
                   />
                   <div className="relative">
                     <Input
-                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-muted focus:bg-muted ${
+                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted ${
                         selectedDestination ? `pt-5 pb-1` : ""
                       }`}
                       placeholder="To"
@@ -453,6 +453,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex w-full justify-around">
+          {/* Departure Date Picker*/}
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -490,6 +491,7 @@ export default function Home() {
               </div>
             </PopoverContent>
           </Popover>
+          {/* Return Date Picker*/}
           <Popover>
             <PopoverTrigger asChild>
               <Button
