@@ -309,15 +309,15 @@ export default function Home() {
   console.log("Selected Destination:", selectedDestination);
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
+    <div className="w-full flex flex-col p-4 overflow-auto">
       <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
-      <div className="relative flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-2">
+      <div className="relative flex flex-col justify-center sm:flex-row sm:items-center gap-4 sm:gap-2">
         {/* Origin Input */}
-        <div className="w-full flex-1">
+        <div className="flex w-full flex-1 justify-end">
           <Popover open={originPopoverOpen} onOpenChange={setOriginPopoverOpen}>
             <PopoverTrigger asChild>
-              <div className="relative">
+              <div className="relative w-full max-w-[358px]">
                 <FontAwesomeIcon
                   icon={faPlaneDeparture}
                   className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
@@ -383,13 +383,13 @@ export default function Home() {
         </Button>
 
         {/* Destination Input */}
-        <div className="w-full flex-1">
+        <div className="flex w-full flex-1 justify-start">
           <Popover
             open={destinationPopoverOpen}
             onOpenChange={setDestinationPopoverOpen}
           >
             <PopoverTrigger asChild>
-              <div className="relative">
+              <div className="relative w-full max-w-[358px]">
                 <FontAwesomeIcon
                   icon={faPlaneArrival}
                   className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
