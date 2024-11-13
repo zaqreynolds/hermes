@@ -8,6 +8,8 @@ import {
   faPlaneArrival,
   faPlaneDeparture,
   faPlaneUp,
+  faRepeat,
+  faRightLong,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { Calendar1Icon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 // import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Address {
@@ -272,11 +275,11 @@ export default function Home() {
             {locationData.map((location) => (
               <li
                 key={location.id}
-                className={`p-3 hover:bg-accent cursor-pointer hover:shadow-lg ${
-                  selectedIndex === locationData.indexOf(location)
-                    ? "bg-accent"
-                    : ""
-                }`}
+                className={cn(
+                  "p-3 hover:bg-accent cursor-pointer hover:shadow-lg",
+                  selectedIndex === locationData.indexOf(location) &&
+                    "bg-accent"
+                )}
                 onClick={() => handleLocationSelect(location, travelDirection)}
               >
                 <div className="flex items-center">
@@ -319,6 +322,17 @@ export default function Home() {
       <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <div className="flex flex-col">
+        <div className="flex flex-col w-full pb-2">
+          {/* Roundtrip vs Oneway toggle */}
+          <ToggleGroup type="single" variant="outline">
+            <ToggleGroupItem value="roundTrip">
+              <FontAwesomeIcon icon={faRepeat} />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="oneWay">
+              <FontAwesomeIcon icon={faRightLong} />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
         <div className="relative flex flex-col justify-center pb-2 sm:flex-row gap-4 sm:gap-2">
           {/* Origin Input */}
           <div className="flex w-full flex-1 justify-end">
@@ -386,9 +400,10 @@ export default function Home() {
           >
             <FontAwesomeIcon
               icon={faExchangeAlt}
-              className={`transition-transform duration-300 transform ${
+              className={cn(
+                "transition-transform duration-300 transform",
                 isRotated ? "rotate-180" : "rotate-0"
-              }`}
+              )}
             />
           </Button>
 
@@ -406,9 +421,10 @@ export default function Home() {
                   />
                   <div className="relative">
                     <Input
-                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted ${
-                        selectedDestination ? `pt-5 pb-1` : ""
-                      }`}
+                      className={cn(
+                        "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
+                        selectedDestination && "pt-5 pb-1"
+                      )}
                       placeholder="To"
                       value={searchDestinationQuery}
                       onChange={(e) =>
