@@ -22,10 +22,19 @@ import {
 } from "@/components/ui/popover";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { cn } from "@/lib/utils";
-import { Calendar1Icon } from "lucide-react";
+import { Calendar1Icon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 // import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Address {
@@ -97,6 +106,9 @@ export default function Home() {
   const [isRotated, setIsRotated] = useState<boolean>(false);
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
   const [returnDate, setReturnDate] = useState<Date | null>(null);
+  const [adults, setAdults] = useState<number>(1);
+  const [children, setChildren] = useState<number>(0);
+  const [infants, setInfants] = useState<number>(0);
 
   const { isMobile } = useScreenSize();
 
@@ -115,6 +127,32 @@ export default function Home() {
 
   // and then this for the button click
   // router.push(pathname + '?' + createQueryString('key', 'value'));
+
+  const maxTravelers = 9;
+
+  const totalTravelers = adults + children + infants;
+
+  const incrementAdults = () => {
+    if (adults + children < maxTravelers) setAdults(adults + 1);
+  };
+  const decrementAdults = () => {
+    if (adults > 1) setAdults(adults - 1);
+    if (infants > adults - 1) setInfants(adults - 1);
+  };
+
+  const incrementChildren = () => {
+    if (adults + children < maxTravelers) setChildren(children + 1);
+  };
+  const decrementChildren = () => {
+    if (children > 0) setChildren(children - 1);
+  };
+
+  const incrementInfants = () => {
+    if (infants < adults) setInfants(infants + 1);
+  };
+  const decrementInfants = () => {
+    if (infants > 0) setInfants(infants - 1);
+  };
 
   const fetchLocations = async (
     keyword: string,
@@ -306,7 +344,7 @@ export default function Home() {
             ))}
           </ul>
         ) : (
-          <div className="p-3 text-center text-gray-500">
+          <div className="p-3 text-center text-gray-500 opacity-50">
             No locations found
           </div>
         )}
@@ -319,19 +357,127 @@ export default function Home() {
 
   return (
     <div className="w-full flex flex-col p-4 overflow-auto">
-      <h1 className="text-2xl font-bold mb-6">Hermes</h1>
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <div className="flex flex-col">
-        <div className="flex flex-col w-full pb-2">
+        <div className="flex w-full pb-2">
           {/* Roundtrip vs Oneway toggle */}
-          <ToggleGroup type="single" variant="outline">
-            <ToggleGroupItem value="roundTrip">
+          <ToggleGroup type="single">
+            <ToggleGroupItem value="roundTrip" className="shadow-md">
+              <span className="mr-1 text-xs">Round-trip</span>
               <FontAwesomeIcon icon={faRepeat} />
             </ToggleGroupItem>
-            <ToggleGroupItem value="oneWay">
+            <ToggleGroupItem value="oneWay" className="shadow-md">
+              <span className="mr-1 text-xs">One-way</span>
               <FontAwesomeIcon icon={faRightLong} />
             </ToggleGroupItem>
           </ToggleGroup>
+          <Separator orientation="vertical" className="mx-1 bg-input" />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-44 mr-1 justify-between text-left text-xs"
+              >
+                {`Travelers: ${totalTravelers} `}
+                <ChevronDown className="opacity-50" />
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="flex flex-col w-fit p-3 space-y-3 ">
+              {/* Adults */}
+              <div className="flex items-center justify-between  w-40">
+                <Label className="text-xs font-medium ">Adults</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    onClick={decrementAdults}
+                    disabled={adults <= 1}
+                    variant="outline"
+                    size="sm"
+                  >
+                    -
+                  </Button>
+                  <span className="text-xs">{adults}</span>
+                  <Button
+                    onClick={incrementAdults}
+                    disabled={adults + children >= maxTravelers}
+                    variant="outline"
+                    size="sm"
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* Children */}
+              <div className="flex items-center justify-between w-40">
+                <Label className="text-xs font-medium">Children</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    onClick={decrementChildren}
+                    disabled={children <= 0}
+                    variant="outline"
+                    size="sm"
+                  >
+                    -
+                  </Button>
+                  <span className="text-xs">{children}</span>
+                  <Button
+                    onClick={incrementChildren}
+                    disabled={adults + children >= maxTravelers}
+                    variant="outline"
+                    size="sm"
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* Infants */}
+              <div className="flex items-center justify-between  w-40">
+                <Label className="text-xs font-medium">Infants</Label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    onClick={decrementInfants}
+                    disabled={infants <= 0}
+                    variant="outline"
+                    size="sm"
+                  >
+                    -
+                  </Button>
+                  <span className="text-xs">{infants}</span>
+                  <Button
+                    onClick={incrementInfants}
+                    disabled={infants >= adults}
+                    variant="outline"
+                    size="sm"
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Flight Class Select */}
+          <Select>
+            <SelectTrigger className="w-32 text-xs">
+              <SelectValue placeholder="Flight class" />
+            </SelectTrigger>
+            <SelectContent className="w-32">
+              <SelectItem value="economy" className="text-xs  pr-1 ">
+                Economy
+              </SelectItem>
+              <SelectItem value="premiumEconomy" className="text-xs pr-1 ">
+                Premium Economy
+              </SelectItem>
+              <SelectItem value="business" className="text-xs  pr-1 ">
+                Business
+              </SelectItem>
+              <SelectItem value="first" className="text-xs  pr-1 ">
+                First
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="relative flex flex-col justify-center pb-2 sm:flex-row gap-4 sm:gap-2">
           {/* Origin Input */}
@@ -344,7 +490,7 @@ export default function Home() {
                 <div className="relative w-full max-w-[358px]">
                   <FontAwesomeIcon
                     icon={faPlaneDeparture}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10"
                   />
                   <div className="relative">
                     <Input
@@ -417,7 +563,7 @@ export default function Home() {
                 <div className="relative w-full max-w-[358px]">
                   <FontAwesomeIcon
                     icon={faPlaneArrival}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-700 z-10"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10"
                   />
                   <div className="relative">
                     <Input
