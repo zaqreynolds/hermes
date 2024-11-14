@@ -35,7 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <main className="flex flex-col items-center sm:items-start h-screen overflow-hidden bg-opacity-90">
-          <h1 className="w-full text-left text-2xl font-bold py-3 pl-4 bg-secondary-foreground text-secondary shadow-md">
+          <h1 className="w-full text-left text-2xl font-bold py-3 pl-4 bg-primary text-secondary shadow-md">
             Hermes
           </h1>
           {children}

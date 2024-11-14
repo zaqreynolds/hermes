@@ -8,8 +8,6 @@ import {
   faPlaneArrival,
   faPlaneDeparture,
   faPlaneUp,
-  faRepeat,
-  faRightLong,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,11 +23,10 @@ import { cn } from "@/lib/utils";
 import { Calendar1Icon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -109,6 +106,7 @@ export default function Home() {
   const [adults, setAdults] = useState<number>(1);
   const [children, setChildren] = useState<number>(0);
   const [infants, setInfants] = useState<number>(0);
+  const [isOneWay, setIsOneWay] = useState<boolean>(false);
 
   const { isMobile } = useScreenSize();
 
@@ -352,26 +350,33 @@ export default function Home() {
     );
   };
 
-  console.log("Selected Origin:", selectedOrigin);
-  console.log("Selected Destination:", selectedDestination);
-
   return (
     <div className="w-full flex flex-col p-4 overflow-auto">
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
-      <div className="flex flex-col">
-        <div className="flex w-full pb-2">
+      {/* form Div */}
+      <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
+        <div className="flex w-full gap-1 pb-2 ">
           {/* Roundtrip vs Oneway toggle */}
-          <ToggleGroup type="single">
-            <ToggleGroupItem value="roundTrip" className="shadow-md">
-              <span className="mr-1 text-xs">Round-trip</span>
-              <FontAwesomeIcon icon={faRepeat} />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="oneWay" className="shadow-md">
-              <span className="mr-1 text-xs">One-way</span>
-              <FontAwesomeIcon icon={faRightLong} />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <Separator orientation="vertical" className="mx-1 bg-input" />
+
+          <Select
+            value={isOneWay ? "oneWay" : "roundtrip"}
+            onValueChange={(value) => setIsOneWay(value === "oneWay")}
+          >
+            <SelectTrigger className="w-24 text-xs mr-1 hover:bg-accent">
+              <SelectValue>{isOneWay ? "One-Way" : "Roundtrip"}</SelectValue>
+            </SelectTrigger>
+            <SelectContent className="w-24 min-w-fit">
+              <SelectGroup className="w-full">
+                <SelectItem value="oneWay" className="text-xs mr-1 pr-1 ">
+                  One-Way
+                </SelectItem>
+                <SelectItem value="roundtrip" className="text-xs  mr-1 pr-1">
+                  Roundtrip
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -382,7 +387,6 @@ export default function Home() {
                 <ChevronDown className="opacity-50" />
               </Button>
             </PopoverTrigger>
-
             <PopoverContent className="flex flex-col w-fit p-3 space-y-3 ">
               {/* Adults */}
               <div className="flex items-center justify-between  w-40">
@@ -460,43 +464,48 @@ export default function Home() {
 
           {/* Flight Class Select */}
           <Select>
-            <SelectTrigger className="w-32 text-xs">
+            <SelectTrigger className="w-36 text-xs hover:bg-accent">
               <SelectValue placeholder="Flight class" />
             </SelectTrigger>
-            <SelectContent className="w-32">
-              <SelectItem value="economy" className="text-xs  pr-1 ">
-                Economy
-              </SelectItem>
-              <SelectItem value="premiumEconomy" className="text-xs pr-1 ">
-                Premium Economy
-              </SelectItem>
-              <SelectItem value="business" className="text-xs  pr-1 ">
-                Business
-              </SelectItem>
-              <SelectItem value="first" className="text-xs  pr-1 ">
-                First
-              </SelectItem>
+            <SelectContent className="w-36">
+              <SelectGroup>
+                <SelectItem value="economy" className="text-xs  pr-1 ">
+                  Economy
+                </SelectItem>
+                <SelectItem value="premiumEconomy" className="text-xs pr-1 ">
+                  Premium Economy
+                </SelectItem>
+                <SelectItem value="business" className="text-xs  pr-1 ">
+                  Business
+                </SelectItem>
+                <SelectItem value="first" className="text-xs  pr-1 ">
+                  First
+                </SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
-        <div className="relative flex flex-col justify-center pb-2 sm:flex-row gap-4 sm:gap-2">
+        <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
           {/* Origin Input */}
-          <div className="flex w-full flex-1 justify-end">
+          <div className="flex w-full justify-start">
             <Popover
               open={originPopoverOpen}
               onOpenChange={setOriginPopoverOpen}
             >
               <PopoverTrigger asChild>
-                <div className="relative w-full max-w-[358px]">
+                <div
+                  className={cn("relative", isMobile ? "w-full" : "w-[360px]")}
+                >
                   <FontAwesomeIcon
                     icon={faPlaneDeparture}
                     className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10"
                   />
                   <div className="relative">
                     <Input
-                      className={`w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted ${
-                        selectedOrigin ? `pt-5 pb-1` : ""
-                      }`}
+                      className={cn(
+                        "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
+                        selectedOrigin && "pt-5 pb-1"
+                      )}
                       placeholder="From"
                       value={searchOriginQuery}
                       onChange={(e) => setSearchOriginQuery(e.target.value)}
@@ -542,25 +551,28 @@ export default function Home() {
           <Button
             onClick={swapLocations}
             variant="outline"
-            className="absolute top-[50%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
+            className="absolute top-[33%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
           >
             <FontAwesomeIcon
               icon={faExchangeAlt}
               className={cn(
-                "transition-transform duration-300 transform",
+                "transition-transform duration-300 transform ",
+                isMobile ? "rotate-90" : "",
                 isRotated ? "rotate-180" : "rotate-0"
               )}
             />
           </Button>
 
           {/* Destination Input */}
-          <div className="flex w-full flex-1 justify-start">
+          <div className="flex w-full justify-start">
             <Popover
               open={destinationPopoverOpen}
               onOpenChange={setDestinationPopoverOpen}
             >
               <PopoverTrigger asChild>
-                <div className="relative w-full max-w-[358px]">
+                <div
+                  className={cn("relative", isMobile ? "w-full" : "w-[360px]")}
+                >
                   <FontAwesomeIcon
                     icon={faPlaneArrival}
                     className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10"
@@ -613,80 +625,86 @@ export default function Home() {
               </PopoverContent>
             </Popover>
           </div>
+          <div className="flex w-full gap-2">
+            {/* Departure Date Picker*/}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-44 h-full justify-start text-left text-xs"
+                >
+                  <Calendar1Icon />
+                  {departureDate ? (
+                    format(departureDate, "PPP")
+                  ) : (
+                    <span className="opacity-70">Pick a date to depart</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                className="flex w-auto flex-col space-y-2 p-2"
+              >
+                <Calendar
+                  mode="single"
+                  selected={departureDate ?? undefined}
+                  onSelect={(day) => setDepartureDate(day ?? null)}
+                  fromDate={new Date()}
+                  toDate={returnDate ?? undefined}
+                  initialFocus
+                />
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    className="w-fit text-xs"
+                    onClick={() => setDepartureDate(null)}
+                  >
+                    Clear Date
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+            {/* Return Date Picker*/}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-44 h-full justify-start text-left text-xs"
+                >
+                  <Calendar1Icon />
+                  {returnDate ? (
+                    format(returnDate, "PPP")
+                  ) : (
+                    <span className="opacity-70">Pick a date to return</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                className="flex w-auto flex-col p-2"
+              >
+                <Calendar
+                  mode="single"
+                  selected={returnDate ?? undefined}
+                  onSelect={(day) => setReturnDate(day ?? null)}
+                  fromDate={departureDate ?? new Date()}
+                  initialFocus
+                />
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    className="w-fit text-xs"
+                    onClick={() => setReturnDate(null)}
+                  >
+                    Clear Date
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
-        <div className="flex w-full justify-around">
-          {/* Departure Date Picker*/}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-44 justify-start text-left text-xs"
-              >
-                <Calendar1Icon />
-                {departureDate ? (
-                  format(departureDate, "PPP")
-                ) : (
-                  <span className="opacity-70">Pick a date to depart</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="start"
-              className="flex w-auto flex-col space-y-2 p-2"
-            >
-              <Calendar
-                mode="single"
-                selected={departureDate ?? undefined}
-                onSelect={(day) => setDepartureDate(day ?? null)}
-                fromDate={new Date()}
-                toDate={returnDate ?? undefined}
-                initialFocus
-              />
-              <div className="flex justify-end">
-                <Button
-                  variant="outline"
-                  className="w-fit text-xs"
-                  onClick={() => setDepartureDate(null)}
-                >
-                  Clear Date
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          {/* Return Date Picker*/}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-44 justify-start text-left text-xs"
-              >
-                <Calendar1Icon />
-                {returnDate ? (
-                  format(returnDate, "PPP")
-                ) : (
-                  <span className="opacity-70">Pick a date to return</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="flex w-auto flex-col p-2">
-              <Calendar
-                mode="single"
-                selected={returnDate ?? undefined}
-                onSelect={(day) => setReturnDate(day ?? null)}
-                fromDate={departureDate ?? new Date()}
-                initialFocus
-              />
-              <div className="flex justify-end">
-                <Button
-                  variant="outline"
-                  className="w-fit text-xs"
-                  onClick={() => setReturnDate(null)}
-                >
-                  Clear Date
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+        <div className="flex justify-end">
+          <Button className="w-fit ">Search</Button>
         </div>
       </div>
     </div>
