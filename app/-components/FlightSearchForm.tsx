@@ -17,11 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  faCity,
   faExchangeAlt,
   faPlaneArrival,
   faPlaneDeparture,
-  faPlaneUp,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,6 +31,7 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { LocationList } from "./LocationList";
 
 export const FlightSearchForm = () => {
   const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
@@ -234,64 +233,6 @@ export const FlightSearchForm = () => {
     return text;
   };
 
-  const renderLocationList = (
-    travelDirection: TravelDirection
-  ): React.ReactNode => {
-    const locationData =
-      travelDirection === "origin" ? originQueryData : destinationQueryData;
-    const isLoading =
-      travelDirection === "origin" ? isLoadingOrigin : isLoadingDestination;
-
-    return (
-      <div className="max-h-96 overflow-y-auto">
-        {isLoading ? (
-          <div className="p-3 text-center text-gray-500">Loading...</div>
-        ) : error ? (
-          <div className="p-3 text-center text-red-500">{error}</div>
-        ) : locationData.length > 0 ? (
-          <ul className="divide-y divide-gray-100">
-            {locationData.map((location) => (
-              <li
-                key={location.id}
-                className={cn(
-                  "p-3 hover:bg-accent cursor-pointer hover:shadow-lg",
-                  selectedIndex === locationData.indexOf(location) &&
-                    "bg-accent"
-                )}
-                onClick={() => handleLocationSelect(location, travelDirection)}
-              >
-                <div className="flex items-center">
-                  <div>
-                    <p className="font-medium flex items-center">
-                      {location.name}
-                      <FontAwesomeIcon
-                        icon={
-                          location.subType === "AIRPORT" ? faPlaneUp : faCity
-                        }
-                        className="h-3 w-3 pl-2"
-                      />
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {location.address.cityName},{" "}
-                      {location.address.countryName}
-                    </p>
-                  </div>
-                  <span className="ml-auto text-sm text-gray-400">
-                    {location.iataCode}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="p-3 text-center text-gray-500 opacity-50">
-            No locations found
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <div className="flex w-full gap-1 pb-2 ">
@@ -478,7 +419,14 @@ export const FlightSearchForm = () => {
               sideOffset={4}
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
-              {renderLocationList("origin")}
+              <LocationList
+                travelDirection="origin"
+                locationData={originQueryData}
+                error={error}
+                isLoading={isLoadingOrigin}
+                handleLocationSelect={handleLocationSelect}
+                selectedIndex={selectedIndex}
+              />
             </PopoverContent>
           </Popover>
         </div>
@@ -555,7 +503,14 @@ export const FlightSearchForm = () => {
               sideOffset={4}
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
-              {renderLocationList("destination")}
+              <LocationList
+                travelDirection="destination"
+                locationData={destinationQueryData}
+                error={error}
+                isLoading={isLoadingDestination}
+                handleLocationSelect={handleLocationSelect}
+                selectedIndex={selectedIndex}
+              />
             </PopoverContent>
           </Popover>
         </div>
