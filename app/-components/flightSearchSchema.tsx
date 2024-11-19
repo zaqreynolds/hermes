@@ -1,12 +1,8 @@
 import { z } from "zod";
 
 const baseSchema = z.object({
-  origin: z.object({
-    iataCode: z.string(),
-  }),
-  destination: z.object({
-    iataCode: z.string(),
-  }),
+  origin: z.string(),
+  destination: z.string(),
   departureDate: z.date(),
   travelers: z.object({
     adults: z.number().min(1),
