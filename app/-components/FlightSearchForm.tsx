@@ -637,43 +637,54 @@ export const FlightSearchForm = () => {
             </div>
             <div className="flex w-full gap-2">
               {/* Departure Date Picker*/}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-44 h-full justify-start text-left text-xs"
-                  >
-                    <Calendar1Icon />
-                    {departureDate ? (
-                      format(departureDate, "PPP")
-                    ) : (
-                      <span className="opacity-70">Pick a date to depart</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  className="flex w-auto flex-col space-y-2 p-2"
-                >
-                  <Calendar
-                    mode="single"
-                    selected={departureDate ?? undefined}
-                    onSelect={(day) => setDepartureDate(day ?? null)}
-                    fromDate={new Date()}
-                    toDate={returnDate ?? undefined}
-                    initialFocus
-                  />
-                  <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      className="w-fit text-xs"
-                      onClick={() => setDepartureDate(null)}
-                    >
-                      Clear Date
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <FormField
+                control={form.control}
+                name="departureDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-44 h-full justify-start text-left text-xs"
+                        >
+                          <Calendar1Icon />
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span className="opacity-70">
+                              Pick a date to depart
+                            </span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        className="flex w-auto flex-col space-y-2 p-2"
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          fromDate={new Date()}
+                          toDate={form.getValues("departureDate") ?? undefined}
+                          initialFocus
+                        />
+                        <div className="flex justify-end">
+                          <Button
+                            variant="outline"
+                            className="w-fit text-xs"
+                            onClick={() => field.onChange(null)}
+                          >
+                            Clear Date
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormItem>
+                )}
+              />
+
               {/* Return Date Picker*/}
               <Popover>
                 <PopoverTrigger asChild>
