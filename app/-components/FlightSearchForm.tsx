@@ -236,8 +236,8 @@ export const FlightSearchForm = () => {
       return searchDestinationQuery;
     });
 
-    form.setValue("origin", { iataCode: selectedDestination?.iataCode || "" });
-    form.setValue("destination", { iataCode: selectedOrigin?.iataCode || "" });
+    form.setValue("origin", selectedDestination?.iataCode || "");
+    form.setValue("destination", selectedOrigin?.iataCode || "");
 
     setIsRotated((prev) => !prev);
   };
@@ -465,7 +465,12 @@ export const FlightSearchForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <Select onValueChange={(value) => field.onChange(value)}>
-                    <SelectTrigger className="w-36 text-xs hover:bg-accent">
+                    <SelectTrigger
+                      className={cn(
+                        "text-xs hover:bg-accent",
+                        isMobile ? "w-[125px]" : "w-36"
+                      )}
+                    >
                       <SelectValue placeholder="Flight class" />
                     </SelectTrigger>
                     <SelectContent className="w-36">
