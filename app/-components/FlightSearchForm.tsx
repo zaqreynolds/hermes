@@ -207,9 +207,19 @@ export const FlightSearchForm = () => {
         (prevIndex) =>
           (prevIndex - 1 + locationData.length) % locationData.length
       );
-    } else if (e.key === "Enter" && selectedIndex >= 0) {
-      handleLocationSelect(locationData[selectedIndex], travelDirection, field);
-      setSelectedIndex(-1);
+    } else if (
+      e.key === "Enter" &&
+      (originPopoverOpen || destinationPopoverOpen)
+    ) {
+      e.preventDefault(); // Prevent form submission when popover is open
+      if (selectedIndex >= 0) {
+        handleLocationSelect(
+          locationData[selectedIndex],
+          travelDirection,
+          field
+        );
+        setSelectedIndex(-1); // Reset selectedIndex
+      }
     } else if (e.key === "Escape") {
       if (travelDirection === "origin") {
         setOriginPopoverOpen(false);
@@ -255,6 +265,8 @@ export const FlightSearchForm = () => {
 
   console.log("form errors", form.formState.errors);
 
+  console.log("oneway", oneWay);
+
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <Form {...form}>
@@ -268,7 +280,7 @@ export const FlightSearchForm = () => {
                 <FormItem>
                   <Select
                     onValueChange={(value) =>
-                      field.onChange(value === "oneWay")
+                      field.onChange(value === "oneWay" ? true : false)
                     }
                     defaultValue="roundtrip"
                   >
@@ -303,7 +315,7 @@ export const FlightSearchForm = () => {
             <FormField
               control={form.control}
               name="travelers"
-              render={({ field }) => {
+              render={({ field, fieldState }) => {
                 const { value } = field;
                 const maxTravelers = 9;
 
@@ -364,96 +376,106 @@ export const FlightSearchForm = () => {
                   }
                 };
                 return (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-44 mr-1 justify-between text-left text-xs"
-                      >
-                        {`Travelers: ${
-                          value.adults + value.children + value.infants
-                        } `}
-                        <ChevronDownIcon className="opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="flex flex-col w-fit p-3 space-y-3">
-                      {/* Adults */}
-                      <div className="flex items-center justify-between w-40">
-                        <Label className="text-xs font-medium">Adults</Label>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            onClick={decrementAdults}
-                            disabled={value.adults <= 1}
-                            variant="outline"
-                            size="sm"
-                          >
-                            -
-                          </Button>
-                          <span className="text-xs">{value.adults}</span>
-                          <Button
-                            onClick={incrementAdults}
-                            disabled={
-                              value.adults + value.children >= maxTravelers
-                            }
-                            variant="outline"
-                            size="sm"
-                          >
-                            +
-                          </Button>
+                  <FormItem>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            " mr-1 justify-between text-left text-xs",
+                            isMobile ? "w-full" : "w-36"
+                          )}
+                        >
+                          {`Travelers: ${
+                            value.adults + value.children + value.infants
+                          } `}
+                          <ChevronDownIcon className="opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="flex flex-col w-fit p-3 space-y-3">
+                        {/* Adults */}
+                        <div className="flex items-center justify-between w-40">
+                          <Label className="text-xs font-medium">Adults</Label>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={decrementAdults}
+                              disabled={value.adults <= 1}
+                              variant="outline"
+                              size="sm"
+                            >
+                              -
+                            </Button>
+                            <span className="text-xs">{value.adults}</span>
+                            <Button
+                              onClick={incrementAdults}
+                              disabled={
+                                value.adults + value.children >= maxTravelers
+                              }
+                              variant="outline"
+                              size="sm"
+                            >
+                              +
+                            </Button>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Children */}
-                      <div className="flex items-center justify-between w-40">
-                        <Label className="text-xs font-medium">Children</Label>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            onClick={decrementChildren}
-                            disabled={value.children <= 0}
-                            variant="outline"
-                            size="sm"
-                          >
-                            -
-                          </Button>
-                          <span className="text-xs">{value.children}</span>
-                          <Button
-                            onClick={incrementChildren}
-                            disabled={
-                              value.adults + value.children >= maxTravelers
-                            }
-                            variant="outline"
-                            size="sm"
-                          >
-                            +
-                          </Button>
+                        {/* Children */}
+                        <div className="flex items-center justify-between w-40">
+                          <Label className="text-xs font-medium">
+                            Children
+                          </Label>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={decrementChildren}
+                              disabled={value.children <= 0}
+                              variant="outline"
+                              size="sm"
+                            >
+                              -
+                            </Button>
+                            <span className="text-xs">{value.children}</span>
+                            <Button
+                              onClick={incrementChildren}
+                              disabled={
+                                value.adults + value.children >= maxTravelers
+                              }
+                              variant="outline"
+                              size="sm"
+                            >
+                              +
+                            </Button>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Infants */}
-                      <div className="flex items-center justify-between w-40">
-                        <Label className="text-xs font-medium">Infants</Label>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            onClick={decrementInfants}
-                            disabled={value.infants <= 0}
-                            variant="outline"
-                            size="sm"
-                          >
-                            -
-                          </Button>
-                          <span className="text-xs">{value.infants}</span>
-                          <Button
-                            onClick={incrementInfants}
-                            disabled={value.infants >= value.adults}
-                            variant="outline"
-                            size="sm"
-                          >
-                            +
-                          </Button>
+                        {/* Infants */}
+                        <div className="flex items-center justify-between w-40">
+                          <Label className="text-xs font-medium">Infants</Label>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={decrementInfants}
+                              disabled={value.infants <= 0}
+                              variant="outline"
+                              size="sm"
+                            >
+                              -
+                            </Button>
+                            <span className="text-xs">{value.infants}</span>
+                            <Button
+                              onClick={incrementInfants}
+                              disabled={value.infants >= value.adults}
+                              variant="outline"
+                              size="sm"
+                            >
+                              +
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                      </PopoverContent>
+                    </Popover>
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
+                  </FormItem>
                 );
               }}
             />
@@ -502,7 +524,7 @@ export const FlightSearchForm = () => {
             <FormField
               control={form.control}
               name="origin"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <Popover
                     open={originPopoverOpen}
@@ -575,12 +597,16 @@ export const FlightSearchForm = () => {
                       />
                     </PopoverContent>
                   </Popover>
+                  {fieldState.error && (
+                    <FormMessage>{fieldState.error.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
 
             {/* Swap Button */}
             <Button
+              type="button"
               onClick={swapLocations}
               variant="outline"
               className="absolute top-[33%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
@@ -599,7 +625,7 @@ export const FlightSearchForm = () => {
             <FormField
               control={form.control}
               name="destination"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <Popover
                     open={destinationPopoverOpen}
@@ -674,6 +700,9 @@ export const FlightSearchForm = () => {
                       />
                     </PopoverContent>
                   </Popover>
+                  {fieldState.error && (
+                    <FormMessage>{fieldState.error.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -682,7 +711,7 @@ export const FlightSearchForm = () => {
               <FormField
                 control={form.control}
                 name="departureDate"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -723,6 +752,9 @@ export const FlightSearchForm = () => {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
@@ -731,7 +763,7 @@ export const FlightSearchForm = () => {
               <FormField
                 control={form.control}
                 name="returnDate"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -771,6 +803,9 @@ export const FlightSearchForm = () => {
                         </div>
                       </PopoverContent>
                     </Popover>
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
                   </FormItem>
                 )}
               />
