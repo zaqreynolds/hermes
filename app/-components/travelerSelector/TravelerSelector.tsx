@@ -25,20 +25,6 @@ export const TravelerSelector = ({
 }: TravelerSelectorProps) => {
   const formatTravelersLabel = (travelers: Travelers) => {
     const total = travelers.adults + travelers.children + travelers.infants;
-    // const parts = [];
-
-    // if (travelers.adults)
-    //   parts.push(
-    //     `${travelers.adults} Adult${travelers.adults !== 1 ? "s" : ""}`
-    //   );
-    // if (travelers.children)
-    //   parts.push(
-    //     `${travelers.children} Child${travelers.children !== 1 ? "ren" : ""}`
-    //   );
-    // if (travelers.infants)
-    //   parts.push(
-    //     `${travelers.infants} Infant${travelers.infants !== 1 ? "s" : ""}`
-    //   );
 
     return `${total} Traveler${total !== 1 ? "s" : ""}`;
   };
