@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -19,10 +18,8 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -32,7 +29,6 @@ import {
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { Calendar1Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AmadeusLocation, TravelDirection } from "../types";
@@ -45,6 +41,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
 import { z } from "zod";
+import { TravelerSelector } from "./travelerSelector/TravelerSelector";
 
 export const FlightSearchForm = () => {
   const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
@@ -211,14 +208,14 @@ export const FlightSearchForm = () => {
       e.key === "Enter" &&
       (originPopoverOpen || destinationPopoverOpen)
     ) {
-      e.preventDefault(); // Prevent form submission when popover is open
+      e.preventDefault();
       if (selectedIndex >= 0) {
         handleLocationSelect(
           locationData[selectedIndex],
           travelDirection,
           field
         );
-        setSelectedIndex(-1); // Reset selectedIndex
+        setSelectedIndex(-1);
       }
     } else if (e.key === "Escape") {
       if (travelDirection === "origin") {
@@ -263,9 +260,8 @@ export const FlightSearchForm = () => {
     console.log("Form Submitted", data);
   };
 
+  console.log("form values", form.getValues());
   console.log("form errors", form.formState.errors);
-
-  console.log("oneway", oneWay);
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
@@ -312,173 +308,8 @@ export const FlightSearchForm = () => {
               )}
             />
             {/* Travelers */}
-            <FormField
-              control={form.control}
-              name="travelers"
-              render={({ field, fieldState }) => {
-                const { value } = field;
-                const maxTravelers = 9;
 
-                const incrementAdults = () => {
-                  const totalTravelers = value.adults + value.children;
-                  if (totalTravelers < maxTravelers) {
-                    form.setValue("travelers", {
-                      ...value,
-                      adults: value.adults + 1,
-                    });
-                  }
-                };
-
-                const decrementAdults = () => {
-                  if (value.adults > 1) {
-                    form.setValue("travelers", {
-                      ...value,
-                      adults: value.adults - 1,
-                      infants: Math.min(value.infants, value.adults - 1),
-                    });
-                  }
-                };
-
-                const incrementChildren = () => {
-                  const totalTravelers = value.adults + value.children;
-                  if (totalTravelers < maxTravelers) {
-                    form.setValue("travelers", {
-                      ...value,
-                      children: value.children + 1,
-                    });
-                  }
-                };
-
-                const decrementChildren = () => {
-                  if (value.children > 0) {
-                    form.setValue("travelers", {
-                      ...value,
-                      children: value.children - 1,
-                    });
-                  }
-                };
-
-                const incrementInfants = () => {
-                  if (value.infants < value.adults) {
-                    form.setValue("travelers", {
-                      ...value,
-                      infants: value.infants + 1,
-                    });
-                  }
-                };
-
-                const decrementInfants = () => {
-                  if (value.infants > 0) {
-                    form.setValue("travelers", {
-                      ...value,
-                      infants: value.infants - 1,
-                    });
-                  }
-                };
-                return (
-                  <FormItem>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            " mr-1 justify-between text-left text-xs",
-                            isMobile ? "w-full" : "w-36"
-                          )}
-                        >
-                          {`Travelers: ${
-                            value.adults + value.children + value.infants
-                          } `}
-                          <ChevronDownIcon className="opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="flex flex-col w-fit p-3 space-y-3">
-                        {/* Adults */}
-                        <div className="flex items-center justify-between w-40">
-                          <Label className="text-xs font-medium">Adults</Label>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              onClick={decrementAdults}
-                              disabled={value.adults <= 1}
-                              variant="outline"
-                              size="sm"
-                            >
-                              -
-                            </Button>
-                            <span className="text-xs">{value.adults}</span>
-                            <Button
-                              onClick={incrementAdults}
-                              disabled={
-                                value.adults + value.children >= maxTravelers
-                              }
-                              variant="outline"
-                              size="sm"
-                            >
-                              +
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Children */}
-                        <div className="flex items-center justify-between w-40">
-                          <Label className="text-xs font-medium">
-                            Children
-                          </Label>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              onClick={decrementChildren}
-                              disabled={value.children <= 0}
-                              variant="outline"
-                              size="sm"
-                            >
-                              -
-                            </Button>
-                            <span className="text-xs">{value.children}</span>
-                            <Button
-                              onClick={incrementChildren}
-                              disabled={
-                                value.adults + value.children >= maxTravelers
-                              }
-                              variant="outline"
-                              size="sm"
-                            >
-                              +
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Infants */}
-                        <div className="flex items-center justify-between w-40">
-                          <Label className="text-xs font-medium">Infants</Label>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              onClick={decrementInfants}
-                              disabled={value.infants <= 0}
-                              variant="outline"
-                              size="sm"
-                            >
-                              -
-                            </Button>
-                            <span className="text-xs">{value.infants}</span>
-                            <Button
-                              onClick={incrementInfants}
-                              disabled={value.infants >= value.adults}
-                              variant="outline"
-                              size="sm"
-                            >
-                              +
-                            </Button>
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    {fieldState.error && (
-                      <FormMessage>{fieldState.error.message}</FormMessage>
-                    )}
-                  </FormItem>
-                );
-              }}
-            />
+            <TravelerSelector control={form.control} isMobile={isMobile} />
 
             {/* Flight Class Select */}
             <FormField
@@ -760,55 +591,57 @@ export const FlightSearchForm = () => {
               />
 
               {/* Return Date Picker*/}
-              <FormField
-                control={form.control}
-                name="returnDate"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-44 h-full justify-start text-left text-xs"
-                        >
-                          <Calendar1Icon />
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span className="opacity-70">
-                              Pick a date to return
-                            </span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        align="start"
-                        className="flex w-auto flex-col p-2"
-                      >
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          fromDate={departureDate || new Date()}
-                          initialFocus
-                        />
-                        <div className="flex justify-end">
+              {!oneWay && (
+                <FormField
+                  control={form.control}
+                  name="returnDate"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-fit text-xs"
-                            onClick={() => field.onChange(null)}
+                            className="w-44 h-full justify-start text-left text-xs"
                           >
-                            Clear Date
+                            <Calendar1Icon />
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span className="opacity-70">
+                                Pick a date to return
+                              </span>
+                            )}
                           </Button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    {fieldState.error && (
-                      <FormMessage>{fieldState.error.message}</FormMessage>
-                    )}
-                  </FormItem>
-                )}
-              />
+                        </PopoverTrigger>
+                        <PopoverContent
+                          align="start"
+                          className="flex w-auto flex-col p-2"
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            fromDate={departureDate || new Date()}
+                            initialFocus
+                          />
+                          <div className="flex justify-end">
+                            <Button
+                              variant="outline"
+                              className="w-fit text-xs"
+                              onClick={() => field.onChange(null)}
+                            >
+                              Clear Date
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      {fieldState.error && (
+                        <FormMessage>{fieldState.error.message}</FormMessage>
+                      )}
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
           <div className="flex justify-end">

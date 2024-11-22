@@ -37,3 +37,18 @@ export interface AmadeusLocation {
 }
 
 export type TravelDirection = "origin" | "destination";
+
+export interface Travelers {
+  adults: number;
+  children: number;
+  infants: number;
+}
+
+export interface TravelerCategory {
+  label: string;
+  type: keyof Travelers;
+  description?: string;
+  max: number;
+  min: number;
+  validateAdd: (current: Travelers) => boolean;
+}
