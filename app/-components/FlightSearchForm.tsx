@@ -42,15 +42,12 @@ import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
 import { z } from "zod";
 import { TravelerSelector } from "./travelerSelector/TravelerSelector";
+import { useFetchLocation } from "./useFetchLocation";
 
 export const FlightSearchForm = () => {
   const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
   const [searchDestinationQuery, setSearchDestinationQuery] =
     useState<string>("");
-  const [originQueryData, setOriginQueryData] = useState<AmadeusLocation[]>([]);
-  const [destinationQueryData, setDestinationQueryData] = useState<
-    AmadeusLocation[]
-  >([]);
   const [selectedOrigin, setSelectedOrigin] = useState<AmadeusLocation | null>(
     null
   );
@@ -59,10 +56,6 @@ export const FlightSearchForm = () => {
   const [originPopoverOpen, setOriginPopoverOpen] = useState<boolean>(false);
   const [destinationPopoverOpen, setDestinationPopoverOpen] =
     useState<boolean>(false);
-  const [isLoadingOrigin, setIsLoadingOrigin] = useState<boolean>(false);
-  const [isLoadingDestination, setIsLoadingDestination] =
-    useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isRotated, setIsRotated] = useState<boolean>(false);
 
@@ -93,69 +86,38 @@ export const FlightSearchForm = () => {
   const returnDate = form.watch("returnDate");
   const oneWay = form.watch("oneWay");
 
-  const fetchLocations = async (
-    keyword: string,
-    travelDirection: TravelDirection
-  ): Promise<void> => {
-    if (travelDirection === "origin") {
-      setIsLoadingOrigin(true);
-    } else {
-      setIsLoadingDestination(true);
-    }
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/amadeus/locations?keyword=${encodeURIComponent(keyword)}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch locations");
-      }
-
-      const data: AmadeusLocation[] = await response.json();
-      if (travelDirection === "origin") {
-        setOriginQueryData(data);
-      } else {
-        setDestinationQueryData(data);
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-      console.error("Error fetching data:", error);
-    } finally {
-      if (travelDirection === "origin") {
-        setIsLoadingOrigin(false);
-      } else {
-        setIsLoadingDestination(false);
-      }
-    }
-  };
+  const {
+    isLoading: isLoadingOrigin,
+    error: errorOrigin,
+    locationData: originQueryData,
+    fetchLocation: fetchOriginLocation,
+  } = useFetchLocation();
+  const {
+    isLoading: isLoadingDestination,
+    error: errorDestination,
+    locationData: destinationQueryData,
+    fetchLocation: fetchDestinationLocation,
+  } = useFetchLocation();
 
   useEffect(() => {
     if (debouncedOrigin === "") {
-      setOriginQueryData([]);
       setOriginPopoverOpen(false);
     } else if (debouncedOrigin && searchOriginQuery && !selectedOrigin) {
-      fetchLocations(debouncedOrigin, "origin");
+      fetchOriginLocation(debouncedOrigin);
       setOriginPopoverOpen(true);
     }
 
     if (debouncedDestination === "") {
-      setDestinationQueryData([]);
       setDestinationPopoverOpen(false);
     } else if (
       debouncedDestination &&
       searchDestinationQuery &&
       !selectedDestination
     ) {
-      fetchLocations(debouncedDestination, "destination");
+      fetchDestinationLocation(debouncedDestination);
       setDestinationPopoverOpen(true);
     }
-  }, [
-    debouncedOrigin,
-    debouncedDestination,
-    JSON.stringify(selectedOrigin),
-    JSON.stringify(selectedDestination),
-  ]);
+  }, [debouncedOrigin, debouncedDestination]);
 
   const handleLocationSelect = (
     location: AmadeusLocation,
@@ -179,12 +141,10 @@ export const FlightSearchForm = () => {
     if (travelDirection === "origin") {
       setSearchOriginQuery("");
       setSelectedOrigin(null);
-      setOriginQueryData([]);
       setOriginPopoverOpen(false);
     } else {
       setSearchDestinationQuery("");
       setSelectedDestination(null);
-      setDestinationQueryData([]);
       setDestinationPopoverOpen(false);
     }
   };
@@ -259,9 +219,6 @@ export const FlightSearchForm = () => {
   const onSubmit = (data: z.infer<typeof flightSearchSchema>) => {
     console.log("Form Submitted", data);
   };
-
-  console.log("form values", form.getValues());
-  console.log("form errors", form.formState.errors);
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
@@ -419,7 +376,7 @@ export const FlightSearchForm = () => {
                       <LocationList
                         travelDirection="origin"
                         locationData={originQueryData}
-                        error={error}
+                        error={errorOrigin}
                         isLoading={isLoadingOrigin}
                         handleLocationSelect={(location) =>
                           handleLocationSelect(location, "origin", field)
@@ -522,7 +479,7 @@ export const FlightSearchForm = () => {
                       <LocationList
                         travelDirection="destination"
                         locationData={destinationQueryData}
-                        error={error}
+                        error={errorDestination}
                         isLoading={isLoadingDestination}
                         handleLocationSelect={(location) =>
                           handleLocationSelect(location, "destination", field)
