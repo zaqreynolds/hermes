@@ -43,6 +43,7 @@ import { flightSearchSchema } from "./flightSearchSchema";
 import { z } from "zod";
 import { TravelerSelector } from "./travelerSelector/TravelerSelector";
 import { useFetchLocation } from "./useFetchLocation";
+import { LocationInput } from "./LocationInput";
 
 export const FlightSearchForm = () => {
   const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
@@ -314,7 +315,7 @@ export const FlightSearchForm = () => {
               name="origin"
               render={({ field, fieldState }) => (
                 <FormItem>
-                  <Popover
+                  {/* <Popover
                     open={originPopoverOpen}
                     onOpenChange={setOriginPopoverOpen}
                   >
@@ -384,7 +385,29 @@ export const FlightSearchForm = () => {
                         selectedIndex={selectedIndex}
                       />
                     </PopoverContent>
-                  </Popover>
+                  </Popover> */}
+                  <LocationInput
+                    // query={searchOriginQuery}
+                    // setQuery={setSearchOriginQuery}
+                    // selectedLocation={selectedOrigin}
+                    // setSelectedLocation={setSelectedOrigin}
+                    // isLoading={isLoadingOrigin}
+                    // error={errorOrigin}
+                    // locationData={originQueryData}
+                    onSelect={(location) => {
+                      // setSelectedOrigin(location);
+                      // setSearchOriginQuery(location.name);
+                      field.onChange(location.iataCode);
+                    }}
+                    placeholder="From"
+                    icon={
+                      <FontAwesomeIcon
+                        icon={faPlaneDeparture}
+                        className="h-5 w-5 text-stone-600"
+                      />
+                    }
+                    travelDirection="origin"
+                  />
                   {fieldState.error && (
                     <FormMessage>{fieldState.error.message}</FormMessage>
                   )}
