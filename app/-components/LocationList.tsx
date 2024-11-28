@@ -1,24 +1,19 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AmadeusLocation, TravelDirection } from "../types";
+import { AmadeusLocation } from "../types";
 import { faCity, faPlaneUp } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
 export const LocationList = ({
-  travelDirection,
   locationData,
   error,
   isLoading,
   handleLocationSelect,
   selectedIndex,
 }: {
-  travelDirection: TravelDirection;
   locationData: AmadeusLocation[];
   error: string | null;
   isLoading: boolean;
-  handleLocationSelect: (
-    location: AmadeusLocation,
-    travelDirection: TravelDirection
-  ) => void;
+  handleLocationSelect: (location: AmadeusLocation) => void;
   selectedIndex: number;
 }) => {
   return (
@@ -36,7 +31,7 @@ export const LocationList = ({
                 "p-3 hover:bg-accent cursor-pointer hover:shadow-lg",
                 selectedIndex === locationData.indexOf(location) && "bg-accent"
               )}
-              onClick={() => handleLocationSelect(location, travelDirection)}
+              onClick={() => handleLocationSelect(location)}
             >
               <div className="flex items-center">
                 <div>

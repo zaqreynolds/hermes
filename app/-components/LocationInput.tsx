@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { AmadeusLocation, TravelDirection } from "../types";
+import { AmadeusLocation } from "../types";
 import {
   Popover,
   PopoverContent,
@@ -17,33 +17,19 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useFetchLocation } from "./useFetchLocation";
 
 interface LocationInputProps {
-  // query: string;
-  // setQuery: (value: string) => void;
-  selectedLocation: AmadeusLocation | null;
-  setSelectedLocation: (location: AmadeusLocation | null) => void;
-  isLoading: boolean;
-  error: string | null;
-  locationData: AmadeusLocation[];
   onSelect: (location: AmadeusLocation) => void;
   placeholder: string;
   icon: React.ReactNode;
-  travelDirection: TravelDirection;
+  location: AmadeusLocation | null;
 }
 
 export const LocationInput: React.FC<LocationInputProps> = ({
-  // query,
-  // setQuery,
-  // selectedLocation,
-  // setSelectedLocation,
-  // isLoading,
-  // error,
-  // locationData,
   onSelect,
   placeholder,
   icon,
-  travelDirection,
+  location,
 }) => {
-  const [query, setQuery] = useState<string>("");
+  const [query, setQuery] = useState<string>(location?.name || "");
   const [selectedLocation, setSelectedLocation] =
     useState<AmadeusLocation | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -53,7 +39,8 @@ export const LocationInput: React.FC<LocationInputProps> = ({
 
   const debouncedQuery = useDebounce(query, 500);
 
-  const { isLoading, error, locationData, fetchLocation } = useFetchLocation();
+  const { isLoading, error, locationData, fetchLocation, clearLocationData } =
+    useFetchLocation();
 
   useEffect(() => {
     if (debouncedQuery === "") {
@@ -64,27 +51,27 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     }
   }, [debouncedQuery]);
 
-  const handleLocationSelect = (
-    location: AmadeusLocation,
-    travelDirection: TravelDirection,
-    field?: { onChange: (value: string) => void }
-  ): void => {
+  useEffect(() => {
+    setQuery(location?.name || "");
+    setSelectedLocation(location);
+  }, [location]);
+
+  const handleLocationSelect = (location: AmadeusLocation): void => {
     setSelectedLocation(location);
     setQuery(location.name);
     setPopoverOpen(false);
     onSelect(location);
-    field?.onChange?.(location.iataCode);
   };
 
   const handleClearInput = () => {
     setQuery("");
     setSelectedLocation(null);
     setPopoverOpen(false);
+    clearLocationData();
   };
 
   const handleKeyDown = (
     e: React.KeyboardEvent,
-    travelDirection: TravelDirection,
     field?: { onChange: (value: string) => void }
   ) => {
     if (e.key === "ArrowDown") {
@@ -97,11 +84,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     } else if (e.key === "Enter" && popoverOpen) {
       e.preventDefault();
       if (selectedIndex >= 0) {
-        handleLocationSelect(
-          locationData[selectedIndex],
-          travelDirection,
-          field
-        );
+        handleLocationSelect(locationData[selectedIndex], field);
         setSelectedIndex(-1);
       }
     } else if (e.key === "Escape") {
@@ -116,8 +99,6 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     }
     return text;
   };
-
-  console.log("selectedLocation", selectedLocation);
 
   return (
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -135,7 +116,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, travelDirection)}
+              onKeyDown={(e) => handleKeyDown(e)}
             />
             {selectedLocation && (
               <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
@@ -166,7 +147,6 @@ export const LocationInput: React.FC<LocationInputProps> = ({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <LocationList
-          travelDirection={travelDirection}
           locationData={locationData}
           error={error}
           isLoading={isLoading}

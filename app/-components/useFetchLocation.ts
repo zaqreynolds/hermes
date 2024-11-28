@@ -31,5 +31,9 @@ export const useFetchLocation = () => {
     }
   }, []);
 
-  return { isLoading, error, locationData, fetchLocation };
+  const clearLocationData = () => {
+    setLocationData([]);
+  };
+
+  return { isLoading, error, locationData, fetchLocation, clearLocationData };
 };

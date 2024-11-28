@@ -46,24 +46,9 @@ import { useFetchLocation } from "./useFetchLocation";
 import { LocationInput } from "./LocationInput";
 
 export const FlightSearchForm = () => {
-  const [searchOriginQuery, setSearchOriginQuery] = useState<string>("");
-  const [searchDestinationQuery, setSearchDestinationQuery] =
-    useState<string>("");
-  const [selectedOrigin, setSelectedOrigin] = useState<AmadeusLocation | null>(
-    null
-  );
-  const [selectedDestination, setSelectedDestination] =
-    useState<AmadeusLocation | null>(null);
-  const [originPopoverOpen, setOriginPopoverOpen] = useState<boolean>(false);
-  const [destinationPopoverOpen, setDestinationPopoverOpen] =
-    useState<boolean>(false);
-  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isRotated, setIsRotated] = useState<boolean>(false);
 
   const { isMobile } = useScreenSize();
-
-  const debouncedOrigin = useDebounce(searchOriginQuery, 500);
-  const debouncedDestination = useDebounce(searchDestinationQuery, 500);
 
   const form = useForm<z.infer<typeof flightSearchSchema>>({
     resolver: zodResolver(flightSearchSchema),
@@ -100,112 +85,12 @@ export const FlightSearchForm = () => {
     fetchLocation: fetchDestinationLocation,
   } = useFetchLocation();
 
-  useEffect(() => {
-    if (debouncedOrigin === "") {
-      setOriginPopoverOpen(false);
-    } else if (debouncedOrigin && searchOriginQuery && !selectedOrigin) {
-      fetchOriginLocation(debouncedOrigin);
-      setOriginPopoverOpen(true);
-    }
-
-    if (debouncedDestination === "") {
-      setDestinationPopoverOpen(false);
-    } else if (
-      debouncedDestination &&
-      searchDestinationQuery &&
-      !selectedDestination
-    ) {
-      fetchDestinationLocation(debouncedDestination);
-      setDestinationPopoverOpen(true);
-    }
-  }, [debouncedOrigin, debouncedDestination]);
-
-  const handleLocationSelect = (
-    location: AmadeusLocation,
-    travelDirection: TravelDirection,
-    field?: { onChange: (value: string) => void }
-  ): void => {
-    if (travelDirection === "origin") {
-      setSelectedOrigin(location);
-      setSearchOriginQuery(location.name);
-      setOriginPopoverOpen(false);
-      field?.onChange?.(location.iataCode);
-    } else if (travelDirection === "destination") {
-      setSelectedDestination(location);
-      setSearchDestinationQuery(location.name);
-      setDestinationPopoverOpen(false);
-      field?.onChange?.(location.iataCode);
-    }
-  };
-
-  const handleClearInput = (travelDirection: TravelDirection): void => {
-    if (travelDirection === "origin") {
-      setSearchOriginQuery("");
-      setSelectedOrigin(null);
-      setOriginPopoverOpen(false);
-    } else {
-      setSearchDestinationQuery("");
-      setSelectedDestination(null);
-      setDestinationPopoverOpen(false);
-    }
-  };
-
-  const handleKeyDown = (
-    e: React.KeyboardEvent,
-    travelDirection: TravelDirection,
-    field?: { onChange: (value: string) => void }
-  ) => {
-    const locationData =
-      travelDirection === "origin" ? originQueryData : destinationQueryData;
-
-    if (e.key === "ArrowDown") {
-      setSelectedIndex((prevIndex) => (prevIndex + 1) % locationData.length);
-    } else if (e.key === "ArrowUp") {
-      setSelectedIndex(
-        (prevIndex) =>
-          (prevIndex - 1 + locationData.length) % locationData.length
-      );
-    } else if (
-      e.key === "Enter" &&
-      (originPopoverOpen || destinationPopoverOpen)
-    ) {
-      e.preventDefault();
-      if (selectedIndex >= 0) {
-        handleLocationSelect(
-          locationData[selectedIndex],
-          travelDirection,
-          field
-        );
-        setSelectedIndex(-1);
-      }
-    } else if (e.key === "Escape") {
-      if (travelDirection === "origin") {
-        setOriginPopoverOpen(false);
-      } else {
-        setDestinationPopoverOpen(false);
-      }
-      setSelectedIndex(-1);
-    }
-  };
-  useEffect(() => {
-    if (!originPopoverOpen && !destinationPopoverOpen) {
-      setSelectedIndex(-1);
-    }
-  }, [originPopoverOpen, destinationPopoverOpen]);
-
   const swapLocations = () => {
-    setSelectedOrigin((prevOrigin) => {
-      setSelectedDestination(prevOrigin);
-      return selectedDestination;
-    });
+    const prevOrigin = form.getValues("origin");
+    const prevDestination = form.getValues("destination");
 
-    setSearchOriginQuery((prevQuery) => {
-      setSearchDestinationQuery(prevQuery);
-      return searchDestinationQuery;
-    });
-
-    form.setValue("origin", selectedDestination?.iataCode || "");
-    form.setValue("destination", selectedOrigin?.iataCode || "");
+    form.setValue("origin", prevDestination);
+    form.setValue("destination", prevOrigin);
 
     setIsRotated((prev) => !prev);
   };
@@ -315,89 +200,9 @@ export const FlightSearchForm = () => {
               name="origin"
               render={({ field, fieldState }) => (
                 <FormItem>
-                  {/* <Popover
-                    open={originPopoverOpen}
-                    onOpenChange={setOriginPopoverOpen}
-                  >
-                    <PopoverTrigger asChild>
-                      <div
-                        className={cn(
-                          "relative",
-                          isMobile ? "w-full" : "w-[360px]"
-                        )}
-                      >
-                        <FontAwesomeIcon
-                          icon={faPlaneDeparture}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10"
-                        />
-                        <div className="relative">
-                          <Input
-                            className={cn(
-                              "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
-                              selectedOrigin && "pt-5 pb-1"
-                            )}
-                            placeholder="From"
-                            value={searchOriginQuery}
-                            onChange={(e) => {
-                              setSearchOriginQuery(e.target.value);
-                            }}
-                            onKeyDown={(e) => handleKeyDown(e, "origin")}
-                          />
-                          {selectedOrigin && (
-                            <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
-                              {truncateText(
-                                `${selectedOrigin.address.cityName}, ${" "} ${
-                                  selectedOrigin.address.countryName
-                                }`,
-                                isMobile ? 64 : 34
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        {searchOriginQuery && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                            onClick={() => handleClearInput("origin")}
-                          >
-                            <FontAwesomeIcon
-                              icon={faTimesCircle}
-                              className="text-foreground"
-                            />
-                          </Button>
-                        )}
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-[var(--radix-popover-trigger-width)] p-0"
-                      sideOffset={4}
-                      onOpenAutoFocus={(e) => e.preventDefault()}
-                    >
-                      <LocationList
-                        travelDirection="origin"
-                        locationData={originQueryData}
-                        error={errorOrigin}
-                        isLoading={isLoadingOrigin}
-                        handleLocationSelect={(location) =>
-                          handleLocationSelect(location, "origin", field)
-                        }
-                        selectedIndex={selectedIndex}
-                      />
-                    </PopoverContent>
-                  </Popover> */}
                   <LocationInput
-                    // query={searchOriginQuery}
-                    // setQuery={setSearchOriginQuery}
-                    // selectedLocation={selectedOrigin}
-                    // setSelectedLocation={setSelectedOrigin}
-                    // isLoading={isLoadingOrigin}
-                    // error={errorOrigin}
-                    // locationData={originQueryData}
                     onSelect={(location) => {
-                      // setSelectedOrigin(location);
-                      // setSearchOriginQuery(location.name);
-                      field.onChange(location.iataCode);
+                      field.onChange(location);
                     }}
                     placeholder="From"
                     icon={
@@ -406,7 +211,7 @@ export const FlightSearchForm = () => {
                         className="h-5 w-5 text-stone-600"
                       />
                     }
-                    travelDirection="origin"
+                    location={field.value}
                   />
                   {fieldState.error && (
                     <FormMessage>{fieldState.error.message}</FormMessage>
@@ -438,79 +243,22 @@ export const FlightSearchForm = () => {
               name="destination"
               render={({ field, fieldState }) => (
                 <FormItem>
-                  <Popover
-                    open={destinationPopoverOpen}
-                    onOpenChange={setDestinationPopoverOpen}
-                  >
-                    <PopoverTrigger asChild>
-                      <div
-                        className={cn(
-                          "relative",
-                          isMobile ? "w-full" : "w-[360px]"
-                        )}
-                      >
-                        <FontAwesomeIcon
-                          icon={faPlaneArrival}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10"
-                        />
-                        <div className="relative">
-                          <Input
-                            className={cn(
-                              "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
-                              selectedDestination && "pt-5 pb-1"
-                            )}
-                            placeholder="To"
-                            value={searchDestinationQuery}
-                            onChange={(e) => {
-                              setSearchDestinationQuery(e.target.value);
-                            }}
-                            onKeyDown={(e) => handleKeyDown(e, "origin")}
-                          />
-                          {selectedDestination && (
-                            <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
-                              {truncateText(
-                                `${
-                                  selectedDestination.address.cityName
-                                }, ${" "} ${
-                                  selectedDestination.address.countryName
-                                }`,
-                                isMobile ? 64 : 34
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        {searchOriginQuery && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                            onClick={() => handleClearInput("destination")}
-                          >
-                            <FontAwesomeIcon
-                              icon={faTimesCircle}
-                              className="text-foreground"
-                            />
-                          </Button>
-                        )}
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-[var(--radix-popover-trigger-width)] p-0"
-                      sideOffset={4}
-                      onOpenAutoFocus={(e) => e.preventDefault()}
-                    >
-                      <LocationList
-                        travelDirection="destination"
-                        locationData={destinationQueryData}
-                        error={errorDestination}
-                        isLoading={isLoadingDestination}
-                        handleLocationSelect={(location) =>
-                          handleLocationSelect(location, "destination", field)
-                        }
-                        selectedIndex={selectedIndex}
+                  <LocationInput
+                    onSelect={(location) => {
+                      field.onChange(location);
+                    }}
+                    placeholder="To"
+                    icon={
+                      <FontAwesomeIcon
+                        icon={faPlaneArrival}
+                        className="h-5 w-5 text-stone-600"
                       />
-                    </PopoverContent>
-                  </Popover>
+                    }
+                    location={field.value}
+                  />
+                  {fieldState.error && (
+                    <FormMessage>{fieldState.error.message}</FormMessage>
+                  )}
                   {fieldState.error && (
                     <FormMessage>{fieldState.error.message}</FormMessage>
                   )}
