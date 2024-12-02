@@ -1,8 +1,39 @@
 import { z } from "zod";
 
+// make location an amadeuslocation for origin and destination
+const locationSchema = z.object({
+  address: z.object({
+    cityName: z.string(),
+    cityCode: z.string(),
+    countryName: z.string(),
+    countryCode: z.string(),
+    stateCode: z.string(),
+  }),
+  analytics: z.object({
+    travelers: z.object({
+      score: z.number(),
+    }),
+  }),
+  detailedName: z.string(),
+  geoCode: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }),
+  iataCode: z.string(),
+  id: z.string(),
+  name: z.string(),
+  self: z.object({
+    href: z.string(),
+    methods: z.array(z.string()),
+  }),
+  subType: z.string(),
+  timeZoneOffset: z.string(),
+  type: z.string(),
+});
+
 const baseSchema = z.object({
-  origin: z.string(),
-  destination: z.string(),
+  origin: locationSchema,
+  destination: locationSchema,
   departureDate: z.date(),
   travelers: z.object({
     adults: z.number().min(1),

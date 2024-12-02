@@ -25,6 +25,7 @@ interface LocationInputProps {
   icon: React.ReactNode;
   control: Control<z.infer<typeof flightSearchSchema>>;
   name: "origin" | "destination";
+  value: AmadeusLocation | undefined;
 }
 
 export const LocationInput: React.FC<LocationInputProps> = ({
@@ -32,6 +33,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
   icon,
   control,
   name,
+  value,
 }) => {
   const [query, setQuery] = useState<string>("");
   const [selectedLocation, setSelectedLocation] =
@@ -55,11 +57,21 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     }
   }, [debouncedQuery]);
 
-  const handleLocationSelect = (location: AmadeusLocation): void => {
+  useEffect(() => {
+    if (value) {
+      setSelectedLocation(value);
+      setQuery(value.name);
+    }
+  }, [value]);
+
+  const handleLocationSelect = (
+    location: AmadeusLocation,
+    field: { onChange: (value: string) => void }
+  ): void => {
     setSelectedLocation(location);
     setQuery(location.name);
     setPopoverOpen(false);
-    // onSelect(location.iataCode);
+    field.onChange(location);
   };
 
   const handleClearInput = () => {
@@ -71,7 +83,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
 
   const handleKeyDown = (
     e: React.KeyboardEvent,
-    field?: { onChange: (value: string) => void }
+    field?: { onChange: (value: AmadeusLocation) => void }
   ) => {
     if (e.key === "ArrowDown") {
       setSelectedIndex((prevIndex) => (prevIndex + 1) % locationData.length);
@@ -82,10 +94,10 @@ export const LocationInput: React.FC<LocationInputProps> = ({
       );
     } else if (e.key === "Enter" && popoverOpen) {
       e.preventDefault();
-      if (selectedIndex >= 0) {
-        handleLocationSelect(locationData[selectedIndex]);
-        setSelectedIndex(-1);
+      if (selectedIndex >= 0 && field) {
+        handleLocationSelect(locationData[selectedIndex], field);
       }
+      setSelectedIndex(-1);
     } else if (e.key === "Escape") {
       setPopoverOpen(false);
       setSelectedIndex(-1);
@@ -122,7 +134,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                     placeholder={placeholder}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e)}
+                    onKeyDown={(e) => handleKeyDown(e, field)}
                   />
                   {selectedLocation && (
                     <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
@@ -157,8 +169,8 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                 error={error}
                 isLoading={isLoading}
                 handleLocationSelect={(location) => {
-                  handleLocationSelect(location);
-                  field.onChange(location.iataCode); // Set the iataCode as the form value
+                  handleLocationSelect(location, field);
+                  field.onChange(location);
                 }}
                 selectedIndex={selectedIndex}
               />

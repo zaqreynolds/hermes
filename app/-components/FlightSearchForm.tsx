@@ -73,6 +73,8 @@ export const FlightSearchForm = () => {
   const departureDate = form.watch("departureDate");
   const returnDate = form.watch("returnDate");
   const oneWay = form.watch("oneWay");
+  const origin = form.watch("origin");
+  const destination = form.watch("destination");
 
   const swapLocations = () => {
     const prevOrigin = form.getValues("origin");
@@ -84,10 +86,14 @@ export const FlightSearchForm = () => {
     setIsRotated((prev) => !prev);
   };
 
+  // console.log("origin", origin);
+  // console.log("destination", destination);
+
   const onSubmit = (data: z.infer<typeof flightSearchSchema>) => {
     console.log("Form Submitted", data);
   };
 
+  console.log("formvalues", form.getValues());
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <Form {...form}>
@@ -111,6 +117,7 @@ export const FlightSearchForm = () => {
                   className="h-5 w-5 text-stone-600"
                 />
               }
+              value={origin}
             />
 
             {/* Swap Button */}
@@ -141,6 +148,7 @@ export const FlightSearchForm = () => {
                   className="h-5 w-5 text-stone-600"
                 />
               }
+              value={destination}
             />
             <div className="flex w-full gap-2">
               {/* Departure Date Picker*/}
