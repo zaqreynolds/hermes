@@ -30,10 +30,10 @@ export interface AmadeusLocation {
   iataCode: string;
   id: string;
   name: string;
-  self: Self;
-  subType: string;
-  timeZoneOffset: string;
-  type: string;
+  self?: Self;
+  subType?: string;
+  timeZoneOffset?: string;
+  type?: string;
 }
 
 export type TravelDirection = "origin" | "destination";

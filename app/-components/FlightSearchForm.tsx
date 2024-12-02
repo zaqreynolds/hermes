@@ -72,19 +72,6 @@ export const FlightSearchForm = () => {
   const returnDate = form.watch("returnDate");
   const oneWay = form.watch("oneWay");
 
-  const {
-    isLoading: isLoadingOrigin,
-    error: errorOrigin,
-    locationData: originQueryData,
-    fetchLocation: fetchOriginLocation,
-  } = useFetchLocation();
-  const {
-    isLoading: isLoadingDestination,
-    error: errorDestination,
-    locationData: destinationQueryData,
-    fetchLocation: fetchDestinationLocation,
-  } = useFetchLocation();
-
   const swapLocations = () => {
     const prevOrigin = form.getValues("origin");
     const prevDestination = form.getValues("destination");
@@ -93,13 +80,6 @@ export const FlightSearchForm = () => {
     form.setValue("destination", prevOrigin);
 
     setIsRotated((prev) => !prev);
-  };
-
-  const truncateText = (text: string, maxLength: number): string => {
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
-    }
-    return text;
   };
 
   const onSubmit = (data: z.infer<typeof flightSearchSchema>) => {
@@ -195,29 +175,16 @@ export const FlightSearchForm = () => {
           </div>
           <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
             {/* Origin Input */}
-            <FormField
+            <LocationInput
               control={form.control}
               name="origin"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <LocationInput
-                    onSelect={(location) => {
-                      field.onChange(location);
-                    }}
-                    placeholder="From"
-                    icon={
-                      <FontAwesomeIcon
-                        icon={faPlaneDeparture}
-                        className="h-5 w-5 text-stone-600"
-                      />
-                    }
-                    location={field.value}
-                  />
-                  {fieldState.error && (
-                    <FormMessage>{fieldState.error.message}</FormMessage>
-                  )}
-                </FormItem>
-              )}
+              placeholder="From"
+              icon={
+                <FontAwesomeIcon
+                  icon={faPlaneDeparture}
+                  className="h-5 w-5 text-stone-600"
+                />
+              }
             />
 
             {/* Swap Button */}
@@ -238,32 +205,16 @@ export const FlightSearchForm = () => {
             </Button>
 
             {/* Destination Input */}
-            <FormField
+            <LocationInput
               control={form.control}
               name="destination"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <LocationInput
-                    onSelect={(location) => {
-                      field.onChange(location);
-                    }}
-                    placeholder="To"
-                    icon={
-                      <FontAwesomeIcon
-                        icon={faPlaneArrival}
-                        className="h-5 w-5 text-stone-600"
-                      />
-                    }
-                    location={field.value}
-                  />
-                  {fieldState.error && (
-                    <FormMessage>{fieldState.error.message}</FormMessage>
-                  )}
-                  {fieldState.error && (
-                    <FormMessage>{fieldState.error.message}</FormMessage>
-                  )}
-                </FormItem>
-              )}
+              placeholder="To"
+              icon={
+                <FontAwesomeIcon
+                  icon={faPlaneArrival}
+                  className="h-5 w-5 text-stone-600"
+                />
+              }
             />
             <div className="flex w-full gap-2">
               {/* Departure Date Picker*/}

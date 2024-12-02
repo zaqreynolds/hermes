@@ -15,21 +15,25 @@ import { LocationList } from "./LocationList";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFetchLocation } from "./useFetchLocation";
+import { Control } from "react-hook-form";
+import { z } from "zod";
+import { flightSearchSchema } from "./flightSearchSchema";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface LocationInputProps {
-  onSelect: (location: AmadeusLocation) => void;
   placeholder: string;
   icon: React.ReactNode;
-  location: AmadeusLocation | null;
+  control: Control<z.infer<typeof flightSearchSchema>>;
+  name: "origin" | "destination";
 }
 
 export const LocationInput: React.FC<LocationInputProps> = ({
-  onSelect,
   placeholder,
   icon,
-  location,
+  control,
+  name,
 }) => {
-  const [query, setQuery] = useState<string>(location?.name || "");
+  const [query, setQuery] = useState<string>("");
   const [selectedLocation, setSelectedLocation] =
     useState<AmadeusLocation | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -51,16 +55,11 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     }
   }, [debouncedQuery]);
 
-  useEffect(() => {
-    setQuery(location?.name || "");
-    setSelectedLocation(location);
-  }, [location]);
-
   const handleLocationSelect = (location: AmadeusLocation): void => {
     setSelectedLocation(location);
     setQuery(location.name);
     setPopoverOpen(false);
-    onSelect(location);
+    // onSelect(location.iataCode);
   };
 
   const handleClearInput = () => {
@@ -84,7 +83,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     } else if (e.key === "Enter" && popoverOpen) {
       e.preventDefault();
       if (selectedIndex >= 0) {
-        handleLocationSelect(locationData[selectedIndex], field);
+        handleLocationSelect(locationData[selectedIndex]);
         setSelectedIndex(-1);
       }
     } else if (e.key === "Escape") {
@@ -101,59 +100,75 @@ export const LocationInput: React.FC<LocationInputProps> = ({
   };
 
   return (
-    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-      <PopoverTrigger asChild>
-        <div className={cn("relative", isMobile ? "w-full" : "w-[360px]")}>
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10">
-            {icon}
-          </span>
-          <div className="relative">
-            <Input
-              className={cn(
-                "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
-                selectedLocation && "pt-5 pb-1"
-              )}
-              placeholder={placeholder}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e)}
-            />
-            {selectedLocation && (
-              <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
-                {truncateText(
-                  `${selectedLocation.address.cityName}, ${" "} ${
-                    selectedLocation.address.countryName
-                  }`,
-                  isMobile ? 64 : 34
+    <FormField
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <FormItem>
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+              <div
+                className={cn("relative", isMobile ? "w-full" : "w-[360px]")}
+              >
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-stone-600 z-10">
+                  {icon}
+                </span>
+                <div className="relative">
+                  <Input
+                    className={cn(
+                      "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
+                      selectedLocation && "pt-5 pb-1"
+                    )}
+                    placeholder={placeholder}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(e)}
+                  />
+                  {selectedLocation && (
+                    <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
+                      {truncateText(
+                        `${selectedLocation.address.cityName}, ${" "} ${
+                          selectedLocation.address.countryName
+                        }`,
+                        isMobile ? 64 : 34
+                      )}
+                    </div>
+                  )}
+                </div>
+                {query && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                    onClick={handleClearInput}
+                  >
+                    <FontAwesomeIcon icon={faTimesCircle} />
+                  </Button>
                 )}
               </div>
-            )}
-          </div>
-          {query && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-              onClick={handleClearInput}
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-[var(--radix-popover-trigger-width)] p-0"
+              sideOffset={4}
+              onOpenAutoFocus={(e) => e.preventDefault()}
             >
-              <FontAwesomeIcon icon={faTimesCircle} />
-            </Button>
+              <LocationList
+                locationData={locationData}
+                error={error}
+                isLoading={isLoading}
+                handleLocationSelect={(location) => {
+                  handleLocationSelect(location);
+                  field.onChange(location.iataCode); // Set the iataCode as the form value
+                }}
+                selectedIndex={selectedIndex}
+              />
+            </PopoverContent>
+          </Popover>
+          {fieldState.error && (
+            <FormMessage>{fieldState.error.message}</FormMessage>
           )}
-        </div>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
-        sideOffset={4}
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
-        <LocationList
-          locationData={locationData}
-          error={error}
-          isLoading={isLoading}
-          handleLocationSelect={handleLocationSelect}
-          selectedIndex={selectedIndex}
-        />
-      </PopoverContent>
-    </Popover>
+        </FormItem>
+      )}
+    />
   );
 };
