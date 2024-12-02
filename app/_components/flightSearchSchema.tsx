@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// make location an amadeuslocation for origin and destination
 const locationSchema = z.object({
   address: z.object({
     cityName: z.string(),

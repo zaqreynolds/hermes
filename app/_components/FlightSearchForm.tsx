@@ -1,55 +1,32 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  faExchangeAlt,
   faPlaneArrival,
   faPlaneDeparture,
-  faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Calendar1Icon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { AmadeusLocation, TravelDirection } from "../types";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import { useDebounce } from "@/hooks/useDebounce";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { LocationList } from "./LocationList";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
 import { z } from "zod";
 import { TravelerSelector } from "./travelerSelector/TravelerSelector";
-import { useFetchLocation } from "./useFetchLocation";
 import { LocationInput } from "./LocationInput";
 import { RoundtripOneWaySelector } from "./RoundtripOneWaySelector";
 import { FlightClassSelector } from "./FlightClassSelector";
+import { SwapLocationsButton } from "./SwapLocationsButton";
 
 export const FlightSearchForm = () => {
-  const [isRotated, setIsRotated] = useState<boolean>(false);
-
   const { isMobile } = useScreenSize();
 
   const form = useForm<z.infer<typeof flightSearchSchema>>({
@@ -76,19 +53,6 @@ export const FlightSearchForm = () => {
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
-  const swapLocations = () => {
-    const prevOrigin = form.getValues("origin");
-    const prevDestination = form.getValues("destination");
-
-    form.setValue("origin", prevDestination);
-    form.setValue("destination", prevOrigin);
-
-    setIsRotated((prev) => !prev);
-  };
-
-  // console.log("origin", origin);
-  // console.log("destination", destination);
-
   const onSubmit = (data: z.infer<typeof flightSearchSchema>) => {
     console.log("Form Submitted", data);
   };
@@ -106,7 +70,6 @@ export const FlightSearchForm = () => {
             <FlightClassSelector control={form.control} isMobile={isMobile} />
           </div>
           <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
-            {/* Origin Input */}
             <LocationInput
               control={form.control}
               name="origin"
@@ -120,24 +83,12 @@ export const FlightSearchForm = () => {
               value={origin}
             />
 
-            {/* Swap Button */}
-            <Button
-              type="button"
-              onClick={swapLocations}
-              variant="outline"
-              className="absolute top-[33%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-lg hover:shadow-md sm:static sm:translate-x-0 sm:translate-y-0 sm:h-12 sm:w-12"
-            >
-              <FontAwesomeIcon
-                icon={faExchangeAlt}
-                className={cn(
-                  "transition-transform duration-300 transform ",
-                  isMobile ? "rotate-90" : "",
-                  isRotated ? "rotate-180" : "rotate-0"
-                )}
-              />
-            </Button>
+            <SwapLocationsButton
+              setValue={form.setValue}
+              getValues={form.getValues}
+              isMobile={isMobile}
+            />
 
-            {/* Destination Input */}
             <LocationInput
               control={form.control}
               name="destination"

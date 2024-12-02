@@ -4,7 +4,6 @@ import amadeus from "../amadeusClient";
 export const GET = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const keyword = searchParams.get("keyword");
-  console.log("Keyword:", keyword);
 
   if (!keyword) {
     return NextResponse.json(
