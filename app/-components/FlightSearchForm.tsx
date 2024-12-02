@@ -92,10 +92,7 @@ export const FlightSearchForm = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex w-full gap-1 pb-2 ">
-            {/* Roundtrip vs Oneway toggle */}
-
             <RoundtripOneWaySelector control={form.control} />
-            {/* Travelers */}
 
             <TravelerSelector control={form.control} isMobile={isMobile} />
 
