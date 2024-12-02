@@ -44,6 +44,7 @@ import { z } from "zod";
 import { TravelerSelector } from "./travelerSelector/TravelerSelector";
 import { useFetchLocation } from "./useFetchLocation";
 import { LocationInput } from "./LocationInput";
+import { RoundtripOneWaySelector } from "./RoundtripOneWaySelector";
 
 export const FlightSearchForm = () => {
   const [isRotated, setIsRotated] = useState<boolean>(false);
@@ -92,44 +93,8 @@ export const FlightSearchForm = () => {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex w-full gap-1 pb-2 ">
             {/* Roundtrip vs Oneway toggle */}
-            <FormField
-              control={form.control}
-              name="oneWay"
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    onValueChange={(value) =>
-                      field.onChange(value === "oneWay" ? true : false)
-                    }
-                    defaultValue="roundtrip"
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-24 text-xs mr-1 hover:bg-accent">
-                        <SelectValue>
-                          {field.value ? "One-Way" : "Roundtrip"}
-                        </SelectValue>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="w-24 min-w-fit">
-                      <SelectGroup className="w-full">
-                        <SelectItem
-                          value="roundtrip"
-                          className="text-xs  mr-1 pr-1"
-                        >
-                          Roundtrip
-                        </SelectItem>
-                        <SelectItem
-                          value="oneWay"
-                          className="text-xs mr-1 pr-1 "
-                        >
-                          One-Way
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
+
+            <RoundtripOneWaySelector control={form.control} />
             {/* Travelers */}
 
             <TravelerSelector control={form.control} isMobile={isMobile} />
