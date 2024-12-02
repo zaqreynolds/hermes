@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { z } from "zod";
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import { cn } from "@/lib/utils";
+import { flightSearchSchema } from "./flightSearchSchema";
 
 interface SwapLocationsButtonProps {
   setValue: UseFormSetValue<z.infer<typeof flightSearchSchema>>;

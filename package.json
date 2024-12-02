@@ -66,6 +66,8 @@
   },
   "devDependencies": {
     "@eslint/config-array": "^0.19.0",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.16.0",
     "@eslint/object-schema": "^2.1.4",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
