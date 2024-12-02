@@ -66,7 +66,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
 
   const handleLocationSelect = (
     location: AmadeusLocation,
-    field: { onChange: (value: string) => void }
+    field: { onChange: (value: AmadeusLocation) => void }
   ): void => {
     setSelectedLocation(location);
     setQuery(location.name);
@@ -74,11 +74,14 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     field.onChange(location);
   };
 
-  const handleClearInput = () => {
+  const handleClearInput = (field: {
+    onChange: (value: AmadeusLocation | undefined) => void;
+  }) => {
     setQuery("");
     setSelectedLocation(null);
     setPopoverOpen(false);
     clearLocationData();
+    field.onChange(undefined);
   };
 
   const handleKeyDown = (
@@ -152,7 +155,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                     type="button"
                     variant="ghost"
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                    onClick={handleClearInput}
+                    onClick={() => handleClearInput(field)}
                   >
                     <FontAwesomeIcon icon={faTimesCircle} />
                   </Button>
