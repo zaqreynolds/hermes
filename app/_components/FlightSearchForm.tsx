@@ -13,7 +13,7 @@ import {
   faPlaneDeparture,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Calendar1Icon } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -114,7 +114,7 @@ export const FlightSearchForm = () => {
                           variant="outline"
                           className="w-44 h-full justify-start text-left text-xs"
                         >
-                          <Calendar1Icon />
+                          <CalendarIcon />
                           {field.value ? (
                             format(field.value, "PPP")
                           ) : (
@@ -124,19 +124,18 @@ export const FlightSearchForm = () => {
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent
-                        align="start"
-                        className="flex w-auto flex-col space-y-2 p-2"
-                      >
+                      <PopoverContent align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          fromDate={new Date()}
-                          toDate={returnDate || undefined}
-                          initialFocus
+                          disabled={{
+                            before: new Date(),
+                            after: returnDate || undefined,
+                          }}
+                          autoFocus
                         />
-                        <div className="flex justify-end">
+                        {/* <div className="flex justify-end">
                           <Button
                             variant="outline"
                             className="w-fit text-xs"
@@ -144,7 +143,7 @@ export const FlightSearchForm = () => {
                           >
                             Clear Date
                           </Button>
-                        </div>
+                        </div> */}
                       </PopoverContent>
                     </Popover>
                     {fieldState.error && (
@@ -167,7 +166,7 @@ export const FlightSearchForm = () => {
                             variant="outline"
                             className="w-44 h-full justify-start text-left text-xs"
                           >
-                            <Calendar1Icon />
+                            <CalendarIcon />
                             {field.value ? (
                               format(field.value, "PPP")
                             ) : (
@@ -185,8 +184,7 @@ export const FlightSearchForm = () => {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            fromDate={departureDate || new Date()}
-                            initialFocus
+                            hidden={{ before: departureDate || new Date() }}
                           />
                           <div className="flex justify-end">
                             <Button
