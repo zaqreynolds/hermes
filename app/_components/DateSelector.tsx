@@ -17,6 +17,7 @@ interface DateSelectorProps {
   name: "departureDate" | "returnDate";
   departureDate?: Date | null;
   returnDate?: Date | null;
+  isMobile: boolean;
 }
 
 export const DateSelector = ({
@@ -24,6 +25,7 @@ export const DateSelector = ({
   name,
   departureDate,
   returnDate,
+  isMobile,
 }: DateSelectorProps) => {
   return (
     <FormField
@@ -53,15 +55,21 @@ export const DateSelector = ({
                 fromDate={departureDate || new Date()}
                 toDate={returnDate || undefined}
                 initialFocus
+                modifiersClassNames={{
+                  today: "bg-muted",
+                }}
+                numberOfMonths={isMobile ? 1 : 2}
               />
               <div className="flex justify-end">
-                <Button
-                  variant="outline"
-                  className="w-fit text-xs"
-                  onClick={() => field.onChange(null)}
-                >
-                  Clear Date
-                </Button>
+                {field.value && (
+                  <Button
+                    variant="outline"
+                    className="w-fit text-xs"
+                    onClick={() => field.onChange(null)}
+                  >
+                    Clear Date
+                  </Button>
+                )}
               </div>
             </PopoverContent>
           </Popover>

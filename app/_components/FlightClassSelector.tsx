@@ -1,3 +1,4 @@
+"use client";
 import { Control } from "react-hook-form";
 import { z } from "zod";
 import { flightSearchSchema } from "./flightSearchSchema";

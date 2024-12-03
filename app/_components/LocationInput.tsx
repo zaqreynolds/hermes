@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { LocationList } from "./LocationList";
-import { useScreenSize } from "@/hooks/useScreenSize";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFetchLocation } from "./useFetchLocation";
 import { Control } from "react-hook-form";
@@ -26,6 +25,7 @@ interface LocationInputProps {
   control: Control<z.infer<typeof flightSearchSchema>>;
   name: "origin" | "destination";
   value: AmadeusLocation | undefined;
+  isMobile: boolean;
 }
 
 export const LocationInput: React.FC<LocationInputProps> = ({
@@ -34,14 +34,13 @@ export const LocationInput: React.FC<LocationInputProps> = ({
   control,
   name,
   value,
+  isMobile,
 }) => {
   const [query, setQuery] = useState<string>("");
   const [selectedLocation, setSelectedLocation] =
     useState<AmadeusLocation | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-
-  const { isMobile } = useScreenSize();
 
   const debouncedQuery = useDebounce(query, 500);
 

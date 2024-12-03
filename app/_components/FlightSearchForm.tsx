@@ -6,7 +6,6 @@ import {
   faPlaneDeparture,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useScreenSize } from "@/hooks/useScreenSize";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
@@ -17,6 +16,7 @@ import { RoundtripOneWaySelector } from "./RoundtripOneWaySelector";
 import { FlightClassSelector } from "./FlightClassSelector";
 import { SwapLocationsButton } from "./SwapLocationsButton";
 import { DateSelector } from "./DateSelector";
+import { useScreenSize } from "@/hooks/useScreenSize";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -73,6 +73,7 @@ export const FlightSearchForm = () => {
                 />
               }
               value={origin}
+              isMobile={isMobile}
             />
 
             <SwapLocationsButton
@@ -92,12 +93,14 @@ export const FlightSearchForm = () => {
                 />
               }
               value={destination}
+              isMobile={isMobile}
             />
             <div className="flex w-full gap-2">
               <DateSelector
                 control={form.control}
                 name="departureDate"
                 returnDate={returnDate}
+                isMobile={isMobile}
               />
 
               {!oneWay && (
@@ -105,6 +108,7 @@ export const FlightSearchForm = () => {
                   control={form.control}
                   name="returnDate"
                   departureDate={departureDate}
+                  isMobile={isMobile}
                 />
               )}
             </div>
