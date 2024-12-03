@@ -17,7 +17,6 @@ interface DateSelectorProps {
   name: "departureDate" | "returnDate";
   departureDate?: Date | null;
   returnDate?: Date | null;
-  isMobile: boolean;
 }
 
 export const DateSelector = ({
@@ -25,7 +24,6 @@ export const DateSelector = ({
   name,
   departureDate,
   returnDate,
-  isMobile,
 }: DateSelectorProps) => {
   return (
     <FormField
@@ -58,7 +56,6 @@ export const DateSelector = ({
                 modifiersClassNames={{
                   today: "bg-muted",
                 }}
-                numberOfMonths={isMobile ? 1 : 2}
               />
               <div className="flex justify-end">
                 {field.value && (

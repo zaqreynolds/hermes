@@ -100,7 +100,6 @@ export const FlightSearchForm = () => {
                 control={form.control}
                 name="departureDate"
                 returnDate={returnDate}
-                isMobile={isMobile}
               />
 
               {!oneWay && (
@@ -108,7 +107,6 @@ export const FlightSearchForm = () => {
                   control={form.control}
                   name="returnDate"
                   departureDate={departureDate}
-                  isMobile={isMobile}
                 />
               )}
             </div>
