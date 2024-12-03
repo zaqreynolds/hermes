@@ -1,21 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import {
   faPlaneArrival,
   faPlaneDeparture,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CalendarIcon } from "lucide-react";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
@@ -25,6 +16,7 @@ import { LocationInput } from "./LocationInput";
 import { RoundtripOneWaySelector } from "./RoundtripOneWaySelector";
 import { FlightClassSelector } from "./FlightClassSelector";
 import { SwapLocationsButton } from "./SwapLocationsButton";
+import { DateSelector } from "./DateSelector";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -102,106 +94,17 @@ export const FlightSearchForm = () => {
               value={destination}
             />
             <div className="flex w-full gap-2">
-              {/* Departure Date Picker*/}
-              <FormField
+              <DateSelector
                 control={form.control}
                 name="departureDate"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-44 h-full justify-start text-left text-xs"
-                        >
-                          <CalendarIcon />
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span className="opacity-70">
-                              Pick a date to depart
-                            </span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={{
-                            before: new Date(),
-                            after: returnDate || undefined,
-                          }}
-                          autoFocus
-                        />
-                        {/* <div className="flex justify-end">
-                          <Button
-                            variant="outline"
-                            className="w-fit text-xs"
-                            onClick={() => field.onChange(null)}
-                          >
-                            Clear Date
-                          </Button>
-                        </div> */}
-                      </PopoverContent>
-                    </Popover>
-                    {fieldState.error && (
-                      <FormMessage>{fieldState.error.message}</FormMessage>
-                    )}
-                  </FormItem>
-                )}
+                returnDate={returnDate}
               />
 
-              {/* Return Date Picker*/}
               {!oneWay && (
-                <FormField
+                <DateSelector
                   control={form.control}
                   name="returnDate"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-44 h-full justify-start text-left text-xs"
-                          >
-                            <CalendarIcon />
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span className="opacity-70">
-                                Pick a date to return
-                              </span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          align="start"
-                          className="flex w-auto flex-col p-2"
-                        >
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            hidden={{ before: departureDate || new Date() }}
-                          />
-                          <div className="flex justify-end">
-                            <Button
-                              variant="outline"
-                              className="w-fit text-xs"
-                              onClick={() => field.onChange(null)}
-                            >
-                              Clear Date
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                      {fieldState.error && (
-                        <FormMessage>{fieldState.error.message}</FormMessage>
-                      )}
-                    </FormItem>
-                  )}
+                  departureDate={departureDate}
                 />
               )}
             </div>
