@@ -17,6 +17,7 @@ import { FlightClassSelector } from "./FlightClassSelector";
 import { SwapLocationsButton } from "./SwapLocationsButton";
 import { DateSelector } from "./DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
+import { useSearchFlights } from "./useSearchFlights";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -45,11 +46,15 @@ export const FlightSearchForm = () => {
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
-  const onSubmit = (data: z.infer<typeof flightSearchSchema>) => {
-    console.log("Form Submitted", data);
+  const {
+    searchFlights,
+    // data, loading, error
+  } = useSearchFlights();
+
+  const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
+    await searchFlights(data);
   };
 
-  console.log("formvalues", form.getValues());
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <Form {...form}>
