@@ -18,6 +18,7 @@ import { SwapLocationsButton } from "./SwapLocationsButton";
 import { DateSelector } from "./DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./useSearchFlights";
+import { useEffect } from "react";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -48,13 +49,18 @@ export const FlightSearchForm = () => {
 
   const {
     searchFlights,
-    // data, loading, error
+    data: flights,
+    // loading, error
   } = useSearchFlights();
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
     await searchFlights(data);
   };
-
+  useEffect(() => {
+    if (flights) {
+      console.log("Updated flights data:", flights);
+    }
+  }, [flights]);
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <Form {...form}>
