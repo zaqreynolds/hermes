@@ -1,4 +1,4 @@
-import Amadeus from "amadeus";
+import Amadeus from "amadeus-ts";
 
 const amadeus = new Amadeus({
   clientId: process.env.AMADEUS_API_KEY || "",
