@@ -70,7 +70,6 @@ export const POST = async (req: NextRequest) => {
     const processedFlightOffers = flightOffers.map((offer) =>
       decodeFlightOffer(offer, dictionaries)
     );
-    console.log("processedFlightOffers", processedFlightOffers);
     return NextResponse.json(processedFlightOffers, { status: 200 });
   } catch (error) {
     console.error("Error searching flights:", error);
