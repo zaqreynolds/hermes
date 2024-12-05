@@ -17,7 +17,7 @@ import { FlightClassSelector } from "./FlightClassSelector";
 import { SwapLocationsButton } from "./SwapLocationsButton";
 import { DateSelector } from "./DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
-import { useSearchFlights } from "./useSearchFlights";
+import { useSearchFlights } from "./hooks/useSearchFlights";
 import { useEffect } from "react";
 
 export const FlightSearchForm = () => {

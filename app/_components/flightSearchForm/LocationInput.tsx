@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { AmadeusLocation } from "../types";
+import { AmadeusLocation } from "../../types";
 import {
   Popover,
   PopoverContent,
@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { LocationList } from "./LocationList";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useFetchLocation } from "./useFetchLocation";
+import { useFetchLocation } from "./hooks/useFetchLocation";
 import { Control } from "react-hook-form";
 import { z } from "zod";
 import { flightSearchSchema } from "./flightSearchSchema";

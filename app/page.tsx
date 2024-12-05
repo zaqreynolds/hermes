@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import FlightSearchForm from "./_components/FlightSearchForm";
+import FlightSearchForm from "./_components/flightSearchForm/FlightSearchForm";
 
 export default function Home() {
   // const router = useRouter();
