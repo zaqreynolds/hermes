@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -11,6 +12,7 @@ import { CalendarIcon } from "lucide-react";
 import { Control } from "react-hook-form";
 import { z } from "zod";
 import { flightSearchSchema } from "./flightSearchSchema";
+import { useState } from "react";
 
 interface DateSelectorProps {
   control: Control<z.infer<typeof flightSearchSchema>>;
@@ -25,13 +27,15 @@ export const DateSelector = ({
   departureDate,
   returnDate,
 }: DateSelectorProps) => {
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
   return (
     <FormField
       control={control}
       name={name}
       render={({ field, fieldState }) => (
         <FormItem>
-          <Popover>
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -49,7 +53,10 @@ export const DateSelector = ({
               <Calendar
                 mode="single"
                 selected={field.value}
-                onSelect={field.onChange}
+                onSelect={(date) => {
+                  field.onChange(date);
+                  setPopoverOpen(false);
+                }}
                 fromDate={departureDate || new Date()}
                 toDate={returnDate || undefined}
                 initialFocus
