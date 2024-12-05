@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
-import { flightSearchSchema } from "@/app/_components/flightSearchSchema";
+import { flightSearchSchema } from "../../../_components/flightSearchForm/flightSearchSchema";
+import { Dictionaries, FlightOffer, TravelerPricing } from "./types";
+import { TravelClass } from "amadeus-ts";
 
-const decodeFlightOffer = (offer: FlightOffer, dictionaries: Dictionaries) => {
+const decodeFlightOffer = (
+  offer: FlightOffer & { travelerPricings: TravelerPricing[] },
+  dictionaries: Dictionaries
+) => {
   const { locations, carriers, aircraft } = dictionaries;
 
   return {
@@ -56,7 +61,7 @@ export const POST = async (req: NextRequest) => {
     adults: parsed.data.travelers.adults,
     children: parsed.data.travelers.children || 0,
     infants: parsed.data.travelers.infants || 0,
-    travelClass: parsed.data.travelClass || "ECONOMY",
+    travelClass: (parsed.data.travelClass as TravelClass) || "ECONOMY",
     nonStop: parsed.data.nonStop || false,
     max: 10,
   };

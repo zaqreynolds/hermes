@@ -50,7 +50,8 @@ export const FlightSearchForm = () => {
   const {
     searchFlights,
     data: flights,
-    // loading, error
+    loading,
+    // error
   } = useSearchFlights();
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
@@ -123,7 +124,7 @@ export const FlightSearchForm = () => {
             </div>
           </div>
           <div className="flex justify-end">
-            <Button className="w-fit" type="submit">
+            <Button className="w-fit" type="submit" disabled={loading}>
               Search
             </Button>
           </div>
