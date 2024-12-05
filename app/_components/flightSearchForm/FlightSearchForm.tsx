@@ -19,6 +19,7 @@ import { DateSelector } from "./DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
 import { useEffect } from "react";
+import { LoaderCircleIcon } from "lucide-react";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -62,6 +63,15 @@ export const FlightSearchForm = () => {
       console.log("Updated flights data:", flights);
     }
   }, [flights]);
+
+  const handleSearchStatus = () => {
+    if (loading) {
+      return <LoaderCircleIcon className="animate-spin h-6 w-6" />;
+    } else {
+      return "Search";
+    }
+  };
+
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <Form {...form}>
@@ -124,8 +134,8 @@ export const FlightSearchForm = () => {
             </div>
           </div>
           <div className="flex justify-end">
-            <Button className="w-fit" type="submit" disabled={loading}>
-              Search
+            <Button className="w-20" type="submit" disabled={loading}>
+              {handleSearchStatus()}
             </Button>
           </div>
         </form>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
 import { flightSearchSchema } from "../../../_components/flightSearchForm/flightSearchSchema";
-import { Dictionaries, FlightOffer, TravelerPricing } from "./types";
+import { Dictionaries, TravelerPricing } from "./types";
 import { TravelClass } from "amadeus-ts";
 
 const decodeFlightOffer = (
