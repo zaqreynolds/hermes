@@ -7,6 +7,7 @@ interface FlightSearchResultsProps {
 export const FlightSearchResults = ({
   flightResults,
 }: FlightSearchResultsProps) => {
+  console.log("heloooo", flightResults);
   return (
     <div>
       {flightResults.map((flight) => (

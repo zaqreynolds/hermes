@@ -21,6 +21,7 @@ import { useSearchFlights } from "./hooks/useSearchFlights";
 import { useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
 import { FlightOffer } from "amadeus-ts";
+import { Toggle } from "@/components/ui/toggle";
 
 interface FlightSearchFormProps {
   setFlightResultsAction: (flights: FlightOffer[]) => void;
@@ -140,8 +141,21 @@ export const FlightSearchForm = ({
               )}
             </div>
           </div>
-          <div className="flex justify-end">
-            <Button className="w-20" type="submit" disabled={loading}>
+          <div className="flex justify-end gap-2">
+            <Toggle
+              id="nonStop"
+              // pressed={value}
+              // onPressedChange={onChange}
+              className="bg-background text-secondary-foreground border-secondary-foreground border-[1px] rounded-md shadow-md active:shadow-none hover:bg-primary-muted"
+            >
+              Nonstop
+            </Toggle>
+
+            <Button
+              className="w-20 shadow-md active:shadow-none"
+              type="submit"
+              disabled={loading}
+            >
               {handleSearchStatus()}
             </Button>
           </div>

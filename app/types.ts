@@ -1,3 +1,5 @@
+import { FlightOffer } from "amadeus-ts";
+
 export interface Address {
   cityName: string;
   cityCode: string;
@@ -51,4 +53,34 @@ export interface TravelerCategory {
   max: number;
   min: number;
   validateAdd: (current: Travelers) => boolean;
+}
+
+//for Context
+export interface FlightSearchState {
+  isOneWay: boolean;
+  origin: string | null;
+  destination: string | null;
+  departureDate: Date | null;
+  returnDate: Date | null;
+
+  travelers: {
+    adults: number;
+    children: number;
+    infants: number;
+  };
+
+  travelClass: "ECONOMY" | "BUSINESS" | "FIRST" | "PREMIUM_ECONOMY";
+  nonStop: boolean;
+
+  flightOffers: FlightOffer[];
+  pricedFlight: FlightOffer | null;
+  priceAnalysis: PriceAnalysis | null;
+}
+
+export interface PriceAnalysis {
+  average: number;
+  lowest: number;
+  highest: number;
+  numberOfPrices: number;
+  priceBucket: "LOW" | "MEDIUM" | "HIGH";
 }
