@@ -1,14 +1,13 @@
 "use client";
 import { useState, useCallback } from "react";
-import { flightSearchSchema } from "./flightSearchSchema";
+import { flightSearchSchema } from "../flightSearchSchema";
 import { z } from "zod";
+import { FlightOffer } from "amadeus-ts";
 
 export const useSearchFlights = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<z.infer<typeof flightSearchSchema> | null>(
-    null
-  );
+  const [data, setData] = useState<FlightOffer[] | null>(null);
 
   const preprocessedData = (formData: z.infer<typeof flightSearchSchema>) => ({
     ...formData,

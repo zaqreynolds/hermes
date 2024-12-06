@@ -1,5 +1,9 @@
-import { Suspense } from "react";
+"use client";
+
+import { Suspense, useState } from "react";
 import FlightSearchForm from "./_components/flightSearchForm/FlightSearchForm";
+import { FlightOffer } from "amadeus-ts";
+import { FlightSearchResults } from "./_components/flightSearchForm/FlightSearchResults";
 
 export default function Home() {
   // const router = useRouter();
@@ -18,12 +22,16 @@ export default function Home() {
 
   // and then this for the button click
   // router.push(pathname + '?' + createQueryString('key', 'value'));
+  const [flights, setFlights] = useState<FlightOffer[]>([]);
 
   return (
     <div className="w-full flex flex-col p-4 overflow-auto">
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <Suspense fallback={<div>Loading Flight Search Form...</div>}>
-        <FlightSearchForm />
+        <FlightSearchForm setFlightResultsAction={setFlights} />
+      </Suspense>
+      <Suspense fallback={<div>Loading Flight Search Results...</div>}>
+        <FlightSearchResults flightResults={flights} />
       </Suspense>
     </div>
   );

@@ -20,8 +20,15 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
 import { useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
+import { FlightOffer } from "amadeus-ts";
 
-export const FlightSearchForm = () => {
+interface FlightSearchFormProps {
+  setFlightResultsAction: (flights: FlightOffer[]) => void;
+}
+
+export const FlightSearchForm = ({
+  setFlightResultsAction,
+}: FlightSearchFormProps) => {
   const { isMobile } = useScreenSize();
 
   const form = useForm<z.infer<typeof flightSearchSchema>>({
@@ -60,9 +67,9 @@ export const FlightSearchForm = () => {
   };
   useEffect(() => {
     if (flights) {
-      console.log("Updated flights data:", flights);
+      setFlightResultsAction(flights);
     }
-  }, [flights]);
+  }, [flights, setFlightResultsAction]);
 
   const handleSearchStatus = () => {
     if (loading) {
