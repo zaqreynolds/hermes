@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import FlightSearchProviderWrapper from "@/context/FlightSearchProviderWrapper";
 
 config.autoAddCss = false;
 
@@ -38,7 +39,7 @@ export default function RootLayout({
           <h1 className="w-full text-left text-2xl font-bold py-3 pl-4 bg-primary text-secondary shadow-md">
             Hermes
           </h1>
-          {children}
+          <FlightSearchProviderWrapper> {children}</FlightSearchProviderWrapper>
         </main>
       </body>
     </html>

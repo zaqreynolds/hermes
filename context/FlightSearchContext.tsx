@@ -7,26 +7,22 @@ type FlightSearchContextType = {
 import { createContext, useState, ReactNode } from "react";
 
 const defaultState: FlightSearchState = {
-  // User inputs
   isOneWay: false,
   origin: null,
   destination: null,
   departureDate: null,
   returnDate: null,
-
-  // Traveler details
   travelers: {
-    adults: 1, // Default to 1 adult
+    adults: 1,
     children: 0,
     infants: 0,
   },
-
-  // Preferences
   travelClass: "ECONOMY",
   nonStop: false,
-
-  // API results
-  flightOffers: [],
+  departureOffers: [],
+  returnOffers: [],
+  selectedDeparture: null,
+  selectedReturn: null,
   pricedFlight: null,
   priceAnalysis: null,
 };

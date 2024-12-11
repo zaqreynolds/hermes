@@ -75,6 +75,9 @@ export interface FlightSearchState {
   flightOffers: FlightOffer[];
   pricedFlight: FlightOffer | null;
   priceAnalysis: PriceAnalysis | null;
+
+  selectedDeparture: FlightOffer | null;
+  selectedReturn: FlightOffer | null;
 }
 
 export interface PriceAnalysis {

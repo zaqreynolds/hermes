@@ -55,7 +55,7 @@ export const DateSelector = ({
                 selected={field.value}
                 onSelect={(date) => {
                   field.onChange(date);
-                  setPopoverOpen(false);
+                  setTimeout(() => setPopoverOpen(false), 200);
                 }}
                 fromDate={departureDate || new Date()}
                 toDate={returnDate || undefined}
