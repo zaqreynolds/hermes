@@ -1,8 +1,9 @@
+"use client";
 import { FlightSearchState } from "@/app/types";
 
 type FlightSearchContextType = {
-  state: FlightSearchState;
-  setState: React.Dispatch<React.SetStateAction<FlightSearchState>>;
+  searchState: FlightSearchState;
+  setSearchState: React.Dispatch<React.SetStateAction<FlightSearchState>>;
 };
 import { createContext, useState, ReactNode } from "react";
 
@@ -27,16 +28,17 @@ const defaultState: FlightSearchState = {
   priceAnalysis: null,
 };
 
-const FlightSearchContext = createContext<FlightSearchContextType>({
-  state: defaultState,
-  setState: () => {},
+export const FlightSearchContext = createContext<FlightSearchContextType>({
+  searchState: defaultState,
+  setSearchState: () => {},
 });
 
 export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
-  const [state, setState] = useState<FlightSearchState>(defaultState);
+  const [searchState, setSearchState] =
+    useState<FlightSearchState>(defaultState);
 
   return (
-    <FlightSearchContext.Provider value={{ state, setState }}>
+    <FlightSearchContext.Provider value={{ searchState, setSearchState }}>
       {children}
     </FlightSearchContext.Provider>
   );

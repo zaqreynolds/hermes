@@ -18,18 +18,12 @@ import { SwapLocationsButton } from "./SwapLocationsButton";
 import { DateSelector } from "./DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
-import { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
-import { FlightOffer } from "amadeus-ts";
 import { Toggle } from "@/components/ui/toggle";
+import { FlightSearchContext } from "@/context/FlightSearchContext";
 
-interface FlightSearchFormProps {
-  setFlightResultsAction: (flights: FlightOffer[]) => void;
-}
-
-export const FlightSearchForm = ({
-  setFlightResultsAction,
-}: FlightSearchFormProps) => {
+export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
 
   const form = useForm<z.infer<typeof flightSearchSchema>>({
@@ -56,6 +50,8 @@ export const FlightSearchForm = ({
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
+  const { setSearchState } = useContext(FlightSearchContext);
+
   const {
     searchFlights,
     data: flights,
@@ -64,13 +60,27 @@ export const FlightSearchForm = ({
   } = useSearchFlights();
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
-    await searchFlights(data);
+    const { oneWay, returnDate, ...rest } = data;
+
+    setSearchState((prev) => ({
+      ...prev,
+      isOneWay: oneWay,
+      returnDate: oneWay ? null : returnDate,
+    }));
+
+    const searchParams = {
+      ...rest,
+      origin: rest.origin.address.cityCode,
+      destination: rest.destination.address.cityCode,
+      departureDate: rest.departureDate.toISOString(),
+    };
+    await searchFlights(searchParams);
   };
   useEffect(() => {
     if (flights) {
-      setFlightResultsAction(flights);
+      setSearchState((prev) => ({ ...prev, departureOffers: flights }));
     }
-  }, [flights, setFlightResultsAction]);
+  }, [flights, setSearchState]);
 
   const handleSearchStatus = () => {
     if (loading) {

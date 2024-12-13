@@ -72,12 +72,14 @@ export interface FlightSearchState {
   travelClass: "ECONOMY" | "BUSINESS" | "FIRST" | "PREMIUM_ECONOMY";
   nonStop: boolean;
 
-  flightOffers: FlightOffer[];
-  pricedFlight: FlightOffer | null;
-  priceAnalysis: PriceAnalysis | null;
+  departureOffers: FlightOffer[];
+  returnOffers: FlightOffer[];
 
   selectedDeparture: FlightOffer | null;
   selectedReturn: FlightOffer | null;
+
+  pricedFlight: FlightOffer | null;
+  priceAnalysis: PriceAnalysis | null;
 }
 
 export interface PriceAnalysis {

@@ -1,13 +1,12 @@
+"use client";
+import { FlightSearchContext } from "@/context/FlightSearchContext";
 import { FlightOffer } from "amadeus-ts";
+import { useContext } from "react";
 
-interface FlightSearchResultsProps {
-  flightResults: FlightOffer[];
-}
+export const FlightSearchResults = () => {
+  const { searchState } = useContext(FlightSearchContext);
 
-export const FlightSearchResults = ({
-  flightResults,
-}: FlightSearchResultsProps) => {
-  console.log("heloooo", flightResults);
+  const flightResults = searchState.departureOffers as FlightOffer[];
   return (
     <div>
       {flightResults.map((flight) => (
@@ -16,6 +15,7 @@ export const FlightSearchResults = ({
           <h3>{flight.price.total}</h3>
         </div>
       ))}
+      {flightResults.length === 0 && <div>No results yet</div>}
     </div>
   );
 };

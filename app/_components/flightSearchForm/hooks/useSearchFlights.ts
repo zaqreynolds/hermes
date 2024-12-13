@@ -1,52 +1,58 @@
 "use client";
 import { useState, useCallback } from "react";
-import { flightSearchSchema } from "../flightSearchSchema";
-import { z } from "zod";
 import { FlightOffer } from "amadeus-ts";
+
+export type SearchFlightsInput = {
+  origin: string;
+  destination: string;
+  departureDate: string;
+  returnDate?: string;
+  travelers: {
+    adults: number;
+    children: number;
+    infants: number;
+  };
+  travelClass?: string;
+  nonStop: boolean;
+};
 
 export const useSearchFlights = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FlightOffer[] | null>(null);
 
-  const preprocessedData = (formData: z.infer<typeof flightSearchSchema>) => ({
-    ...formData,
-    departureDate: formData.departureDate.toISOString().split("T")[0],
-    returnDate: formData.returnDate
-      ? formData.returnDate.toISOString().split("T")[0]
-      : undefined,
+  const preprocessedData = (data: SearchFlightsInput) => ({
+    ...data,
+    departureDate: new Date(data.departureDate).toISOString().split("T")[0],
   });
 
-  const searchFlights = useCallback(
-    async (formData: z.infer<typeof flightSearchSchema>) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch("/api/amadeus/flightSearch", {
-          method: "POST",
-          body: JSON.stringify(preprocessedData(formData)),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to search flights");
-        }
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError(String(error));
-        }
-        console.error("Error searching flights", error);
-      } finally {
-        setLoading(false);
+  const searchFlights = useCallback(async (data: SearchFlightsInput) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/amadeus/flightSearch", {
+        method: "POST",
+        body: JSON.stringify(preprocessedData(data)),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to search flights");
       }
-    },
-    []
-  );
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error));
+      }
+      console.error("Error searching flights", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { loading, error, data, searchFlights };
 };

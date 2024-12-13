@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
-import { flightSearchSchema } from "../../../_components/flightSearchForm/flightSearchSchema";
+import { compactFlightSearchSchema } from "../../../_components/flightSearchForm/flightSearchSchema";
 import { Dictionaries, TravelerPricing } from "./types";
-import { TravelClass } from "amadeus-ts";
+import { FlightOffer, TravelClass } from "amadeus-ts";
 
 const decodeFlightOffer = (
   offer: FlightOffer & { travelerPricings: TravelerPricing[] },
@@ -37,14 +37,16 @@ const decodeFlightOffer = (
 
 export const POST = async (req: NextRequest) => {
   const data = await req.json();
+  console.log("Received request body:", data);
   data.departureDate = new Date(data.departureDate);
-  if (data.returnDate) {
-    data.returnDate = new Date(data.returnDate);
-  }
+  // if (data.returnDate) {
+  //   data.returnDate = new Date(data.returnDate);
+  // }
 
-  const parsed = flightSearchSchema.safeParse(data);
+  const parsed = compactFlightSearchSchema.safeParse(data);
 
   if (!parsed.success) {
+    console.error("Validation errors:", parsed.error);
     return NextResponse.json(
       { error: "Invalid request body" },
       { status: 400 }
@@ -52,12 +54,12 @@ export const POST = async (req: NextRequest) => {
   }
 
   const requestBody = {
-    originLocationCode: parsed.data.origin.iataCode,
-    destinationLocationCode: parsed.data.destination.iataCode,
+    originLocationCode: parsed.data.origin,
+    destinationLocationCode: parsed.data.destination,
     departureDate: parsed.data.departureDate.toISOString().split("T")[0],
-    returnDate: parsed.data.returnDate
-      ? parsed.data.returnDate.toISOString().split("T")[0]
-      : undefined,
+    // returnDate: parsed.data.returnDate
+    //   ? parsed.data.returnDate.toISOString().split("T")[0]
+    //   : undefined,
     adults: parsed.data.travelers.adults,
     children: parsed.data.travelers.children || 0,
     infants: parsed.data.travelers.infants || 0,
@@ -67,14 +69,25 @@ export const POST = async (req: NextRequest) => {
   };
 
   try {
+    console.log("Searching flights with request body:", requestBody);
     const response = await amadeus.shopping.flightOffersSearch.get(requestBody);
+    console.log("API response:", response);
 
     const { data: flightOffers, result } = response;
     const { dictionaries } = result;
 
-    const processedFlightOffers = flightOffers.map((offer) =>
-      decodeFlightOffer(offer, dictionaries)
-    );
+    if (!dictionaries) {
+      throw new Error("Dictionaries is undefined");
+    }
+    const processedFlightOffers = flightOffers.map((offer) => {
+      if (!offer.travelerPricings) {
+        throw new Error("TravelerPricings is undefined");
+      }
+      return decodeFlightOffer(
+        offer as FlightOffer & { travelerPricings: TravelerPricing[] },
+        dictionaries
+      );
+    });
     return NextResponse.json(processedFlightOffers, { status: 200 });
   } catch (error) {
     console.error("Error searching flights:", error);
