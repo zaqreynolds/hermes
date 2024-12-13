@@ -175,6 +175,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                   field.onChange(location);
                 }}
                 selectedIndex={selectedIndex}
+                onChange={field.onChange}
               />
             </PopoverContent>
           </Popover>

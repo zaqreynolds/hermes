@@ -10,12 +10,14 @@ export const LocationList = ({
   isLoading,
   handleLocationSelect,
   selectedIndex,
+  onChange,
 }: {
   locationData: AmadeusLocation[];
   error: string | null;
   isLoading: boolean;
   handleLocationSelect: (location: AmadeusLocation) => void;
   selectedIndex: number;
+  onChange: (value: AmadeusLocation) => void;
 }) => {
   return (
     <div className="max-h-96 overflow-y-auto">
@@ -34,7 +36,10 @@ export const LocationList = ({
                 "p-3 hover:bg-accent cursor-pointer hover:shadow-lg",
                 selectedIndex === locationData.indexOf(location) && "bg-accent"
               )}
-              onClick={() => handleLocationSelect(location)}
+              onClick={() => {
+                handleLocationSelect(location);
+                onChange(location);
+              }}
             >
               <div className="flex items-center">
                 <div>
