@@ -19,15 +19,15 @@ const decodeFlightOffer = (
         departure: {
           ...segment.departure,
           airport:
-            locations[segment.departure.iataCode]?.name ||
+            locations[segment.departure.iataCode]?.cityCode ||
             segment.departure.iataCode,
         },
-        arrival: {
-          ...segment.arrival,
-          airport:
-            locations[segment.arrival.iataCode]?.name ||
-            segment.arrival.iataCode,
-        },
+        // arrival: {
+        //   ...segment.arrival,
+        //   airport:
+        //     locations[segment.arrival.iataCode]?.cityCode ||
+        //     segment.arrival.iataCode,
+        // },
         carrier: carriers[segment.carrierCode] || segment.carrierCode,
         aircraft: aircraft[segment.aircraft.code] || segment.aircraft.code,
       })),
@@ -37,11 +37,8 @@ const decodeFlightOffer = (
 
 export const POST = async (req: NextRequest) => {
   const data = await req.json();
-  console.log("Received request body:", data);
+
   data.departureDate = new Date(data.departureDate);
-  // if (data.returnDate) {
-  //   data.returnDate = new Date(data.returnDate);
-  // }
 
   const parsed = compactFlightSearchSchema.safeParse(data);
 
@@ -57,9 +54,6 @@ export const POST = async (req: NextRequest) => {
     originLocationCode: parsed.data.origin,
     destinationLocationCode: parsed.data.destination,
     departureDate: parsed.data.departureDate.toISOString().split("T")[0],
-    // returnDate: parsed.data.returnDate
-    //   ? parsed.data.returnDate.toISOString().split("T")[0]
-    //   : undefined,
     adults: parsed.data.travelers.adults,
     children: parsed.data.travelers.children || 0,
     infants: parsed.data.travelers.infants || 0,
@@ -69,16 +63,19 @@ export const POST = async (req: NextRequest) => {
   };
 
   try {
-    console.log("Searching flights with request body:", requestBody);
     const response = await amadeus.shopping.flightOffersSearch.get(requestBody);
-    console.log("API response:", response);
 
-    const { data: flightOffers, result } = response;
+    const { data: flightOffers, result } = response as {
+      data: FlightOffer[];
+      result: { dictionaries: Dictionaries };
+    };
+
     const { dictionaries } = result;
 
     if (!dictionaries) {
       throw new Error("Dictionaries is undefined");
     }
+
     const processedFlightOffers = flightOffers.map((offer) => {
       if (!offer.travelerPricings) {
         throw new Error("TravelerPricings is undefined");
