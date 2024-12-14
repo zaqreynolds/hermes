@@ -20,8 +20,8 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
 import React, { useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
-import { Toggle } from "@/components/ui/toggle";
 import { FlightSearchContext } from "@/context/FlightSearchContext";
+import NonStopSwitch from "./NonStopSwitch";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -94,12 +94,14 @@ export const FlightSearchForm = () => {
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex w-full gap-1 pb-2 ">
+          <div className="flex w-full gap-1 pb-2 pr-1">
             <RoundtripOneWaySelector control={form.control} />
 
             <TravelerSelector control={form.control} isMobile={isMobile} />
 
             <FlightClassSelector control={form.control} isMobile={isMobile} />
+            <div className=" flex-1" />
+            {!isMobile && <NonStopSwitch control={form.control} />}
           </div>
           <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
             <LocationInput
@@ -151,18 +153,15 @@ export const FlightSearchForm = () => {
               )}
             </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Toggle
-              id="nonStop"
-              // pressed={value}
-              // onPressedChange={onChange}
-              className="bg-background text-secondary-foreground border-secondary-foreground border-[1px] rounded-md shadow-md active:shadow-none hover:bg-primary-muted"
-            >
-              Nonstop
-            </Toggle>
+          <div className="flex justify-between gap-2">
+            {isMobile && (
+              <div className="flex">
+                <NonStopSwitch control={form.control} />
+              </div>
+            )}
 
             <Button
-              className="w-20 shadow-md active:shadow-none"
+              className="w-20 shadow-md active:shadow-none ml-auto"
               type="submit"
               disabled={loading}
             >
