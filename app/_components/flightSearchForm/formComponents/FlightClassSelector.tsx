@@ -1,7 +1,7 @@
 "use client";
 import { Control } from "react-hook-form";
 import { z } from "zod";
-import { flightSearchSchema } from "./flightSearchSchema";
+import { flightSearchSchema } from "../flightSearchSchema";
 import { FormField, FormItem } from "@/components/ui/form";
 import {
   Select,

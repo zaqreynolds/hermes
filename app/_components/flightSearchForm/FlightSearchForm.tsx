@@ -10,18 +10,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
 import { z } from "zod";
-import { TravelerSelector } from "./travelerSelector/TravelerSelector";
-import { LocationInput } from "./LocationInput";
-import { RoundtripOneWaySelector } from "./RoundtripOneWaySelector";
-import { FlightClassSelector } from "./FlightClassSelector";
-import { SwapLocationsButton } from "./SwapLocationsButton";
-import { DateSelector } from "./DateSelector";
+import { TravelerSelector } from "./formComponents/travelerSelector/TravelerSelector";
+import { LocationInput } from "./formComponents/LocationInput";
+import { RoundtripOneWaySelector } from "./formComponents/RoundtripOneWaySelector";
+import { FlightClassSelector } from "./formComponents/FlightClassSelector";
+import { SwapLocationsButton } from "./formComponents/SwapLocationsButton";
+import { DateSelector } from "./formComponents/DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
 import React, { useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
 import { FlightSearchContext } from "@/context/FlightSearchContext";
-import NonStopSwitch from "./NonStopSwitch";
+import NonStopSwitch from "./formComponents/NonStopSwitch";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();

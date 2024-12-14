@@ -1,6 +1,6 @@
 import { Control } from "react-hook-form";
 import { z } from "zod";
-import { flightSearchSchema } from "./flightSearchSchema";
+import { flightSearchSchema } from "../flightSearchSchema";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
 
 import {

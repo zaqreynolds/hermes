@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AmadeusLocation } from "../../types";
+import { AmadeusLocation } from "../../../types";
 import { faCity, faPlaneUp } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
-import { LoadingText } from "./LoadingText";
+import { LoadingText } from "../LoadingText";
 
 export const LocationList = ({
   locationData,

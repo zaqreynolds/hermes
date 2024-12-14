@@ -2,7 +2,7 @@ import { FormField, FormItem } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Control } from "react-hook-form";
-import { flightSearchSchema } from "./flightSearchSchema";
+import { flightSearchSchema } from "../flightSearchSchema";
 import { z } from "zod";
 
 interface NonStopSwitchProps {

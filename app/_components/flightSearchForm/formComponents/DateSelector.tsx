@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Control } from "react-hook-form";
 import { z } from "zod";
-import { flightSearchSchema } from "./flightSearchSchema";
+import { flightSearchSchema } from "../flightSearchSchema";
 import { useState } from "react";
 
 interface DateSelectorProps {

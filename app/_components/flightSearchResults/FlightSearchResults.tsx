@@ -6,16 +6,17 @@ import { useContext } from "react";
 export const FlightSearchResults = () => {
   const { searchState } = useContext(FlightSearchContext);
 
-  const flightResults = searchState.departureOffers as FlightOffer[];
+  const departureOffers = searchState.departureOffers as FlightOffer[];
+  console.log("departureOffers", JSON.stringify(departureOffers, null, 2));
   return (
     <div>
-      {flightResults.map((flight) => (
+      {departureOffers.map((flight) => (
         <div key={flight.id}>
           <h2>{flight.id}</h2>
           <h3>{flight.price.total}</h3>
         </div>
       ))}
-      {flightResults.length === 0 && <div>No results yet</div>}
+      {departureOffers.length === 0 && <div>No results yet</div>}
     </div>
   );
 };
