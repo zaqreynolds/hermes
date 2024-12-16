@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
 import { compactFlightSearchSchema } from "../../../_components/flightSearchForm/flightSearchSchema";
 import { Dictionaries, TravelerPricing } from "./types";
-import { FlightOffer, TravelClass } from "amadeus-ts";
+import { CurrencyCode, FlightOffer, TravelClass } from "amadeus-ts";
+import { toPascalCase } from "@/lib/utils";
 
 const decodeFlightOffer = (
   offer: FlightOffer & { travelerPricings: TravelerPricing[] },
@@ -16,34 +17,17 @@ const decodeFlightOffer = (
       ...itinerary,
       segments: itinerary.segments.map((segment) => ({
         ...segment,
-        departure: {
-          ...segment.departure,
-          airport: {
-            code: segment.departure.iataCode,
-            name:
-              locations[segment.departure.iataCode]?.name || // Airport name
-              segment.departure.iataCode,
-            city:
-              locations[segment.departure.iataCode]?.cityName || // City name
-              segment.departure.iataCode,
-          },
-        },
-        arrival: {
-          ...segment.arrival,
-          airport: {
-            code: segment.arrival.iataCode,
-            name:
-              locations[segment.arrival.iataCode]?.name || // Airport name
-              segment.arrival.iataCode,
-            city:
-              locations[segment.arrival.iataCode]?.cityName || // City name
-              segment.arrival.iataCode,
-          },
-        },
-        carrier: carriers[segment.carrierCode] || segment.carrierCode,
-        aircraft: aircraft[segment.aircraft.code] || segment.aircraft.code,
+        carrier:
+          toPascalCase(carriers[segment.carrierCode]) || segment.carrierCode,
+        aircraft:
+          toPascalCase(aircraft[segment.aircraft.code]) ||
+          segment.aircraft.code,
       })),
     })),
+    validatingAirlineCodes:
+      offer.validatingAirlineCodes?.map(
+        (code) => toPascalCase(carriers[code]) || code
+      ) || [],
   };
 };
 
@@ -72,6 +56,7 @@ export const POST = async (req: NextRequest) => {
     travelClass: (parsed.data.travelClass as TravelClass) || "ECONOMY",
     nonStop: parsed.data.nonStop || false,
     max: 10,
+    currencyCode: "USD" as CurrencyCode,
   };
 
   try {
