@@ -139,13 +139,16 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                     onKeyDown={(e) => handleKeyDown(e, field)}
                   />
                   {selectedLocation && (
-                    <div className="absolute left-10 top-1.5 right-10 text-[10px] text-muted-foreground">
-                      {truncateText(
-                        `${selectedLocation.address.cityName}, ${" "} ${
-                          selectedLocation.address.countryName
-                        }`,
-                        isMobile ? 64 : 34
-                      )}
+                    <div className="absolute left-10 top-1.5 right-10 flex items-center text-[10px] text-muted-foreground">
+                      <span className="mr-2 text-xs  text-primary">
+                        {selectedLocation.iataCode} -
+                      </span>
+                      <span>
+                        {truncateText(
+                          `${selectedLocation.address.cityName}, ${selectedLocation.address.countryName}`,
+                          isMobile ? 64 : 34
+                        )}
+                      </span>
                     </div>
                   )}
                 </div>

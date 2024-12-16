@@ -7,11 +7,12 @@ export const FlightSearchResults = () => {
   const { searchState } = useContext(FlightSearchContext);
 
   const departureOffers = searchState.departureOffers as FlightOffer[];
-  console.log("departureOffers", JSON.stringify(departureOffers, null, 2));
+  console.log("departureOffers", departureOffers);
+
   return (
     <div>
       {departureOffers.map((flight) => (
-        <div key={flight.id}>
+        <div key={flight.id} className="flex">
           <h2>{flight.id}</h2>
           <h3>{flight.price.total}</h3>
         </div>

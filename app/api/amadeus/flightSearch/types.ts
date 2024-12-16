@@ -1,6 +1,8 @@
 export type Location = {
   cityCode: string;
   countryCode: string;
+  name?: string;
+  cityName?: string;
 };
 
 export type Carrier = string; // e.g., "United Airlines"

@@ -66,7 +66,7 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
       value={{ searchState, setSearchState, amadeusStatus }}
     >
       {children}
-      <AmadeusHealthDialog open={amadeusStatus !== "ok"} />
+      <AmadeusHealthDialog open={amadeusStatus === "unavailable"} />
     </FlightSearchContext.Provider>
   );
 };

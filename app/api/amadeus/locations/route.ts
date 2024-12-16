@@ -14,10 +14,10 @@ export const GET = async (req: NextRequest) => {
 
   try {
     const response = await amadeus.referenceData.locations.get({
+      view: "FULL",
       keyword,
       subType: "AIRPORT,CITY",
     });
-
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
     console.error("Amadeus API error:", error);

@@ -14,7 +14,6 @@ export const TravelerCounter = ({
   onChange,
 }: TravelerCounterProps) => {
   const count = travelers[category.type];
-  console.log("count", count);
 
   const handleDecrement = () => {
     if (count > category.min) {

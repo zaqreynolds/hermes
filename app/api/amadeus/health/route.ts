@@ -8,7 +8,6 @@ export const GET = async () => {
       keyword: "test",
       subType: "AIRPORT",
     });
-    console.log("health response", response);
     if (response.statusCode === 200) {
       return NextResponse.json(null, { status: 200 });
     } else {

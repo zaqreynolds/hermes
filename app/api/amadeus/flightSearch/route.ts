@@ -18,16 +18,28 @@ const decodeFlightOffer = (
         ...segment,
         departure: {
           ...segment.departure,
-          airport:
-            locations[segment.departure.iataCode]?.cityCode ||
-            segment.departure.iataCode,
+          airport: {
+            code: segment.departure.iataCode,
+            name:
+              locations[segment.departure.iataCode]?.name || // Airport name
+              segment.departure.iataCode,
+            city:
+              locations[segment.departure.iataCode]?.cityName || // City name
+              segment.departure.iataCode,
+          },
         },
-        // arrival: {
-        //   ...segment.arrival,
-        //   airport:
-        //     locations[segment.arrival.iataCode]?.cityCode ||
-        //     segment.arrival.iataCode,
-        // },
+        arrival: {
+          ...segment.arrival,
+          airport: {
+            code: segment.arrival.iataCode,
+            name:
+              locations[segment.arrival.iataCode]?.name || // Airport name
+              segment.arrival.iataCode,
+            city:
+              locations[segment.arrival.iataCode]?.cityName || // City name
+              segment.arrival.iataCode,
+          },
+        },
         carrier: carriers[segment.carrierCode] || segment.carrierCode,
         aircraft: aircraft[segment.aircraft.code] || segment.aircraft.code,
       })),
@@ -64,6 +76,8 @@ export const POST = async (req: NextRequest) => {
 
   try {
     const response = await amadeus.shopping.flightOffersSearch.get(requestBody);
+    console.log("request body:", requestBody);
+    console.log("Flight offers response:", response);
 
     const { data: flightOffers, result } = response as {
       data: FlightOffer[];
