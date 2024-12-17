@@ -1,8 +1,12 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { durationFormat } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn, durationFormat } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
+import airlinesData from "@/lib/airlines.json";
 
 const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
+  const isMobile = useIsMobile();
+
   const handleStopsWithLayovers = (
     segments: FlightOffer["itineraries"][0]["segments"]
   ) => {
@@ -10,16 +14,14 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
 
     if (stops === 0) return "Non-stop";
 
-    const layoverTimes = segments
-      .slice(0, -1) // Exclude the last segment since no layover follows it
-      .map((segment, index) => {
-        const nextSegment = segments[index + 1];
-        const arrivalTime = new Date(segment.arrival.at);
-        const departureTime = new Date(nextSegment.departure.at);
-        const layoverMinutes =
-          (departureTime.getTime() - arrivalTime.getTime()) / (1000 * 60);
-        return `${Math.floor(layoverMinutes / 60)}h ${layoverMinutes % 60}m`;
-      });
+    const layoverTimes = segments.slice(0, -1).map((segment, index) => {
+      const nextSegment = segments[index + 1];
+      const arrivalTime = new Date(segment.arrival.at);
+      const departureTime = new Date(nextSegment.departure.at);
+      const layoverMinutes =
+        (departureTime.getTime() - arrivalTime.getTime()) / (1000 * 60);
+      return `${Math.floor(layoverMinutes / 60)}h ${layoverMinutes % 60}m`;
+    });
 
     return `${stops} stop${stops > 1 ? "s" : ""} (${layoverTimes.join(", ")})`;
   };
@@ -29,16 +31,40 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const getICAOFromIATA = (iataCode: string): string | null => {
+    const airline = airlinesData.airlines.find(
+      (airline) => airline.IATA === iataCode
+    );
+    return airline ? airline.ICAO : null;
+  };
+
+  const getAirlineLogoUrl = (iataCode: string): string => {
+    const icaoCode = getICAOFromIATA(iataCode);
+    return icaoCode
+      ? `/logos/flightaware_logos/${icaoCode}.png`
+      : "/logos/default_logo.png";
+  };
   return (
     <Card
       key={flight.id}
       className="flex flex-col rounded-lg p-4 shadow-md mb-1"
     >
       {/* Airline and Price */}
-      <CardHeader className="flex-row justify-between p-0">
-        <h3 className="text-md font-semibold">
-          {flight.validatingAirlineCodes?.[0] || "Unknown Airline"}
-        </h3>
+      <CardHeader className="flex-row justify-between items-center p-0">
+        <div className="flex items-center space-x-2">
+          <div className="w-10 h-10 flex items-center justify-center rounded">
+            <img
+              src={getAirlineLogoUrl(
+                flight.itineraries[0].segments[0].carrierCode
+              )}
+              alt={flight.itineraries[0].segments[0].carrierCode}
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h3 className="text-md font-semibold">
+            {flight.validatingAirlineCodes?.[0] || "Unknown Airline"}
+          </h3>
+        </div>
         <p className="text-xl font-bold">${flight.price.grandTotal}</p>
       </CardHeader>
       {/* Flight Details */}
@@ -49,7 +75,12 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
               Duration: {durationFormat(itinerary.duration)} |{" "}
               {handleStopsWithLayovers(itinerary.segments)}
             </div>
-            <div className="flex items-center space-x-4">
+            <div
+              className={cn(
+                "flex items-center space-x-4",
+                isMobile && "justify-between"
+              )}
+            >
               {itinerary.segments.map((segment, segmentIndex) => (
                 <div key={segmentIndex} className="flex items-center space-x-4">
                   {/* Segment Details */}
@@ -60,6 +91,9 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
                     </p>
                     <p>
                       {segment.departure.iataCode} → {segment.arrival.iataCode}
+                    </p>
+                    <p>
+                      Flight {segment.carrierCode} {segment.number}
                     </p>
                     <p className="text-gray-500">
                       Duration: {durationFormat(segment.duration)}
