@@ -47,7 +47,7 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
   return (
     <Card
       key={flight.id}
-      className="flex flex-col rounded-lg p-4 shadow-md mb-1"
+      className="flex flex-col rounded-lg p-4 shadow-md mb-1 max-w-[571px] h-[181px]"
     >
       {/* Airline and Price */}
       <CardHeader className="flex-row justify-between items-center p-0">

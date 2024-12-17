@@ -39,7 +39,7 @@ export const DateSelector = ({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-44 h-12 justify-start text-left text-xs"
+                className="w-[177px] h-12 justify-start text-left text-xs"
               >
                 <CalendarIcon />
                 {field.value ? (

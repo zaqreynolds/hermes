@@ -1,16 +1,18 @@
 "use client";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FlightSearchContext } from "@/context/FlightSearchContext";
-import { cn, durationFormat } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import { useContext } from "react";
 import FlightResultCard from "./FlightResultCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchFlights } from "../flightSearchForm/hooks/useSearchFlights";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const FlightSearchResults = () => {
   const { searchState } = useContext(FlightSearchContext);
   const isMobile = useIsMobile();
+  const { loading } = useSearchFlights();
 
   const departureOffers = searchState.departureOffers as FlightOffer[];
   const returnOffers = searchState.returnOffers as FlightOffer[];
@@ -25,14 +27,18 @@ export const FlightSearchResults = () => {
             {departureOffers.map((flight) => (
               <FlightResultCard key={flight.id} flight={flight} />
             ))}
-            {departureOffers.length === 0 && <div>No results yet</div>}
+            {departureOffers.length === 0 && !loading && (
+              <div>No results yet</div>
+            )}
+            {loading && <SkeletonFlightResultCards />}
           </div>
           <div className="flex-1 flex-col pl-2">
             <h3 className="text-lg mb-4">Return</h3>
             {returnOffers.map((flight) => (
               <FlightResultCard key={flight.id} flight={flight} />
             ))}
-            {returnOffers.length === 0 && <div>No results yet</div>}
+            {returnOffers.length === 0 && !loading && <div>No results yet</div>}
+            {loading && <SkeletonFlightResultCards />}
           </div>
         </div>
       )}
@@ -47,7 +53,6 @@ export const FlightSearchResults = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="departure">
-            {" "}
             <div className="flex-1 flex-col">
               {departureOffers.map((flight) => (
                 <FlightResultCard key={flight.id} flight={flight} />
@@ -66,5 +71,15 @@ export const FlightSearchResults = () => {
         </Tabs>
       )}
     </div>
+  );
+};
+
+const SkeletonFlightResultCards = () => {
+  return (
+    <>
+      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
+    </>
   );
 };
