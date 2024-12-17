@@ -16,16 +16,21 @@ export type SearchFlightsInput = {
   nonStop: boolean;
 };
 
+export type FlightSearchResult = {
+  departureOffers: FlightOffer[];
+  returnOffers?: FlightOffer[];
+};
+
 export const useSearchFlights = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<FlightOffer[] | null>(null);
+  const [data, setData] = useState<FlightSearchResult | null>(null);
 
   const preprocessedData = (data: SearchFlightsInput) => ({
     ...data,
-    departureDate: new Date(data.departureDate).toISOString().split("T")[0],
+    departureDate: new Date(data.departureDate), // Convert departureDate to Date object
+    returnDate: data.returnDate ? new Date(data.returnDate) : undefined, // Ensure returnDate is a Date object
   });
-
   const searchFlights = useCallback(async (data: SearchFlightsInput) => {
     setLoading(true);
     setError(null);
@@ -40,7 +45,7 @@ export const useSearchFlights = () => {
       if (!response.ok) {
         throw new Error("Failed to search flights");
       }
-      const result = await response.json();
+      const result: FlightSearchResult = await response.json();
       setData(result);
     } catch (error) {
       if (error instanceof Error) {

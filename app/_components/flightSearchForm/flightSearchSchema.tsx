@@ -59,6 +59,7 @@ export const compactFlightSearchSchema = z.object({
   origin: z.string(),
   destination: z.string(),
   departureDate: z.date(),
+  returnDate: z.date().optional(),
   travelers: z.object({
     adults: z.number().min(1),
     children: z.number().min(0),

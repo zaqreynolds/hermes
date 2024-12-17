@@ -73,12 +73,19 @@ export const FlightSearchForm = () => {
       origin: rest.origin.address.cityCode,
       destination: rest.destination.address.cityCode,
       departureDate: rest.departureDate.toISOString(),
+      ...(returnDate && !oneWay && { returnDate: returnDate.toISOString() }),
     };
+
     await searchFlights(searchParams);
   };
+
   useEffect(() => {
     if (flights) {
-      setSearchState((prev) => ({ ...prev, departureOffers: flights }));
+      setSearchState((prev) => ({
+        ...prev,
+        departureOffers: flights.departureOffers || [],
+        returnOffers: flights.returnOffers || [],
+      }));
     }
   }, [flights, setSearchState]);
 
