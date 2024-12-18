@@ -1,5 +1,5 @@
 "use client";
-import AmadeusHealthDialog from "@/app/_components/AmadeusHealthDialog";
+import AmadeusHealthDialog from "@/app/_views/AmadeusHealthDialog";
 import { FlightSearchState } from "@/app/types";
 
 type FlightSearchContextType = {

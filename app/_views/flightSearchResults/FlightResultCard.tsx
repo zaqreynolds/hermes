@@ -32,7 +32,6 @@ const FlightResultCard = ({
     if (minutes > 0) {
       formattedParts.push(`${minutes}m`);
     }
-
     return formattedParts.length > 0 ? formattedParts.join(" ") : "0m";
   };
 
@@ -51,7 +50,6 @@ const FlightResultCard = ({
         (departureTime.getTime() - arrivalTime.getTime()) / (1000 * 60);
       return `${Math.floor(layoverMinutes / 60)}h ${layoverMinutes % 60}m`;
     });
-
     return `${stops} stop${stops > 1 ? "s" : ""} (${layoverTimes.join(", ")})`;
   };
 

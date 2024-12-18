@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
-import { compactFlightSearchSchema } from "../../../_components/flightSearchForm/flightSearchSchema";
+import { compactFlightSearchSchema } from "../../../_views/flightSearchForm/flightSearchSchema";
 import { Dictionaries, TravelerPricing } from "./types";
 import { CurrencyCode, FlightOffer, TravelClass } from "amadeus-ts";
 import { toPascalCase } from "@/lib/utils";
