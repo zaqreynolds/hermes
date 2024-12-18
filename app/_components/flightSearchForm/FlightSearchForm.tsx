@@ -99,6 +99,7 @@ export const FlightSearchForm = () => {
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
+      <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex w-full gap-1 pb-2 pr-1">

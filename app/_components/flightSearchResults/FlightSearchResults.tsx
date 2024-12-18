@@ -1,5 +1,8 @@
 "use client";
-import { FlightSearchContext } from "@/context/FlightSearchContext";
+import {
+  FlightSearchContext,
+  defaultState,
+} from "@/context/FlightSearchContext";
 import { cn } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import { useContext } from "react";
@@ -17,10 +20,22 @@ export const FlightSearchResults = () => {
   const departureOffers = searchState.departureOffers as FlightOffer[];
   const returnOffers = searchState.returnOffers as FlightOffer[];
 
+  const isDefaultState =
+    JSON.stringify(searchState) === JSON.stringify(defaultState);
+
   return (
-    <div className="flex flex-col">
-      <h2 className="text-lg font-semibold mb-4">Available Flights:</h2>
-      {!isMobile && (
+    <div className="flex flex-col w-full max-w-[1155px]">
+      {isDefaultState && (
+        <div className="flex flex-col items-center">
+          <h2 className="text-lg font-semibold mb-4">
+            Search for flights above first...
+          </h2>
+        </div>
+      )}
+      {!isDefaultState && (
+        <h2 className="text-lg font-semibold mb-4">Available Flights:</h2>
+      )}
+      {!isDefaultState && !isMobile && (
         <div className={cn("flex", isMobile && "flex-col")}>
           <div className="flex-1 flex-col">
             <h3 className="text-lg mb-4">Departure</h3>
@@ -42,7 +57,7 @@ export const FlightSearchResults = () => {
           </div>
         </div>
       )}
-      {isMobile && (
+      {!isDefaultState && isMobile && (
         <Tabs className="flex flex-col items-center">
           <TabsList defaultValue="departure" className="w-fit shadow-md">
             <TabsTrigger value="departure" className="text-lg">

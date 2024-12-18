@@ -9,7 +9,7 @@ type FlightSearchContextType = {
 };
 import { createContext, useState, ReactNode, useEffect } from "react";
 
-const defaultState: FlightSearchState = {
+export const defaultState: FlightSearchState = {
   isOneWay: false,
   origin: null,
   destination: null,
