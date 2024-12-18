@@ -41,7 +41,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
       )}
       {!isDefaultState && !isMobile && (
         <div className={cn("flex", isMobile && "flex-col")}>
-          <div className="flex-1 flex-col">
+          <div className="flex-col">
             <h3 className="text-lg mb-4">Departure</h3>
             {departureOffers.map((flight) => (
               <FlightResultCard
@@ -56,7 +56,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
             )}
             {loading && <SkeletonFlightResultCards />}
           </div>
-          <div className="flex-1 flex-col pl-2">
+          <div className="flex-col pl-2">
             <h3 className="text-lg mb-4">Return</h3>
             {returnOffers.map((flight) => (
               <FlightResultCard
@@ -116,10 +116,10 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
 const SkeletonFlightResultCards = () => {
   return (
     <>
-      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
     </>
   );
 };
