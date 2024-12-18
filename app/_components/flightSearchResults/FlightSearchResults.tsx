@@ -9,19 +9,19 @@ import { useContext } from "react";
 import FlightResultCard from "./FlightResultCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSearchFlights } from "../flightSearchForm/hooks/useSearchFlights";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const FlightSearchResults = () => {
+export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
   const { searchState } = useContext(FlightSearchContext);
   const isMobile = useIsMobile();
-  const { loading } = useSearchFlights();
 
   const departureOffers = searchState.departureOffers as FlightOffer[];
   const returnOffers = searchState.returnOffers as FlightOffer[];
 
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultState);
+
+  console.log("loading", loading);
 
   return (
     <div className="flex flex-col w-full max-w-[1155px]">
@@ -92,6 +92,7 @@ export const FlightSearchResults = () => {
 const SkeletonFlightResultCards = () => {
   return (
     <>
+      <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
       <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
       <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />
       <Skeleton className="rounded-lg h-[181px] w-[571px] mb-1" />

@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import FlightSearchForm from "./_components/flightSearchForm/FlightSearchForm";
-import { FlightSearchResults } from "./_components/flightSearchResults/FlightSearchResults";
 
 export default function Home() {
   // const router = useRouter();
@@ -24,9 +23,6 @@ export default function Home() {
     <div className="w-full flex flex-col p-4 overflow-auto items-center">
       <Suspense fallback={<div>Loading Flight Search Form...</div>}>
         <FlightSearchForm />
-      </Suspense>
-      <Suspense fallback={<div>Loading Flight Search Results...</div>}>
-        <FlightSearchResults />
       </Suspense>
     </div>
   );

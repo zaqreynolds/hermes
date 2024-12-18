@@ -1,11 +1,30 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn, durationFormat } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
+import Image from "next/image";
 
 const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
   const isMobile = useIsMobile();
+
+  const durationFormat = (duration: string) => {
+    const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
+    const match = duration.match(regex);
+
+    const hours = match && match[1] ? parseInt(match[1], 10) : 0;
+    const minutes = match && match[2] ? parseInt(match[2], 10) : 0;
+
+    const formattedParts = [];
+    if (hours > 0) {
+      formattedParts.push(`${hours}h`);
+    }
+    if (minutes > 0) {
+      formattedParts.push(`${minutes}m`);
+    }
+
+    return formattedParts.length > 0 ? formattedParts.join(" ") : "0m";
+  };
 
   const handleStopsWithLayovers = (
     segments: FlightOffer["itineraries"][0]["segments"]
@@ -53,12 +72,14 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
       <CardHeader className="flex-row justify-between items-center p-0">
         <div className="flex items-center space-x-2">
           <div className="w-10 h-10 flex items-center justify-center rounded">
-            <img
+            <Image
               src={getAirlineLogoUrl(
                 flight.itineraries[0].segments[0].carrierCode
               )}
               alt={flight.itineraries[0].segments[0].carrierCode}
               className="w-full h-full object-contain"
+              width={40}
+              height={40}
             />
           </div>
           <h3 className="text-md font-semibold">

@@ -18,10 +18,11 @@ import { SwapLocationsButton } from "./formComponents/SwapLocationsButton";
 import { DateSelector } from "./formComponents/DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
-import React, { useContext, useEffect } from "react";
+import React, { Suspense, useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
 import { FlightSearchContext } from "@/context/FlightSearchContext";
 import NonStopSwitch from "./formComponents/NonStopSwitch";
+import { FlightSearchResults } from "../flightSearchResults/FlightSearchResults";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -178,6 +179,9 @@ export const FlightSearchForm = () => {
           </div>
         </form>
       </Form>
+      <Suspense fallback={<div>Loading Flight Search Results...</div>}>
+        <FlightSearchResults loading={loading} />
+      </Suspense>
     </div>
   );
 };

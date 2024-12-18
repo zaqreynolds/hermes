@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Control } from "react-hook-form";
 import { z } from "zod";
@@ -57,7 +57,7 @@ export const DateSelector = ({
                   field.onChange(date);
                   setTimeout(() => setPopoverOpen(false), 200);
                 }}
-                fromDate={departureDate || new Date()}
+                fromDate={departureDate || addDays(new Date(), 1)}
                 toDate={returnDate || undefined}
                 initialFocus
                 modifiersClassNames={{
