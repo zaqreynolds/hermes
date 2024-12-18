@@ -5,7 +5,17 @@ import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
 import Image from "next/image";
 
-const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
+type FlightResultCardProps = {
+  flight: FlightOffer;
+  isSelected: boolean;
+  onSelect: () => void;
+};
+
+const FlightResultCard = ({
+  flight,
+  isSelected,
+  onSelect,
+}: FlightResultCardProps) => {
   const isMobile = useIsMobile();
 
   const durationFormat = (duration: string) => {
@@ -66,7 +76,11 @@ const FlightResultCard = ({ flight }: { flight: FlightOffer }) => {
   return (
     <Card
       key={flight.id}
-      className="flex flex-col rounded-lg p-4 shadow-md mb-1 max-w-[571px] h-[181px]"
+      onClick={onSelect}
+      className={cn(
+        "flex flex-col rounded-lg p-4 shadow-md mb-1 max-w-[571px] h-[181px] hover:cursor-pointer hover:shadow-xl",
+        isSelected && "border-2 border-blue-500 bg-blue-50"
+      )}
     >
       {/* Airline and Price */}
       <CardHeader className="flex-row justify-between items-center p-0">

@@ -5,13 +5,19 @@ import {
 } from "@/context/FlightSearchContext";
 import { cn } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import FlightResultCard from "./FlightResultCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
+  const [selectedDeparture, setSelectedDeparture] =
+    useState<FlightOffer | null>(null);
+  const [selectedReturn, setSelectedReturn] = useState<FlightOffer | null>(
+    null
+  );
+
   const { searchState } = useContext(FlightSearchContext);
   const isMobile = useIsMobile();
 
@@ -38,7 +44,12 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
           <div className="flex-1 flex-col">
             <h3 className="text-lg mb-4">Departure</h3>
             {departureOffers.map((flight) => (
-              <FlightResultCard key={flight.id} flight={flight} />
+              <FlightResultCard
+                key={flight.id}
+                flight={flight}
+                isSelected={selectedDeparture?.id === flight.id}
+                onSelect={() => setSelectedDeparture(flight)}
+              />
             ))}
             {departureOffers.length === 0 && !loading && (
               <div>No results yet</div>
@@ -48,7 +59,12 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
           <div className="flex-1 flex-col pl-2">
             <h3 className="text-lg mb-4">Return</h3>
             {returnOffers.map((flight) => (
-              <FlightResultCard key={flight.id} flight={flight} />
+              <FlightResultCard
+                key={flight.id}
+                flight={flight}
+                isSelected={selectedReturn?.id === flight.id}
+                onSelect={() => setSelectedReturn(flight)}
+              />
             ))}
             {returnOffers.length === 0 && !loading && <div>No results yet</div>}
             {loading && <SkeletonFlightResultCards />}
@@ -68,7 +84,12 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
           <TabsContent value="departure">
             <div className="flex-1 flex-col">
               {departureOffers.map((flight) => (
-                <FlightResultCard key={flight.id} flight={flight} />
+                <FlightResultCard
+                  key={flight.id}
+                  flight={flight}
+                  isSelected={selectedDeparture?.id === flight.id}
+                  onSelect={() => setSelectedDeparture(flight)}
+                />
               ))}
               {departureOffers.length === 0 && <div>No results yet</div>}
             </div>
@@ -76,7 +97,12 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
           <TabsContent value="return">
             <div className="flex-1 flex-col ">
               {returnOffers.map((flight) => (
-                <FlightResultCard key={flight.id} flight={flight} />
+                <FlightResultCard
+                  key={flight.id}
+                  flight={flight}
+                  isSelected={selectedReturn?.id === flight.id}
+                  onSelect={() => setSelectedReturn(flight)}
+                />
               ))}
               {returnOffers.length === 0 && <div>No results yet</div>}
             </div>
