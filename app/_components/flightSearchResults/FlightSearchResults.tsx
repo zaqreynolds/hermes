@@ -11,6 +11,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type FlightDirection = "departure" | "return";
+
 export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
   const [selectedDeparture, setSelectedDeparture] =
     useState<FlightOffer | null>(null);
@@ -26,6 +28,25 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
 
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultState);
+
+  const handleSelectFlight = (
+    flight: FlightOffer,
+    direction: FlightDirection
+  ) => {
+    if (direction === "departure") {
+      if (selectedDeparture?.id === flight.id) {
+        setSelectedDeparture(null);
+        return;
+      }
+      setSelectedDeparture(flight);
+    } else {
+      if (selectedReturn?.id === flight.id) {
+        setSelectedReturn(null);
+        return;
+      }
+      setSelectedReturn(flight);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full max-w-[1155px]">
@@ -48,7 +69,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                 key={flight.id}
                 flight={flight}
                 isSelected={selectedDeparture?.id === flight.id}
-                onSelect={() => setSelectedDeparture(flight)}
+                onSelect={() => handleSelectFlight(flight, "departure")}
               />
             ))}
             {departureOffers.length === 0 && !loading && (
@@ -63,7 +84,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                 key={flight.id}
                 flight={flight}
                 isSelected={selectedReturn?.id === flight.id}
-                onSelect={() => setSelectedReturn(flight)}
+                onSelect={() => handleSelectFlight(flight, "return")}
               />
             ))}
             {returnOffers.length === 0 && !loading && <div>No results yet</div>}

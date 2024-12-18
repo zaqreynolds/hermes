@@ -78,8 +78,8 @@ const FlightResultCard = ({
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg p-4 shadow-md mb-1 max-w-[460px] h-[181px] hover:cursor-pointer hover:shadow-xl",
-        isSelected && "border-2 border-blue-500 bg-blue-50"
+        "flex flex-col rounded-lg p-4 shadow-md mb-1 max-w-[460px] h-[181px] border border-card hover:cursor-pointer hover:shadow-2xl hover:border-accent",
+        isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50"
       )}
     >
       {/* Airline and Price */}
