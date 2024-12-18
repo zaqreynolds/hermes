@@ -20,8 +20,7 @@ export default function Home() {
   // router.push(pathname + '?' + createQueryString('key', 'value'));
 
   return (
-    <div className="w-full flex flex-col p-4 overflow-auto">
-      <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
+    <div className="w-full flex flex-col p-4 overflow-auto items-center">
       <Suspense fallback={<div>Loading Flight Search Form...</div>}>
         <FlightSearchForm />
       </Suspense>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-import { AmadeusLocation } from "../types";
+import { AmadeusLocation } from "../../../types";
 
 export const useFetchLocation = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);

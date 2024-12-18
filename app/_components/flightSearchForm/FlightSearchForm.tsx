@@ -10,16 +10,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { flightSearchSchema } from "./flightSearchSchema";
 import { z } from "zod";
-import { TravelerSelector } from "./travelerSelector/TravelerSelector";
-import { LocationInput } from "./LocationInput";
-import { RoundtripOneWaySelector } from "./RoundtripOneWaySelector";
-import { FlightClassSelector } from "./FlightClassSelector";
-import { SwapLocationsButton } from "./SwapLocationsButton";
-import { DateSelector } from "./DateSelector";
+import { TravelerSelector } from "./formComponents/travelerSelector/TravelerSelector";
+import { LocationInput } from "./formComponents/LocationInput";
+import { RoundtripOneWaySelector } from "./formComponents/RoundtripOneWaySelector";
+import { FlightClassSelector } from "./formComponents/FlightClassSelector";
+import { SwapLocationsButton } from "./formComponents/SwapLocationsButton";
+import { DateSelector } from "./formComponents/DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
-import { useEffect } from "react";
+import React, { Suspense, useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
+import { FlightSearchContext } from "@/context/FlightSearchContext";
+import NonStopSwitch from "./formComponents/NonStopSwitch";
+import { FlightSearchResults } from "../flightSearchResults/FlightSearchResults";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -48,6 +51,8 @@ export const FlightSearchForm = () => {
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
+  const { setSearchState } = useContext(FlightSearchContext);
+
   const {
     searchFlights,
     data: flights,
@@ -56,13 +61,34 @@ export const FlightSearchForm = () => {
   } = useSearchFlights();
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
-    await searchFlights(data);
+    const { oneWay, returnDate, ...rest } = data;
+
+    setSearchState((prev) => ({
+      ...prev,
+      isOneWay: oneWay,
+      returnDate: oneWay ? null : returnDate,
+    }));
+
+    const searchParams = {
+      ...rest,
+      origin: rest.origin.address.cityCode,
+      destination: rest.destination.address.cityCode,
+      departureDate: rest.departureDate.toISOString(),
+      ...(returnDate && !oneWay && { returnDate: returnDate.toISOString() }),
+    };
+
+    await searchFlights(searchParams);
   };
+
   useEffect(() => {
     if (flights) {
-      console.log("Updated flights data:", flights);
+      setSearchState((prev) => ({
+        ...prev,
+        departureOffers: flights.departureOffers || [],
+        returnOffers: flights.returnOffers || [],
+      }));
     }
-  }, [flights]);
+  }, [flights, setSearchState]);
 
   const handleSearchStatus = () => {
     if (loading) {
@@ -74,14 +100,17 @@ export const FlightSearchForm = () => {
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
+      <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex w-full gap-1 pb-2 ">
+          <div className="flex w-full gap-1 pb-2 pr-1">
             <RoundtripOneWaySelector control={form.control} />
 
             <TravelerSelector control={form.control} isMobile={isMobile} />
 
             <FlightClassSelector control={form.control} isMobile={isMobile} />
+            <div className=" flex-1" />
+            {!isMobile && <NonStopSwitch control={form.control} />}
           </div>
           <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
             <LocationInput
@@ -133,13 +162,26 @@ export const FlightSearchForm = () => {
               )}
             </div>
           </div>
-          <div className="flex justify-end">
-            <Button className="w-20" type="submit" disabled={loading}>
+          <div className="flex justify-between gap-2">
+            {isMobile && (
+              <div className="flex">
+                <NonStopSwitch control={form.control} />
+              </div>
+            )}
+
+            <Button
+              className="w-20 shadow-md active:shadow-none ml-auto"
+              type="submit"
+              disabled={loading}
+            >
               {handleSearchStatus()}
             </Button>
           </div>
         </form>
       </Form>
+      <Suspense fallback={<div>Loading Flight Search Results...</div>}>
+        <FlightSearchResults loading={loading} />
+      </Suspense>
     </div>
   );
 };

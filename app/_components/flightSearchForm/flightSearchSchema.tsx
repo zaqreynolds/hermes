@@ -54,3 +54,17 @@ const roundTripSchema = baseSchema.extend({
 });
 
 export const flightSearchSchema = z.union([oneWaySchema, roundTripSchema]);
+
+export const compactFlightSearchSchema = z.object({
+  origin: z.string(),
+  destination: z.string(),
+  departureDate: z.date(),
+  returnDate: z.date().optional(),
+  travelers: z.object({
+    adults: z.number().min(1),
+    children: z.number().min(0),
+    infants: z.number().min(0),
+  }),
+  travelClass: z.string().optional(),
+  nonStop: z.boolean(),
+});

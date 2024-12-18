@@ -1,13 +1,15 @@
 export type Location = {
-  subType: string;
-  name: string;
+  cityCode: string;
+  countryCode: string;
+  name?: string;
+  cityName?: string;
 };
 
 export type Carrier = string; // e.g., "United Airlines"
 export type Aircraft = string; // e.g., "Boeing 737-900"
 
 export type Dictionaries = {
-  locations: Record<string, Location>; // Maps IATA codes to locations
+  locations: Record<string, Location | undefined>; // Maps IATA codes to locations
   carriers: Record<string, Carrier>; // Maps carrier codes to airline names
   aircraft: Record<string, Aircraft>; // Maps aircraft codes to model names
   currencies: Record<string, string>; // Maps currency codes to currency names
