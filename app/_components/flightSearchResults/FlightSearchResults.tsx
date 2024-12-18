@@ -21,8 +21,6 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultState);
 
-  console.log("loading", loading);
-
   return (
     <div className="flex flex-col w-full max-w-[1155px]">
       {isDefaultState && (
