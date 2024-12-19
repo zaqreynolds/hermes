@@ -6533,6 +6533,14 @@
       "Country": "Chile"
     },
     {
+      "id": 819,
+      "IATA": "SY",
+      "ICAO": "SHY",
+      "Airline": "Sky Airlines",
+      "Callsign": "ANTALYA BIRD",
+      "Country": "Turkey"
+    },
+    {
       "id": 820,
       "IATA": "G3",
       "ICAO": "SEH",

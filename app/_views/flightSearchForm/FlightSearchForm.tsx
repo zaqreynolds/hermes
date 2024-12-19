@@ -23,6 +23,8 @@ import { LoaderCircleIcon } from "lucide-react";
 import { FlightSearchContext } from "@/context/FlightSearchContext";
 import NonStopSwitch from "./formComponents/NonStopSwitch";
 import { FlightSearchResults } from "../flightSearchResults/FlightSearchResults";
+import { Separator } from "@/components/ui/separator";
+import { FlightOffer } from "amadeus-ts";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -51,7 +53,11 @@ export const FlightSearchForm = () => {
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
-  const { setSearchState } = useContext(FlightSearchContext);
+  const { searchState, setSearchState } = useContext(FlightSearchContext);
+  const offers: FlightOffer[] = [
+    ...searchState.departureOffers,
+    ...searchState.returnOffers,
+  ];
 
   const {
     searchFlights,
@@ -59,6 +65,7 @@ export const FlightSearchForm = () => {
     loading,
     // error
   } = useSearchFlights();
+  console.log("loading", loading);
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
     const { oneWay, returnDate, ...rest } = data;
@@ -99,7 +106,7 @@ export const FlightSearchForm = () => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-[1155px] justify-items-center">
+    <div className="flex flex-col w-full max-w-[1155px] h-full justify-items-center ">
       <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -179,9 +186,17 @@ export const FlightSearchForm = () => {
           </div>
         </form>
       </Form>
-      <Suspense fallback={<div>Loading Flight Search Results...</div>}>
-        <FlightSearchResults loading={loading} />
-      </Suspense>
+      <Separator className="bg-accent my-4" />
+      <div className="flex flex-col items-center flex-grow w-full h-screen overflow-hidden">
+        {!offers.length && !loading && (
+          <h2 className="flex text-lg font-semibold text-center mb-4">
+            Search for flights above to get started...
+          </h2>
+        )}
+        <Suspense fallback={<div>Loading Flight Search Results...</div>}>
+          <FlightSearchResults loading={loading} />
+        </Suspense>
+      </div>
     </div>
   );
 };

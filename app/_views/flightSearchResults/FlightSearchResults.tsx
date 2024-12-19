@@ -3,7 +3,6 @@ import {
   FlightSearchContext,
   defaultState,
 } from "@/context/FlightSearchContext";
-import { cn } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import { useContext, useState } from "react";
 import FlightResultCard from "./FlightResultCard";
@@ -49,46 +48,48 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-[1155px]">
-      {isDefaultState && (
-        <div className="flex flex-col items-center">
-          <h2 className="text-lg font-semibold mb-4">
-            Search for flights above first...
-          </h2>
-        </div>
-      )}
+    <div className="flex flex-col w-full overflow-hidden">
       {!isDefaultState && (
-        <h2 className="text-lg font-semibold mb-4">Available Flights:</h2>
+        <h2 className="text-lg font-semibold mb-1">Select your flights:</h2>
       )}
       {!isDefaultState && !isMobile && (
-        <div className={cn("flex", isMobile && "flex-col")}>
-          <div className="flex-col">
-            <h3 className="text-lg mb-4">Departure</h3>
-            {departureOffers.map((flight) => (
-              <FlightResultCard
-                key={flight.id}
-                flight={flight}
-                isSelected={selectedDeparture?.id === flight.id}
-                onSelect={() => handleSelectFlight(flight, "departure")}
-              />
-            ))}
-            {departureOffers.length === 0 && !loading && (
-              <div>No results yet</div>
-            )}
-            {loading && <SkeletonFlightResultCards />}
+        <div className="flex h-full overflow-hidden">
+          {/* Departure Column */}
+          <div className="flex flex-col pr-2">
+            <h3 className="text-lg mb-2 shrink-0">Departure</h3>
+            <div className="flex-1 overflow-auto">
+              {departureOffers.map((flight) => (
+                <FlightResultCard
+                  key={flight.id}
+                  flight={flight}
+                  isSelected={selectedDeparture?.id === flight.id}
+                  onSelect={() => handleSelectFlight(flight, "departure")}
+                />
+              ))}
+              {departureOffers.length === 0 && !loading && (
+                <div>No results yet</div>
+              )}
+              {loading && <SkeletonFlightResultCards />}
+            </div>
           </div>
-          <div className="flex-col pl-2">
-            <h3 className="text-lg mb-4">Return</h3>
-            {returnOffers.map((flight) => (
-              <FlightResultCard
-                key={flight.id}
-                flight={flight}
-                isSelected={selectedReturn?.id === flight.id}
-                onSelect={() => handleSelectFlight(flight, "return")}
-              />
-            ))}
-            {returnOffers.length === 0 && !loading && <div>No results yet</div>}
-            {loading && <SkeletonFlightResultCards />}
+
+          {/* Return Column */}
+          <div className="flex flex-col px-2">
+            <h3 className="text-lg mb-2 shrink-0">Return</h3>
+            <div className="flex-1 overflow-auto">
+              {returnOffers.map((flight) => (
+                <FlightResultCard
+                  key={flight.id}
+                  flight={flight}
+                  isSelected={selectedReturn?.id === flight.id}
+                  onSelect={() => handleSelectFlight(flight, "return")}
+                />
+              ))}
+              {returnOffers.length === 0 && !loading && (
+                <div>No results yet</div>
+              )}
+              {loading && <SkeletonFlightResultCards />}
+            </div>
           </div>
         </div>
       )}
@@ -137,10 +138,10 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
 const SkeletonFlightResultCards = () => {
   return (
     <>
-      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[460px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
     </>
   );
 };

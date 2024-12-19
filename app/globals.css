@@ -112,3 +112,15 @@ h5 {
 h6 {
   font-size: 0.75rem;
 }
+
+::-webkit-scrollbar {
+  @apply w-1;
+}
+
+/* ::-webkit-scrollbar-track {
+  @apply bg-secondary;
+} */
+
+::-webkit-scrollbar-thumb {
+  @apply bg-accent bg-opacity-40 rounded;
+}

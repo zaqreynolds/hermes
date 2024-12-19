@@ -9,7 +9,11 @@ const decodeFlightOffer = (
   offer: FlightOffer & { travelerPricings: TravelerPricing[] },
   dictionaries: Dictionaries
 ) => {
-  const { locations, carriers, aircraft } = dictionaries;
+  const {
+    // locations,
+    carriers,
+    aircraft,
+  } = dictionaries;
 
   return {
     ...offer,
