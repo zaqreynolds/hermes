@@ -25,6 +25,7 @@ import NonStopSwitch from "./formComponents/NonStopSwitch";
 import { FlightSearchResults } from "../flightSearchResults/FlightSearchResults";
 import { Separator } from "@/components/ui/separator";
 import { FlightOffer } from "amadeus-ts";
+import Pricing from "../pricing/Pricing";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -186,16 +187,21 @@ export const FlightSearchForm = () => {
           </div>
         </form>
       </Form>
-      <Separator className="bg-accent my-4" />
+      <Separator className="bg-accent my-2" />
       <div className="flex flex-col items-center flex-grow w-full h-screen overflow-hidden">
         {!offers.length && !loading && (
           <h2 className="flex text-lg font-semibold text-center mb-4">
             Search for flights above to get started...
           </h2>
         )}
-        <Suspense fallback={<div>Loading Flight Search Results...</div>}>
-          <FlightSearchResults loading={loading} />
-        </Suspense>
+        <div className="flex w-full overflow-hidden">
+          <Suspense fallback={<div>Loading Flight Search Results...</div>}>
+            <FlightSearchResults loading={loading} />
+          </Suspense>
+          <Suspense fallback={<div>Loading Pricing and Analysis...</div>}>
+            <Pricing />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

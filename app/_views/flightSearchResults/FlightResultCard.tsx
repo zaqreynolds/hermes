@@ -16,7 +16,6 @@ const FlightResultCard = ({
   isSelected,
   onSelect,
 }: FlightResultCardProps) => {
-  console.log("flight", flight);
   const isMobile = useIsMobile();
 
   const durationFormat = (duration: string) => {
