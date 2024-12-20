@@ -44,6 +44,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                       flight={flight}
                       isSelected={selectedDeparture?.id === flight.id}
                       onSelect={() => handleSelectFlight(flight, "departure")}
+                      view="search"
                     />
                   ))}
                   {departureOffers.length === 0 && !loading && (
@@ -63,6 +64,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                       flight={flight}
                       isSelected={selectedReturn?.id === flight.id}
                       onSelect={() => handleSelectFlight(flight, "return")}
+                      view="search"
                     />
                   ))}
                   {returnOffers.length === 0 && !loading && (
@@ -93,6 +95,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                   flight={flight}
                   isSelected={selectedDeparture?.id === flight.id}
                   onSelect={() => handleSelectFlight(flight, "departure")}
+                  view="search"
                 />
               ))}
               {departureOffers.length === 0 && <div>No results yet</div>}
@@ -106,6 +109,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                   flight={flight}
                   isSelected={selectedReturn?.id === flight.id}
                   onSelect={() => handleSelectFlight(flight, "return")}
+                  view="search"
                 />
               ))}
               {returnOffers.length === 0 && <div>No results yet</div>}
