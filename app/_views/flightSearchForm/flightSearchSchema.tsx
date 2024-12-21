@@ -6,7 +6,7 @@ const locationSchema = z.object({
     cityCode: z.string(),
     countryName: z.string(),
     countryCode: z.string(),
-    stateCode: z.string(),
+    stateCode: z.string().optional(),
   }),
   analytics: z.object({
     travelers: z.object({
@@ -21,12 +21,14 @@ const locationSchema = z.object({
   iataCode: z.string(),
   id: z.string(),
   name: z.string(),
-  self: z.object({
-    href: z.string(),
-    methods: z.array(z.string()),
-  }),
-  subType: z.string(),
-  timeZoneOffset: z.string(),
+  self: z
+    .object({
+      href: z.string(),
+      methods: z.array(z.string()),
+    })
+    .optional(),
+  subType: z.string().optional(),
+  timeZoneOffset: z.string().optional(),
   type: z.string(),
 });
 

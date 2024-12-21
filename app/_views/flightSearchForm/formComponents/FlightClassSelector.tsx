@@ -28,7 +28,10 @@ export const FlightClassSelector = ({
       name="travelClass"
       render={({ field }) => (
         <FormItem>
-          <Select onValueChange={(value) => field.onChange(value)}>
+          <Select
+            value={field.value || ""}
+            onValueChange={(value) => field.onChange(value)}
+          >
             <SelectTrigger
               className={cn(
                 "text-xs hover:bg-accent",

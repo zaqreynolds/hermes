@@ -73,7 +73,7 @@ const FlightResultCard = ({
     const icaoCode = getICAOFromIATA(iataCode);
     return icaoCode
       ? `/logos/flightaware_logos/${icaoCode}.png`
-      : "/logos/default_logo.png";
+      : "/logos/defaultHermes.png";
   };
 
   if (!flight || !flight.itineraries || !flight.itineraries[0]) {
@@ -95,7 +95,7 @@ const FlightResultCard = ({
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg p-4 shadow-md mb-1 border border-card hover:cursor-pointer hover:shadow-2xl hover:border-accent",
+        "flex flex-col rounded-lg p-4 mb-1 border border-card hover:cursor-pointer hover:shadow-sm hover:border-accent",
         isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50",
         search && "w-[313px]",
         details && "w-full"

@@ -124,10 +124,10 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
 const SkeletonFlightResultCards = () => {
   return (
     <>
-      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
-      <Skeleton className="rounded-lg h-[181px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[117px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[117px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[117px] w-[313px] mb-1" />
+      <Skeleton className="rounded-lg h-[117px] w-[313px] mb-1" />
     </>
   );
 };
