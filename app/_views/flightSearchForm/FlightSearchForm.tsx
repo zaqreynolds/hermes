@@ -20,11 +20,15 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
 import React, { Suspense, useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
-import { FlightSearchContext } from "@/context/FlightSearchContext";
+import {
+  defaultSearchState,
+  FlightSearchContext,
+} from "@/context/FlightSearchContext";
 import NonStopSwitch from "./formComponents/NonStopSwitch";
 import { FlightSearchResults } from "../flightSearchResults/FlightSearchResults";
 import { Separator } from "@/components/ui/separator";
 import { FlightOffer } from "amadeus-ts";
+import Pricing from "../pricing/Pricing";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -47,6 +51,11 @@ export const FlightSearchForm = () => {
     },
   });
 
+  const {
+    formState: { isDirty },
+    reset,
+  } = form;
+
   const departureDate = form.watch("departureDate");
   const returnDate = form.watch("returnDate");
   const oneWay = form.watch("oneWay");
@@ -65,7 +74,6 @@ export const FlightSearchForm = () => {
     loading,
     // error
   } = useSearchFlights();
-  console.log("loading", loading);
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
     const { oneWay, returnDate, ...rest } = data;
@@ -169,15 +177,27 @@ export const FlightSearchForm = () => {
               )}
             </div>
           </div>
-          <div className="flex justify-between gap-2">
+          <div className="flex justify-end items-center space-x-2 mt-4">
             {isMobile && (
               <div className="flex">
                 <NonStopSwitch control={form.control} />
               </div>
             )}
+            {isDirty && (
+              <Button
+                variant="outline"
+                className="w-24 shadow-md border border-primary active:shadow-none"
+                onClick={() => {
+                  reset();
+                  setSearchState(defaultSearchState);
+                }}
+              >
+                Clear Search
+              </Button>
+            )}
 
             <Button
-              className="w-20 shadow-md active:shadow-none ml-auto"
+              className="w-20 shadow-md active:shadow-none"
               type="submit"
               disabled={loading}
             >
@@ -186,16 +206,21 @@ export const FlightSearchForm = () => {
           </div>
         </form>
       </Form>
-      <Separator className="bg-accent my-4" />
+      <Separator className="bg-accent my-2" />
       <div className="flex flex-col items-center flex-grow w-full h-screen overflow-hidden">
         {!offers.length && !loading && (
           <h2 className="flex text-lg font-semibold text-center mb-4">
             Search for flights above to get started...
           </h2>
         )}
-        <Suspense fallback={<div>Loading Flight Search Results...</div>}>
-          <FlightSearchResults loading={loading} />
-        </Suspense>
+        <div className="flex w-full overflow-hidden">
+          <Suspense fallback={<div>Loading Flight Search Results...</div>}>
+            <FlightSearchResults loading={loading} />
+          </Suspense>
+          <Suspense fallback={<div>Loading Pricing and Analysis...</div>}>
+            <Pricing />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

@@ -1,15 +1,20 @@
 "use client";
 import AmadeusHealthDialog from "@/app/_views/AmadeusHealthDialog";
 import { FlightSearchState } from "@/app/types";
+import { FlightOffer } from "amadeus-ts";
 
 type FlightSearchContextType = {
   searchState: FlightSearchState;
   setSearchState: React.Dispatch<React.SetStateAction<FlightSearchState>>;
   amadeusStatus: "ok" | "unavailable" | "checking";
+  handleSelectFlight: (
+    flight: FlightOffer,
+    direction: "departure" | "return"
+  ) => void;
 };
 import { createContext, useState, ReactNode, useEffect } from "react";
 
-export const defaultState: FlightSearchState = {
+export const defaultSearchState: FlightSearchState = {
   isOneWay: false,
   origin: null,
   destination: null,
@@ -31,14 +36,15 @@ export const defaultState: FlightSearchState = {
 };
 
 export const FlightSearchContext = createContext<FlightSearchContextType>({
-  searchState: defaultState,
+  searchState: defaultSearchState,
   setSearchState: () => {},
   amadeusStatus: "checking",
+  handleSelectFlight: () => {},
 });
 
 export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchState, setSearchState] =
-    useState<FlightSearchState>(defaultState);
+    useState<FlightSearchState>(defaultSearchState);
   const [amadeusStatus, setAmadeusStatus] = useState<
     "ok" | "unavailable" | "checking"
   >("checking");
@@ -61,9 +67,23 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
     checkAmadeusStatus();
   }, []);
 
+  const handleSelectFlight = (
+    flight: FlightOffer,
+    direction: "departure" | "return"
+  ) => {
+    setSearchState((prev) => ({
+      ...prev,
+      [direction === "departure" ? "selectedDeparture" : "selectedReturn"]:
+        prev[direction === "departure" ? "selectedDeparture" : "selectedReturn"]
+          ?.id === flight.id
+          ? null
+          : flight,
+    }));
+  };
+
   return (
     <FlightSearchContext.Provider
-      value={{ searchState, setSearchState, amadeusStatus }}
+      value={{ searchState, setSearchState, amadeusStatus, handleSelectFlight }}
     >
       {children}
       <AmadeusHealthDialog open={amadeusStatus === "unavailable"} />

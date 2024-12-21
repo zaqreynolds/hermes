@@ -5,7 +5,8 @@ export interface Address {
   cityCode: string;
   countryName: string;
   countryCode: string;
-  stateCode: string;
+  regionCode?: string;
+  stateCode?: string;
 }
 
 export interface Analytics {

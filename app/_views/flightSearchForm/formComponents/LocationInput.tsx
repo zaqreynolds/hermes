@@ -60,6 +60,10 @@ export const LocationInput: React.FC<LocationInputProps> = ({
     if (value) {
       setSelectedLocation(value);
       setQuery(value.name);
+    } else {
+      setQuery(""); // Clear query
+      setSelectedLocation(null); // Clear selected location
+      setPopoverOpen(false); // Close popover
     }
   }, [value]);
 
@@ -131,21 +135,21 @@ export const LocationInput: React.FC<LocationInputProps> = ({
                   <Input
                     className={cn(
                       "w-full h-12 pl-10 pr-10 hover:shadow hover:bg-accent focus:bg-muted",
-                      selectedLocation && "pt-5 pb-1"
+                      field.value && "pt-5 pb-1"
                     )}
                     placeholder={placeholder}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, field)}
                   />
-                  {selectedLocation && (
+                  {field.value && (
                     <div className="absolute left-10 top-1.5 right-10 flex items-center text-[10px] text-muted-foreground">
                       <span className="mr-2 text-xs  text-primary">
-                        {selectedLocation.iataCode} -
+                        {field.value.iataCode} -
                       </span>
                       <span>
                         {truncateText(
-                          `${selectedLocation.address.cityName}, ${selectedLocation.address.countryName}`,
+                          `${field.value.address.cityName}, ${field.value.address.countryName}`,
                           isMobile ? 64 : 34
                         )}
                       </span>
