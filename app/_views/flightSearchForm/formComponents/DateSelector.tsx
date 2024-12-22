@@ -29,6 +29,12 @@ export const DateSelector = ({
 }: DateSelectorProps) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
+  const handleDefaultText = (name: string) => {
+    return name === "departureDate"
+      ? "Pick a date to depart"
+      : "Pick a date to return";
+  };
+
   return (
     <FormField
       control={control}
@@ -45,7 +51,7 @@ export const DateSelector = ({
                 {field.value ? (
                   format(field.value, "PPP")
                 ) : (
-                  <span className="opacity-70">Pick a date to depart</span>
+                  <span className="opacity-70">{handleDefaultText(name)}</span>
                 )}
               </Button>
             </PopoverTrigger>
