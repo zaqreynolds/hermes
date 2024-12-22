@@ -13,7 +13,7 @@ import { TravelerCounter } from "./TravelerCounter";
 import { Control } from "react-hook-form";
 import { Travelers } from "@/app/types";
 import { z } from "zod";
-import { flightSearchSchema } from "../flightSearchSchema";
+import { flightSearchSchema } from "../../flightSearchSchema";
 
 interface TravelerSelectorProps {
   control: Control<z.infer<typeof flightSearchSchema>>;
