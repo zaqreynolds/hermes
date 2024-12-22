@@ -54,7 +54,7 @@ export const LocationInput: React.FC<LocationInputProps> = ({
       fetchLocation(debouncedQuery);
       setPopoverOpen(true);
     }
-  }, [debouncedQuery]);
+  }, [debouncedQuery, query, selectedLocation]);
 
   useEffect(() => {
     if (value) {

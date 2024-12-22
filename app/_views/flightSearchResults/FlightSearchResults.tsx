@@ -10,8 +10,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type FlightDirection = "departure" | "return";
-
 export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
   const { searchState, handleSelectFlight } = useContext(FlightSearchContext);
   const selectedDeparture = searchState.selectedDeparture;
