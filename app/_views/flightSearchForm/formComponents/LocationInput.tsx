@@ -61,9 +61,10 @@ export const LocationInput: React.FC<LocationInputProps> = ({
       setSelectedLocation(value);
       setQuery(value.name);
     } else {
-      setQuery(""); // Clear query
-      setSelectedLocation(null); // Clear selected location
-      setPopoverOpen(false); // Close popover
+      setQuery("");
+      setSelectedLocation(null);
+      setPopoverOpen(false);
+      clearLocationData();
     }
   }, [value]);
 
