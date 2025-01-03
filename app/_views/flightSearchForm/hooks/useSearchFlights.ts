@@ -1,6 +1,7 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
 import { FlightOffer } from "amadeus-ts";
+import { FlightSearchContext } from "@/context/FlightSearchContext";
 
 export type SearchFlightsInput = {
   origin: string;
@@ -22,9 +23,10 @@ export type FlightSearchResult = {
 };
 
 export const useSearchFlights = () => {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FlightSearchResult | null>(null);
+
+  const { setIsFlightSearchLoading } = useContext(FlightSearchContext);
 
   const preprocessedData = (data: SearchFlightsInput) => ({
     ...data,
@@ -32,7 +34,7 @@ export const useSearchFlights = () => {
     returnDate: data.returnDate ? new Date(data.returnDate) : undefined, // Ensure returnDate is a Date object
   });
   const searchFlights = useCallback(async (data: SearchFlightsInput) => {
-    setLoading(true);
+    setIsFlightSearchLoading(true);
     setError(null);
     try {
       const response = await fetch("/api/amadeus/flightSearch", {
@@ -55,9 +57,9 @@ export const useSearchFlights = () => {
       }
       console.error("Error searching flights", error);
     } finally {
-      setLoading(false);
+      setIsFlightSearchLoading(false);
     }
   }, []);
 
-  return { loading, error, data, searchFlights };
+  return { error, data, searchFlights };
 };

@@ -5,6 +5,8 @@ import { FlightOffer } from "amadeus-ts";
 
 type FlightSearchContextType = {
   searchState: FlightSearchState;
+  isFlightSearchLoading: boolean;
+  setIsFlightSearchLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchState: React.Dispatch<React.SetStateAction<FlightSearchState>>;
   amadeusStatus: "ok" | "unavailable" | "checking";
   handleSelectFlight: (
@@ -37,6 +39,8 @@ export const defaultSearchState: FlightSearchState = {
 
 export const FlightSearchContext = createContext<FlightSearchContextType>({
   searchState: defaultSearchState,
+  isFlightSearchLoading: false,
+  setIsFlightSearchLoading: () => {},
   setSearchState: () => {},
   amadeusStatus: "checking",
   handleSelectFlight: () => {},
@@ -45,6 +49,8 @@ export const FlightSearchContext = createContext<FlightSearchContextType>({
 export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchState, setSearchState] =
     useState<FlightSearchState>(defaultSearchState);
+  const [isFlightSearchLoading, setIsFlightSearchLoading] =
+    useState<boolean>(false);
   const [amadeusStatus, setAmadeusStatus] = useState<
     "ok" | "unavailable" | "checking"
   >("checking");
@@ -83,7 +89,14 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <FlightSearchContext.Provider
-      value={{ searchState, setSearchState, amadeusStatus, handleSelectFlight }}
+      value={{
+        searchState,
+        setSearchState,
+        isFlightSearchLoading,
+        setIsFlightSearchLoading,
+        amadeusStatus,
+        handleSelectFlight,
+      }}
     >
       {children}
       <AmadeusHealthDialog open={amadeusStatus === "unavailable"} />

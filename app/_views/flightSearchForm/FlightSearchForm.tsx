@@ -25,10 +25,8 @@ import {
   FlightSearchContext,
 } from "@/context/FlightSearchContext";
 import NonStopSwitch from "./formComponents/NonStopSwitch";
-import { FlightSearchResults } from "../flightSearchResults/FlightSearchResults";
 import { Separator } from "@/components/ui/separator";
 import { FlightOffer } from "amadeus-ts";
-import Pricing from "../pricing/Pricing";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
@@ -62,7 +60,13 @@ export const FlightSearchForm = () => {
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
-  const { searchState, setSearchState } = useContext(FlightSearchContext);
+  const {
+    searchState,
+    setSearchState,
+    isFlightSearchLoading,
+    setIsFlightSearchLoading,
+  } = useContext(FlightSearchContext);
+
   const offers: FlightOffer[] = [
     ...searchState.departureOffers,
     ...searchState.returnOffers,
@@ -71,7 +75,6 @@ export const FlightSearchForm = () => {
   const {
     searchFlights,
     data: flights,
-    loading,
     // error
   } = useSearchFlights();
 
@@ -106,7 +109,7 @@ export const FlightSearchForm = () => {
   }, [flights, setSearchState]);
 
   const handleSearchStatus = () => {
-    if (loading) {
+    if (isFlightSearchLoading) {
       return <LoaderCircleIcon className="animate-spin h-6 w-6" />;
     } else {
       return "Search";
@@ -115,7 +118,7 @@ export const FlightSearchForm = () => {
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] h-full justify-items-center ">
-      <h2 className="text-lg font-semibold mb-4">Where are you going?</h2>
+      <h2 className="text-xl font-semibold mb-4">Where are you going?</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex w-full gap-1 pb-2 pr-1">
@@ -199,7 +202,7 @@ export const FlightSearchForm = () => {
             <Button
               className="w-20 shadow-md active:shadow-none"
               type="submit"
-              disabled={loading}
+              disabled={isFlightSearchLoading}
             >
               {handleSearchStatus()}
             </Button>
@@ -207,20 +210,20 @@ export const FlightSearchForm = () => {
         </form>
       </Form>
       <Separator className="bg-accent my-2" />
-      <div className="flex flex-col items-center flex-grow w-full h-screen overflow-hidden">
-        {!offers.length && !loading && (
+      <div className="flex flex-col items-center flex-grow w-full overflow-hidden">
+        {!offers.length && !isFlightSearchLoading && (
           <h2 className="flex text-lg font-semibold text-center mb-4">
             Search for flights above to get started...
           </h2>
         )}
-        <div className="flex w-full overflow-hidden">
+        {/* <div className="flex w-full overflow-hidden">
           <Suspense fallback={<div>Loading Flight Search Results...</div>}>
-            <FlightSearchResults loading={loading} />
+            <FlightSearchResults loading={isFlightSearchLoading} />
           </Suspense>
           <Suspense fallback={<div>Loading Pricing and Analysis...</div>}>
             <Pricing />
           </Suspense>
-        </div>
+        </div> */}
       </div>
     </div>
   );

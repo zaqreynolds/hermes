@@ -10,8 +10,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
-  const { searchState, handleSelectFlight } = useContext(FlightSearchContext);
+export const FlightSearchResults = () => {
+  const { searchState, handleSelectFlight, isFlightSearchLoading } =
+    useContext(FlightSearchContext);
   const selectedDeparture = searchState.selectedDeparture;
   const selectedReturn = searchState.selectedReturn;
 
@@ -22,6 +23,9 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
 
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultSearchState);
+
+  console.log("isDefaultState", isDefaultState);
+  console.log("isFlightSearchLoading", isFlightSearchLoading);
 
   return (
     <div className="flex  w-[57.2%">
@@ -45,10 +49,10 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                       view="search"
                     />
                   ))}
-                  {departureOffers.length === 0 && !loading && (
+                  {departureOffers.length === 0 && !isFlightSearchLoading && (
                     <div>No results yet</div>
                   )}
-                  {loading && <SkeletonFlightResultCards />}
+                  {isFlightSearchLoading && <SkeletonFlightResultCards />}
                 </div>
               </div>
 
@@ -65,10 +69,10 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
                       view="search"
                     />
                   ))}
-                  {returnOffers.length === 0 && !loading && (
+                  {returnOffers.length === 0 && !isFlightSearchLoading && (
                     <div>No results yet</div>
                   )}
-                  {loading && <SkeletonFlightResultCards />}
+                  {isFlightSearchLoading && <SkeletonFlightResultCards />}
                 </div>
               </div>
             </div>
@@ -120,6 +124,7 @@ export const FlightSearchResults = ({ loading }: { loading: boolean }) => {
 };
 
 const SkeletonFlightResultCards = () => {
+  console.log("Rendering SkeletonFlightResultCards");
   return (
     <>
       <Skeleton className="rounded-lg h-[117px] w-[313px] mb-1" />
