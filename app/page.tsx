@@ -26,7 +26,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading Flight Search Form...</div>}>
         <FlightSearchForm />
       </Suspense>
-      <div className="flex w-full overflow-hidden">
+      <div className="flex w-full max-w-[1155px] overflow-hidden">
         <Suspense fallback={<div>Loading Flight Search Results...</div>}>
           <FlightSearchResults />
         </Suspense>

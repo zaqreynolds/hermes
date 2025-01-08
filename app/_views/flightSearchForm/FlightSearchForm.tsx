@@ -117,7 +117,7 @@ export const FlightSearchForm = () => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-[1155px] h-full justify-items-center ">
+    <div className="flex flex-col w-full max-w-[1155px] justify-items-center ">
       <h2 className="text-xl font-semibold mb-4">Where are you going?</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -210,21 +210,13 @@ export const FlightSearchForm = () => {
         </form>
       </Form>
       <Separator className="bg-accent my-2" />
-      <div className="flex flex-col items-center flex-grow w-full overflow-hidden">
-        {!offers.length && !isFlightSearchLoading && (
+      {!offers.length && !isFlightSearchLoading && (
+        <div className="flex flex-col items-center flex-grow w-full overflow-hidden">
           <h2 className="flex text-lg font-semibold text-center mb-4">
             Search for flights above to get started...
           </h2>
-        )}
-        {/* <div className="flex w-full overflow-hidden">
-          <Suspense fallback={<div>Loading Flight Search Results...</div>}>
-            <FlightSearchResults loading={isFlightSearchLoading} />
-          </Suspense>
-          <Suspense fallback={<div>Loading Pricing and Analysis...</div>}>
-            <Pricing />
-          </Suspense>
-        </div> */}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
