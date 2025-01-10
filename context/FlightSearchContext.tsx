@@ -13,6 +13,12 @@ type FlightSearchContextType = {
     flight: FlightOffer,
     direction: "departure" | "return"
   ) => void;
+  updateOffers: (
+    rawDepartureOffers: FlightOffer[],
+    rawReturnOffers: FlightOffer[],
+    decodedDepartureOffers: FlightOffer[],
+    decodedReturnOffers: FlightOffer[]
+  ) => void;
 };
 import { createContext, useState, ReactNode, useEffect } from "react";
 
@@ -31,6 +37,8 @@ export const defaultSearchState: FlightSearchState = {
   nonStop: false,
   departureOffers: [],
   returnOffers: [],
+  rawDepartureOffers: [],
+  rawReturnOffers: [],
   selectedDeparture: null,
   selectedReturn: null,
   pricedFlight: null,
@@ -44,6 +52,7 @@ export const FlightSearchContext = createContext<FlightSearchContextType>({
   setSearchState: () => {},
   amadeusStatus: "checking",
   handleSelectFlight: () => {},
+  updateOffers: () => {},
 });
 
 export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
@@ -77,13 +86,37 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
     flight: FlightOffer,
     direction: "departure" | "return"
   ) => {
+    const flightWithContext = {
+      ...flight,
+      context: direction, // Add "departure" or "return" context
+    };
     setSearchState((prev) => ({
       ...prev,
       [direction === "departure" ? "selectedDeparture" : "selectedReturn"]:
         prev[direction === "departure" ? "selectedDeparture" : "selectedReturn"]
           ?.id === flight.id
           ? null
-          : flight,
+          : flightWithContext,
+    }));
+  };
+
+  const updateOffers = (
+    rawDepartureOffers: FlightOffer[],
+    rawReturnOffers: FlightOffer[],
+    decodedDepartureOffers: FlightOffer[],
+    decodedReturnOffers: FlightOffer[]
+  ) => {
+    console.log("Raw Departure Offers (context):", rawDepartureOffers);
+    console.log("Raw Return Offers (context):", rawReturnOffers);
+    console.log("Decoded Departure Offers (context):", decodedDepartureOffers);
+    console.log("Decoded Return Offers (context):", decodedReturnOffers);
+
+    setSearchState((prev) => ({
+      ...prev,
+      rawDepartureOffers,
+      rawReturnOffers,
+      departureOffers: decodedDepartureOffers,
+      returnOffers: decodedReturnOffers,
     }));
   };
 
@@ -92,6 +125,7 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
       value={{
         searchState,
         setSearchState,
+        updateOffers,
         isFlightSearchLoading,
         setIsFlightSearchLoading,
         amadeusStatus,

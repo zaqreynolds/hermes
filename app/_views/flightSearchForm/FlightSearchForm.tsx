@@ -18,7 +18,7 @@ import { SwapLocationsButton } from "./formComponents/SwapLocationsButton";
 import { DateSelector } from "./formComponents/DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
-import React, { Suspense, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { LoaderCircleIcon } from "lucide-react";
 import {
   defaultSearchState,
@@ -64,7 +64,7 @@ export const FlightSearchForm = () => {
     searchState,
     setSearchState,
     isFlightSearchLoading,
-    setIsFlightSearchLoading,
+    // setIsFlightSearchLoading,
   } = useContext(FlightSearchContext);
 
   const offers: FlightOffer[] = [
@@ -102,8 +102,10 @@ export const FlightSearchForm = () => {
     if (flights) {
       setSearchState((prev) => ({
         ...prev,
-        departureOffers: flights.departureOffers || [],
-        returnOffers: flights.returnOffers || [],
+        rawDepartureOffers: flights.rawDepartureOffers || [],
+        rawReturnOffers: flights.rawReturnOffers || [],
+        departureOffers: flights.decodedDepartureOffers || [], // For display
+        returnOffers: flights.decodedReturnOffers || [], // For display
       }));
     }
   }, [flights, setSearchState]);

@@ -18,20 +18,23 @@ export type SearchFlightsInput = {
 };
 
 export type FlightSearchResult = {
-  departureOffers: FlightOffer[];
-  returnOffers?: FlightOffer[];
+  rawDepartureOffers: FlightOffer[];
+  rawReturnOffers?: FlightOffer[];
+  decodedDepartureOffers: FlightOffer[];
+  decodedReturnOffers?: FlightOffer[];
 };
 
 export const useSearchFlights = () => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<FlightSearchResult | null>(null);
 
-  const { setIsFlightSearchLoading } = useContext(FlightSearchContext);
+  const { setIsFlightSearchLoading, updateOffers } =
+    useContext(FlightSearchContext);
 
   const preprocessedData = (data: SearchFlightsInput) => ({
     ...data,
-    departureDate: new Date(data.departureDate), // Convert departureDate to Date object
-    returnDate: data.returnDate ? new Date(data.returnDate) : undefined, // Ensure returnDate is a Date object
+    departureDate: new Date(data.departureDate),
+    returnDate: data.returnDate ? new Date(data.returnDate) : undefined,
   });
   const searchFlights = useCallback(async (data: SearchFlightsInput) => {
     setIsFlightSearchLoading(true);
@@ -48,6 +51,16 @@ export const useSearchFlights = () => {
         throw new Error("Failed to search flights");
       }
       const result: FlightSearchResult = await response.json();
+
+      console.log("Raw Flight Offers:", result);
+
+      updateOffers(
+        result.rawDepartureOffers,
+        result.rawReturnOffers || [],
+        result.decodedDepartureOffers,
+        result.decodedReturnOffers || []
+      );
+
       setData(result);
     } catch (error) {
       if (error instanceof Error) {

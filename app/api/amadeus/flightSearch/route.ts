@@ -15,19 +15,20 @@ const decodeFlightOffer = (
     aircraft,
   } = dictionaries;
 
+  const decodedItineraries = offer.itineraries.map((itinerary) => ({
+    ...itinerary,
+    segments: itinerary.segments.map((segment) => ({
+      ...segment,
+      carrier:
+        toPascalCase(carriers[segment.carrierCode]) || segment.carrierCode,
+      decodedAircraft:
+        toPascalCase(aircraft[segment.aircraft.code]) || segment.aircraft.code, // Human-readable
+    })),
+  }));
+
   return {
     ...offer,
-    itineraries: offer.itineraries.map((itinerary) => ({
-      ...itinerary,
-      segments: itinerary.segments.map((segment) => ({
-        ...segment,
-        carrier:
-          toPascalCase(carriers[segment.carrierCode]) || segment.carrierCode,
-        aircraft:
-          toPascalCase(aircraft[segment.aircraft.code]) ||
-          segment.aircraft.code,
-      })),
-    })),
+    itineraries: decodedItineraries,
     validatingAirlineCodes:
       offer.validatingAirlineCodes?.map(
         (code) => toPascalCase(carriers[code]) || code
@@ -105,10 +106,13 @@ export const POST = async (req: NextRequest) => {
         returnResult.dictionaries
       )
     );
+
     return NextResponse.json(
       {
-        departureOffers: decodedDepartureOffers,
-        returnOffers: decodedReturnOffers,
+        rawDepartureOffers: departureOffers,
+        rawReturnOffers: returnOffers,
+        decodedDepartureOffers,
+        decodedReturnOffers,
       },
       { status: 200 }
     );
