@@ -60,23 +60,12 @@ export const FlightSearchForm = () => {
   const origin = form.watch("origin");
   const destination = form.watch("destination");
 
-  const {
-    searchState,
-    setSearchState,
-    isFlightSearchLoading,
-    // setIsFlightSearchLoading,
-  } = useContext(FlightSearchContext);
+  const { searchState, setSearchState, isFlightSearchLoading } =
+    useContext(FlightSearchContext);
 
-  const offers: FlightOffer[] = [
-    ...searchState.departureOffers,
-    ...searchState.returnOffers,
-  ];
+  const offers: FlightOffer[] = [...searchState.flightOffers];
 
-  const {
-    searchFlights,
-    data: flights,
-    // error
-  } = useSearchFlights();
+  const { searchFlights, data: flights } = useSearchFlights();
 
   const onSubmit = async (data: z.infer<typeof flightSearchSchema>) => {
     const { oneWay, returnDate, ...rest } = data;
@@ -84,7 +73,7 @@ export const FlightSearchForm = () => {
     setSearchState((prev) => ({
       ...prev,
       isOneWay: oneWay,
-      returnDate: oneWay ? null : returnDate,
+      returnDate: oneWay ? null : returnDate || null,
     }));
 
     const searchParams = {
@@ -102,10 +91,8 @@ export const FlightSearchForm = () => {
     if (flights) {
       setSearchState((prev) => ({
         ...prev,
-        rawDepartureOffers: flights.rawDepartureOffers || [],
-        rawReturnOffers: flights.rawReturnOffers || [],
-        departureOffers: flights.decodedDepartureOffers || [], // For display
-        returnOffers: flights.decodedReturnOffers || [], // For display
+        rawOffers: flights.rawFlightOffers || [],
+        offers: flights.decodedFlightOffers || [], // For display
       }));
     }
   }, [flights, setSearchState]);

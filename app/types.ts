@@ -74,15 +74,12 @@ export interface FlightSearchState {
   nonStop: boolean;
 
   // Decoded offers for display
-  departureOffers: FlightOffer[];
-  returnOffers: FlightOffer[];
+  flightOffers: FlightOffer[];
 
   // Raw offers for API calls
-  rawDepartureOffers: FlightOffer[];
-  rawReturnOffers: FlightOffer[];
+  rawFlightOffers: FlightOffer[];
 
-  selectedDeparture: FlightOffer | null;
-  selectedReturn: FlightOffer | null;
+  selectedFlight: FlightOffer | null;
 
   pricedFlight: FlightOffer | null;
   priceAnalysis: PriceAnalysis | null;

@@ -9,11 +9,7 @@ const decodeFlightOffer = (
   offer: FlightOffer & { travelerPricings: TravelerPricing[] },
   dictionaries: Dictionaries
 ) => {
-  const {
-    // locations,
-    carriers,
-    aircraft,
-  } = dictionaries;
+  const { carriers, aircraft } = dictionaries;
 
   const decodedItineraries = offer.itineraries.map((itinerary) => ({
     ...itinerary,
@@ -22,7 +18,7 @@ const decodeFlightOffer = (
       carrier:
         toPascalCase(carriers[segment.carrierCode]) || segment.carrierCode,
       decodedAircraft:
-        toPascalCase(aircraft[segment.aircraft.code]) || segment.aircraft.code, // Human-readable
+        toPascalCase(aircraft[segment.aircraft.code]) || segment.aircraft.code,
     })),
   }));
 
@@ -39,10 +35,8 @@ const decodeFlightOffer = (
 export const POST = async (req: NextRequest) => {
   const data = await req.json();
 
-  if (data.returnDate) {
-    data.returnDate = new Date(data.returnDate);
-  }
   data.departureDate = new Date(data.departureDate);
+  if (data.returnDate) data.returnDate = new Date(data.returnDate);
 
   const parsed = compactFlightSearchSchema.safeParse(data);
 
@@ -53,10 +47,14 @@ export const POST = async (req: NextRequest) => {
       { status: 400 }
     );
   }
-  const departureBody = {
+
+  const requestBody = {
     originLocationCode: parsed.data.origin,
     destinationLocationCode: parsed.data.destination,
     departureDate: parsed.data.departureDate.toISOString().split("T")[0],
+    returnDate: parsed.data.returnDate
+      ? parsed.data.returnDate.toISOString().split("T")[0]
+      : undefined,
     adults: parsed.data.travelers.adults,
     children: parsed.data.travelers.children || 0,
     infants: parsed.data.travelers.infants || 0,
@@ -65,59 +63,31 @@ export const POST = async (req: NextRequest) => {
     currencyCode: "USD" as CurrencyCode,
   };
 
-  const returnBody = {
-    ...departureBody,
-    originLocationCode: parsed.data.destination,
-    destinationLocationCode: parsed.data.origin,
-    departureDate: parsed.data.returnDate
-      ? parsed.data.returnDate.toISOString().split("T")[0]
-      : "",
-  };
-
   try {
-    const [departureResponse, returnResponse] = await Promise.all([
-      amadeus.shopping.flightOffersSearch.get(departureBody),
-      parsed.data.returnDate
-        ? amadeus.shopping.flightOffersSearch.get(returnBody)
-        : Promise.resolve(null),
-    ]);
+    const response = await amadeus.shopping.flightOffersSearch.get(requestBody);
 
-    const { data: departureOffers, result: departureResult } =
-      departureResponse as {
-        data: FlightOffer[];
-        result: { dictionaries: Dictionaries };
-      };
-
-    const { data: returnOffers, result: returnResult } = returnResponse as {
+    const { data: flightOffers, result } = response as {
       data: FlightOffer[];
       result: { dictionaries: Dictionaries };
     };
 
-    const decodedDepartureOffers = departureOffers.map((offer) =>
+    const decodedFlightOffers = flightOffers.map((offer) =>
       decodeFlightOffer(
         offer as FlightOffer & { travelerPricings: TravelerPricing[] },
-        departureResult.dictionaries
+        result.dictionaries
       )
     );
 
-    const decodedReturnOffers = returnOffers.map((offer) =>
-      decodeFlightOffer(
-        offer as FlightOffer & { travelerPricings: TravelerPricing[] },
-        returnResult.dictionaries
-      )
-    );
-
+    // Return the response
     return NextResponse.json(
       {
-        rawDepartureOffers: departureOffers,
-        rawReturnOffers: returnOffers,
-        decodedDepartureOffers,
-        decodedReturnOffers,
+        rawFlightOffers: flightOffers,
+        decodedFlightOffers,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error searching flights:", error);
+    console.error("Error fetching flight offers:", error);
     return NextResponse.json(
       { error: "Failed to fetch flight offers" },
       { status: 500 }
