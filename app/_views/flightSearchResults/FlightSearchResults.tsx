@@ -28,7 +28,7 @@ export const FlightSearchResults = () => {
       {!isDefaultState && (
         <div className="flex flex-col overflow-hidden">
           <h2 className="text-lg font-semibold mb-4">Select your flight:</h2>
-          <div className="flex flex-col gap-4 overflow-auto">
+          <div className="flex flex-col gap-1 overflow-y-auto overflow-x-hidden">
             {flightOffers.map((flight) => (
               <FlightResultCard
                 key={flight.id}
@@ -52,7 +52,7 @@ export const FlightSearchResults = () => {
 const SkeletonFlightResultCards = () => (
   <>
     {[...Array(4)].map((_, i) => (
-      <Skeleton key={i} className="rounded-lg h-[117px] w-[313px] mb-1" />
+      <Skeleton key={i} className="rounded-lg h-[206px] w-[3px] mb-1" />
     ))}
   </>
 );

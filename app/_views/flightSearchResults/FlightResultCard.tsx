@@ -155,7 +155,7 @@ const FlightResultCard = ({
                   icon={
                     itineraryIndex === 0 ? faPlaneDeparture : faPlaneArrival
                   }
-                  className="text-primary h-[35px] w-[35px] mr-[6px] opacity-70"
+                  className="text-primary h-[35px] w-[35px] mr-[6px] opacity-50"
                 />
                 <div className="flex flex-1 items-start justify-between">
                   <div className="font-bold flex text-">

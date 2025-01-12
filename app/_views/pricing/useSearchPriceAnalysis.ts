@@ -5,7 +5,7 @@ import { FlightOffer } from "amadeus-ts";
 import { useState } from "react";
 
 interface FetchFlightDataParams {
-  flightOffers: FlightOffer[];
+  flightOffer: FlightOffer;
   origin: string;
   destination: string;
   departureDate: string;
@@ -13,7 +13,7 @@ interface FetchFlightDataParams {
 }
 
 interface FlightPricingResponse {
-  flightOffersPrice: FlightOffer[];
+  flightOffersPrice: FlightOffer;
   flightPriceAnalysis: PriceAnalysis;
 }
 
@@ -26,10 +26,16 @@ const useSearchPriceAnalysis = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("Data being sent to price analysis API:", params);
-      const response = await fetch("api/amadeus/price", {
+      const formattedParams = {
+        ...params,
+        departureDate: params.departureDate.split("T")[0], // Strip time
+        returnDate: params.returnDate?.split("T")[0], // Optional: strip time if returnDate exists
+      };
+
+      console.log("Data being sent to price analysis API:", formattedParams);
+      const response = await fetch("/api/amadeus/price", {
         method: "POST",
-        body: JSON.stringify(params),
+        body: JSON.stringify(formattedParams),
         headers: {
           "Content-Type": "application/json",
         },

@@ -61,6 +61,7 @@ export const POST = async (req: NextRequest) => {
     travelClass: (parsed.data.travelClass as TravelClass) || "ECONOMY",
     nonStop: parsed.data.nonStop || false,
     currencyCode: "USD" as CurrencyCode,
+    max: 50,
   };
 
   try {
@@ -78,7 +79,6 @@ export const POST = async (req: NextRequest) => {
       )
     );
 
-    // Return the response
     return NextResponse.json(
       {
         rawFlightOffers: flightOffers,
