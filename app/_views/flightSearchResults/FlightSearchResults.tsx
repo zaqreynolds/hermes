@@ -21,8 +21,10 @@ export const FlightSearchResults = () => {
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultSearchState);
 
+  console.log("flightOffers", flightOffers);
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mr-4">
       {!isDefaultState && (
         <div className="flex flex-col overflow-hidden">
           <h2 className="text-lg font-semibold mb-4">Select your flight:</h2>
