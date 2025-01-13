@@ -12,7 +12,7 @@ interface FetchFlightDataParams {
   returnDate?: string;
 }
 
-interface FlightPricingResponse {
+export interface FlightPricingResponse {
   flightOffersPrice: FlightOffer;
   flightPriceAnalysis: PriceAnalysis;
 }

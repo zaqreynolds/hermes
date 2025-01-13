@@ -1,30 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
 import { compactFlightSearchSchema } from "../../../_views/flightSearchForm/flightSearchSchema";
-import { Dictionaries, TravelerPricing } from "./types";
-import { CurrencyCode, FlightOffer, TravelClass } from "amadeus-ts";
+import { Dictionaries, Itinerary, Segment, TravelerPricing } from "./types";
+import {
+  CurrencyCode,
+  FlightOffer,
+  OperatingFlight$1,
+  TravelClass,
+} from "amadeus-ts";
 import { toPascalCase } from "@/lib/utils";
 
 const decodeFlightOffer = (
-  offer: FlightOffer & { travelerPricings: TravelerPricing[] },
+  offer: FlightOffer,
   dictionaries: Dictionaries
-) => {
+): DecodedFlightOffer => {
   const { carriers, aircraft } = dictionaries;
 
-  const decodedItineraries = offer.itineraries.map((itinerary) => ({
-    ...itinerary,
-    segments: itinerary.segments.map((segment) => ({
-      ...segment,
-      carrier:
-        toPascalCase(carriers[segment.carrierCode]) || segment.carrierCode,
-      decodedAircraft:
-        toPascalCase(aircraft[segment.aircraft.code]) || segment.aircraft.code,
-    })),
-  }));
+  const decodedItineraries: DecodedItinerary[] = offer.itineraries.map(
+    (itinerary) => ({
+      ...itinerary,
+      segments: itinerary.segments.map((segment) => ({
+        ...segment, // Ensure this has all required fields
+        id: segment.id, // Explicitly add required fields
+        numberOfStops: segment.numberOfStops, // Explicitly add required fields
+        blacklistedInEU: segment.blacklistedInEU, // Explicitly add required fields
+        carrier:
+          toPascalCase(carriers[segment.carrierCode]) || segment.carrierCode,
+        decodedAircraft:
+          toPascalCase(aircraft[segment.aircraft.code]) ||
+          segment.aircraft.code,
+      })),
+    })
+  );
 
   return {
-    ...offer,
-    itineraries: decodedItineraries,
+    ...offer, // Include all existing fields
+    itineraries: decodedItineraries, // Replace itineraries with decoded ones
     validatingAirlineCodes:
       offer.validatingAirlineCodes?.map(
         (code) => toPascalCase(carriers[code]) || code
@@ -94,3 +105,21 @@ export const POST = async (req: NextRequest) => {
     );
   }
 };
+
+interface DecodedSegment extends Segment {
+  id: string;
+  numberOfStops: number;
+  blacklistedInEU: boolean;
+  carrier?: string; // Decoded carrier name
+  decodedAircraft?: string; // Decoded aircraft name
+  operating: OperatingFlight$1; // Add the missing 'operating' property
+}
+
+interface DecodedItinerary extends Itinerary {
+  segments: DecodedSegment[]; // Use the extended DecodedSegment type
+}
+
+export interface DecodedFlightOffer extends FlightOffer {
+  itineraries: DecodedItinerary[]; // Use the extended DecodedItinerary type
+  validatingAirlineCodes?: string[]; // Decoded airline codes
+}

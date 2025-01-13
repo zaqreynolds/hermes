@@ -54,10 +54,10 @@ const Pricing = () => {
           {selectedFlight && (
             <div className="flex w-full flex-col space-y-2">
               <div className="w-full">
-                <div className="font-semibold">Itinerary:</div>
                 <FlightResultCard
                   flight={selectedFlight as FlightOffer}
                   view="details"
+                  priceData={data || undefined}
                 />
               </div>
             </div>
@@ -65,7 +65,7 @@ const Pricing = () => {
           <div className="flex w-full justify-end mt-4">
             <Button
               className="w-fit"
-              disabled={loading}
+              disabled={loading || isSubmitted}
               onClick={handleAnalysisSubmission}
             >
               {loading ? "Checking..." : "Check Price & Analysis"}

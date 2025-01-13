@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import { cn, toPascalCase } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
 import Image from "next/image";
@@ -9,12 +9,15 @@ import {
   faPlaneArrival,
   faPlaneDeparture,
 } from "@fortawesome/free-solid-svg-icons";
+import { DecodedFlightOffer } from "@/app/api/amadeus/flightSearch/route";
+import { FlightPricingResponse } from "../pricing/useSearchPriceAnalysis";
 
 type FlightResultCardProps = {
-  flight: FlightOffer;
+  flight: DecodedFlightOffer;
   isSelected?: boolean;
   onSelect?: () => void;
   view: "search" | "details";
+  priceData?: FlightPricingResponse;
 };
 
 const FlightResultCard = ({
@@ -140,7 +143,19 @@ const FlightResultCard = ({
             {flight.validatingAirlineCodes?.[0] || "Unknown Airline"}
           </h3>
         </div>
-        <div className="text-xl font-bold !m-0">${flight.price.grandTotal}</div>
+        <div className="flex flex-col items-center">
+          <div className="text-xl font-bold !m-0">
+            ${flight.price.grandTotal}
+          </div>
+          {details && (
+            <div className="text-sm">
+              {toPascalCase(
+                flight?.travelerPricings?.[0]?.fareDetailsBySegment?.[0]
+                  ?.cabin || ""
+              )}
+            </div>
+          )}
+        </div>
       </CardHeader>
       {/* Flight Details */}
       <CardContent className="p-0 space-y-1">
@@ -158,8 +173,33 @@ const FlightResultCard = ({
                   className="text-primary h-[35px] w-[35px] mr-[6px] opacity-50"
                 />
                 <div className="flex flex-1 items-start justify-between">
-                  <div className="font-bold flex text-">
-                    {firstTakeoffTime} - {lastLandingTime}
+                  <div className="flex flex-col">
+                    <div className="font-bold flex text-">
+                      {firstTakeoffTime} - {lastLandingTime}
+                    </div>
+                    {details && (
+                      <div
+                        className={cn(
+                          "flex items-center space-x-4",
+                          isMobile && "justify-between"
+                        )}
+                      >
+                        {itinerary.segments.map((segment, segmentIndex) => (
+                          <div
+                            key={segmentIndex}
+                            className="flex items-center space-x-4"
+                          >
+                            {/* Segment Details */}
+                            <div className="text-sm text-gray-800">
+                              <p>
+                                {segment.carrierCode} {segment.number}
+                              </p>
+                              <p>{segment.decodedAircraft}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col items-center text-sm font-bold ">
                     {stopsText}
@@ -177,7 +217,7 @@ const FlightResultCard = ({
                       {durationFormat(itinerary.duration)}
                     </div>
                     <div className="text-sm opacity-80">
-                      {itinerary.segments[0].departure.iataCode}-
+                      {itinerary.segments[0].departure.iataCode} →{" "}
                       {
                         itinerary.segments[itinerary.segments.length - 1]
                           .arrival.iataCode
@@ -186,39 +226,6 @@ const FlightResultCard = ({
                   </div>
                 </div>
               </div>
-              {details && (
-                <div
-                  className={cn(
-                    "flex items-center space-x-4",
-                    isMobile && "justify-between"
-                  )}
-                >
-                  {itinerary.segments.map((segment, segmentIndex) => (
-                    <div
-                      key={segmentIndex}
-                      className="flex items-center space-x-4"
-                    >
-                      {/* Segment Details */}
-                      <div className="text-sm text-gray-800">
-                        <p className="font-medium">
-                          {formatTime(segment.departure.at)} -{" "}
-                          {formatTime(segment.arrival.at)}
-                        </p>
-                        <p>
-                          {segment.departure.iataCode} →{" "}
-                          {segment.arrival.iataCode}
-                        </p>
-                        <p>
-                          Flight {segment.carrierCode} {segment.number}
-                        </p>
-                        <p className="text-gray-500">
-                          Duration: {durationFormat(segment.duration)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}
