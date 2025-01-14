@@ -32,10 +32,11 @@ const locationSchema = z.object({
   type: z.string(),
 });
 
-const baseSchema = z.object({
+export const flightSearchSchema = z.object({
   origin: locationSchema,
   destination: locationSchema,
   departureDate: z.date(),
+  returnDate: z.date().optional(),
   travelers: z.object({
     adults: z.number().min(1),
     children: z.number().min(0),
@@ -43,19 +44,8 @@ const baseSchema = z.object({
   }),
   travelClass: z.string().optional(),
   nonStop: z.boolean(),
+  oneWay: z.boolean(),
 });
-
-const oneWaySchema = baseSchema.extend({
-  oneWay: z.literal(true),
-  returnDate: z.undefined(),
-});
-
-const roundTripSchema = baseSchema.extend({
-  oneWay: z.literal(false),
-  returnDate: z.date(),
-});
-
-export const flightSearchSchema = z.union([oneWaySchema, roundTripSchema]);
 
 export const compactFlightSearchSchema = z.object({
   origin: z.string(),

@@ -73,11 +73,13 @@ export interface FlightSearchState {
   travelClass: "ECONOMY" | "BUSINESS" | "FIRST" | "PREMIUM_ECONOMY";
   nonStop: boolean;
 
-  departureOffers: FlightOffer[];
-  returnOffers: FlightOffer[];
+  // Decoded offers for display
+  flightOffers: FlightOffer[];
 
-  selectedDeparture: FlightOffer | null;
-  selectedReturn: FlightOffer | null;
+  // Raw offers for API calls
+  rawFlightOffers: FlightOffer[];
+
+  selectedFlight: FlightOffer | null;
 
   pricedFlight: FlightOffer | null;
   priceAnalysis: PriceAnalysis | null;

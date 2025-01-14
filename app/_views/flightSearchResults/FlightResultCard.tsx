@@ -1,15 +1,23 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import { cn, toPascalCase } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
 import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPlaneArrival,
+  faPlaneDeparture,
+} from "@fortawesome/free-solid-svg-icons";
+import { DecodedFlightOffer } from "@/app/api/amadeus/flightSearch/route";
+import { FlightPricingResponse } from "../pricing/useSearchPriceAnalysis";
 
 type FlightResultCardProps = {
-  flight: FlightOffer;
+  flight: DecodedFlightOffer;
   isSelected?: boolean;
   onSelect?: () => void;
   view: "search" | "details";
+  priceData?: FlightPricingResponse;
 };
 
 const FlightResultCard = ({
@@ -44,7 +52,12 @@ const FlightResultCard = ({
   ) => {
     const stops = segments.length - 1;
 
-    if (stops === 0) return "Non-stop";
+    if (stops === 0) {
+      return {
+        stopsText: "Non-stop",
+        layoverText: null,
+      };
+    }
 
     const layoverTimes = segments.slice(0, -1).map((segment, index) => {
       const nextSegment = segments[index + 1];
@@ -52,14 +65,25 @@ const FlightResultCard = ({
       const departureTime = new Date(nextSegment.departure.at);
       const layoverMinutes =
         (departureTime.getTime() - arrivalTime.getTime()) / (1000 * 60);
-      return `${Math.floor(layoverMinutes / 60)}h ${layoverMinutes % 60}m`;
+
+      if (layoverMinutes >= 60) {
+        const hours = Math.floor(layoverMinutes / 60);
+        const minutes = layoverMinutes % 60;
+        return `${hours}h ${minutes > 0 ? `${minutes}m` : ""}`;
+      } else {
+        return `${layoverMinutes}m`;
+      }
     });
-    return `${stops} stop${stops > 1 ? "s" : ""} (${layoverTimes.join(", ")})`;
+
+    return {
+      stopsText: `${stops} stop${stops > 1 ? "s" : ""}`,
+      layoverText: layoverTimes.join(", "),
+    };
   };
 
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   };
 
   const getICAOFromIATA = (iataCode: string): string | null => {
@@ -84,20 +108,14 @@ const FlightResultCard = ({
     );
   }
 
-  const firstSegment = flight.itineraries[0].segments[0];
-  const lastSegment =
-    flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
-  const firstTakeoffTime = formatTime(firstSegment.departure.at);
-  const lastLandingTime = formatTime(lastSegment.arrival.at);
-
   return (
     <Card
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg p-4 mb-1 border border-card hover:cursor-pointer hover:shadow-sm hover:border-accent",
+        "flex flex-col rounded-lg p-4 mb-1 border border-card  hover:shadow-sm ",
         isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50",
-        search && "w-[313px]",
+        search && "w-96 hover:cursor-pointer hover:border-accent",
         details && "w-full"
       )}
     >
@@ -119,58 +137,101 @@ const FlightResultCard = ({
             {flight.validatingAirlineCodes?.[0] || "Unknown Airline"}
           </h3>
         </div>
-        <div className="text-xl font-bold !m-0">${flight.price.grandTotal}</div>
-      </CardHeader>
-      {/* Flight Details */}
-      <CardContent className="p-0">
-        {flight.itineraries.map((itinerary, itineraryIndex) => (
-          <div key={itineraryIndex} className="space-y-2">
-            <div className="flex flex-col">
-              <div className="text-sm mt-1">
-                Duration: {durationFormat(itinerary.duration)} |{" "}
-                {handleStopsWithLayovers(itinerary.segments)}
-              </div>
-              {search && (
-                <div className="text-sm">
-                  {firstTakeoffTime} - {lastLandingTime}
-                </div>
+        <div className="flex flex-col items-center">
+          <div className="text-xl font-bold !m-0">
+            ${flight.price.grandTotal}
+          </div>
+          {details && (
+            <div className="text-sm">
+              {toPascalCase(
+                flight?.travelerPricings?.[0]?.fareDetailsBySegment?.[0]
+                  ?.cabin || ""
               )}
             </div>
-            {details && (
-              <div
-                className={cn(
-                  "flex items-center space-x-4",
-                  isMobile && "justify-between"
-                )}
-              >
-                {itinerary.segments.map((segment, segmentIndex) => (
-                  <div
-                    key={segmentIndex}
-                    className="flex items-center space-x-4"
-                  >
+          )}
+        </div>
+      </CardHeader>
+      {/* Flight Details */}
+      <CardContent className="p-0 space-y-1">
+        {flight.itineraries.map((itinerary, itineraryIndex) => {
+          const { stopsText, layoverText } = handleStopsWithLayovers(
+            itinerary.segments
+          );
+
+          return (
+            <div key={itineraryIndex}>
+              <div className="flex justify-start items-center space-x-2">
+                {/* Departure/Arrival Icon */}
+                <FontAwesomeIcon
+                  icon={
+                    itineraryIndex === 0 ? faPlaneDeparture : faPlaneArrival
+                  }
+                  className="text-primary h-[35px] w-[35px] mr-[6px] opacity-50"
+                />
+
+                {/* Main Row Layout */}
+                <div className="flex flex-1 items-start justify-between">
+                  {/* Left Column: Flight Time */}
+                  <div className="flex-1">
+                    <div className="font-bold">
+                      {formatTime(itinerary.segments[0].departure.at)} -{" "}
+                      {formatTime(
+                        itinerary.segments[itinerary.segments.length - 1]
+                          .arrival.at
+                      )}
+                    </div>
                     {/* Segment Details */}
-                    <div className="text-sm text-gray-800">
-                      <p className="font-medium">
-                        {formatTime(segment.departure.at)} -{" "}
-                        {formatTime(segment.arrival.at)}
-                      </p>
-                      <p>
-                        {segment.departure.iataCode} →{" "}
-                        {segment.arrival.iataCode}
-                      </p>
-                      <p>
-                        Flight {segment.carrierCode} {segment.number}
-                      </p>
-                      <p className="text-gray-500">
-                        Duration: {durationFormat(segment.duration)}
-                      </p>
+                    {details && (
+                      <div className="flex items-start space-x-4 mt-2">
+                        {itinerary.segments.map((segment, segmentIndex) => (
+                          <div
+                            key={segmentIndex}
+                            className="flex flex-col space-y-1"
+                          >
+                            <div className="text-sm text-gray-800">
+                              <p>
+                                {segment.carrierCode} {segment.number}
+                              </p>
+                              <p>{segment.decodedAircraft}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Middle Column: Stops and Layovers */}
+                  <div
+                    className={cn(
+                      "flex flex-col text-center",
+                      view === "details" && "mr-20",
+                      view === "search" && "mx-[10px]"
+                    )}
+                  >
+                    <div className="font-bold">{stopsText}</div>
+                    {layoverText && (
+                      <div className="text-sm text-gray-500">{layoverText}</div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Duration and Route */}
+                  <div className="flex flex-col text-center">
+                    <div className="font-bold">
+                      {durationFormat(itinerary.duration)}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {itinerary.segments[0].departure.iataCode} →{" "}
+                      {
+                        itinerary.segments[itinerary.segments.length - 1]
+                          .arrival.iataCode
+                      }
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );

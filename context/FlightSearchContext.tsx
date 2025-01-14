@@ -5,11 +5,14 @@ import { FlightOffer } from "amadeus-ts";
 
 type FlightSearchContextType = {
   searchState: FlightSearchState;
+  isFlightSearchLoading: boolean;
+  setIsFlightSearchLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchState: React.Dispatch<React.SetStateAction<FlightSearchState>>;
   amadeusStatus: "ok" | "unavailable" | "checking";
-  handleSelectFlight: (
-    flight: FlightOffer,
-    direction: "departure" | "return"
+  handleSelectFlight: (flight: FlightOffer) => void;
+  updateOffers: (
+    rawFlightOffers: FlightOffer[],
+    flightOffers: FlightOffer[]
   ) => void;
 };
 import { createContext, useState, ReactNode, useEffect } from "react";
@@ -27,24 +30,28 @@ export const defaultSearchState: FlightSearchState = {
   },
   travelClass: "ECONOMY",
   nonStop: false,
-  departureOffers: [],
-  returnOffers: [],
-  selectedDeparture: null,
-  selectedReturn: null,
+  flightOffers: [],
+  rawFlightOffers: [],
+  selectedFlight: null,
   pricedFlight: null,
   priceAnalysis: null,
 };
 
 export const FlightSearchContext = createContext<FlightSearchContextType>({
   searchState: defaultSearchState,
+  isFlightSearchLoading: false,
+  setIsFlightSearchLoading: () => {},
   setSearchState: () => {},
   amadeusStatus: "checking",
   handleSelectFlight: () => {},
+  updateOffers: () => {},
 });
 
 export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
   const [searchState, setSearchState] =
     useState<FlightSearchState>(defaultSearchState);
+  const [isFlightSearchLoading, setIsFlightSearchLoading] =
+    useState<boolean>(false);
   const [amadeusStatus, setAmadeusStatus] = useState<
     "ok" | "unavailable" | "checking"
   >("checking");
@@ -67,23 +74,36 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
     checkAmadeusStatus();
   }, []);
 
-  const handleSelectFlight = (
-    flight: FlightOffer,
-    direction: "departure" | "return"
-  ) => {
+  const handleSelectFlight = (flight: FlightOffer) => {
     setSearchState((prev) => ({
       ...prev,
-      [direction === "departure" ? "selectedDeparture" : "selectedReturn"]:
-        prev[direction === "departure" ? "selectedDeparture" : "selectedReturn"]
-          ?.id === flight.id
-          ? null
-          : flight,
+      selectedFlight: prev.selectedFlight?.id === flight.id ? null : flight,
+    }));
+  };
+
+  const updateOffers = (
+    rawFlightOffers: FlightOffer[],
+    flightOffers: FlightOffer[]
+  ) => {
+    console.log("Updating Offers: ", { rawFlightOffers, flightOffers });
+    setSearchState((prev) => ({
+      ...prev,
+      rawFlightOffers,
+      flightOffers,
     }));
   };
 
   return (
     <FlightSearchContext.Provider
-      value={{ searchState, setSearchState, amadeusStatus, handleSelectFlight }}
+      value={{
+        searchState,
+        setSearchState,
+        updateOffers,
+        isFlightSearchLoading,
+        setIsFlightSearchLoading,
+        amadeusStatus,
+        handleSelectFlight,
+      }}
     >
       {children}
       <AmadeusHealthDialog open={amadeusStatus === "unavailable"} />
