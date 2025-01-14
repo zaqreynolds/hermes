@@ -2,13 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
 import { compactFlightSearchSchema } from "../../../_views/flightSearchForm/flightSearchSchema";
 import { Dictionaries, Itinerary, Segment, TravelerPricing } from "./types";
-import {
-  CurrencyCode,
-  FlightOffer,
-  OperatingFlight$1,
-  TravelClass,
-} from "amadeus-ts";
+import { CurrencyCode, FlightOffer, TravelClass } from "amadeus-ts";
 import { toPascalCase } from "@/lib/utils";
+import { OperatingFlight$1 } from "@/app/amadeusTypes";
 
 const decodeFlightOffer = (
   offer: FlightOffer,
