@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-// import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, toPascalCase } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
@@ -26,7 +26,7 @@ const FlightResultCard = ({
   onSelect,
   view,
 }: FlightResultCardProps) => {
-  // const isMobile = useIsMobile();
+  const isMobile = useIsMobile();
   const search = view === "search";
   const details = view === "details";
 
@@ -113,10 +113,13 @@ const FlightResultCard = ({
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg p-4 mb-1 border border-card  hover:shadow-sm ",
+        "flex flex-col rounded-lg mb-1 border border-card hover:shadow-sm",
         isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50",
-        search && "w-96 hover:cursor-pointer hover:border-accent",
-        details && "w-full"
+        search &&
+          !isMobile &&
+          "w-96 p-4 hover:cursor-pointer hover:border-accent",
+        details && "w-full",
+        search && isMobile && "w-full flex-1 p-2"
       )}
     >
       {/* Airline and Price */}
