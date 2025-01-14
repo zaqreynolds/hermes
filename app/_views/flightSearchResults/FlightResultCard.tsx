@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useIsMobile } from "@/hooks/use-mobile";
+// import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, toPascalCase } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
@@ -26,7 +26,7 @@ const FlightResultCard = ({
   onSelect,
   view,
 }: FlightResultCardProps) => {
-  const isMobile = useIsMobile();
+  // const isMobile = useIsMobile();
   const search = view === "search";
   const details = view === "details";
 
