@@ -52,7 +52,10 @@ export const FlightSearchResults = () => {
 const SkeletonFlightResultCards = () => (
   <>
     {[...Array(4)].map((_, i) => (
-      <Skeleton key={i} className="rounded-lg h-[206px] w-[3px] mb-1" />
+      <Skeleton
+        key={i}
+        className="rounded-lg h-[206px] w-[384px] mb-1 flex-shrink-0"
+      />
     ))}
   </>
 );

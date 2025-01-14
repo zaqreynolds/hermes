@@ -83,6 +83,18 @@ export const POST = async (req: NextRequest) => {
       result: { dictionaries: Dictionaries };
     };
 
+    // const parseAsEndOfDayUTC = (dateString: string): Date => {
+    //   return new Date(`${dateString}T23:59:59Z`); // Set to end of the day in UTC
+    // };
+    // const now = new Date();
+    // const validFlightOffers = flightOffers.filter((offer) => {
+    //   const lastTicketingDateTime = offer.lastTicketingDateTime
+    //     ? new Date(offer.lastTicketingDateTime)
+    //     : parseAsEndOfDayUTC;
+
+    //   return lastTicketingDateTime >= now; // Keep only offers that are still valid
+    // });
+
     const decodedFlightOffers = flightOffers.map((offer) =>
       decodeFlightOffer(
         offer as FlightOffer & { travelerPricings: TravelerPricing[] },

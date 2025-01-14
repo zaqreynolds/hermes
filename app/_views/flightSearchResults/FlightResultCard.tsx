@@ -163,33 +163,37 @@ const FlightResultCard = ({
           const { stopsText, layoverText } = handleStopsWithLayovers(
             itinerary.segments
           );
+
           return (
             <div key={itineraryIndex}>
-              <div className="flex justify-start items-center space-x-2 space-y-1">
+              <div className="flex justify-start items-center space-x-2">
+                {/* Departure/Arrival Icon */}
                 <FontAwesomeIcon
                   icon={
                     itineraryIndex === 0 ? faPlaneDeparture : faPlaneArrival
                   }
                   className="text-primary h-[35px] w-[35px] mr-[6px] opacity-50"
                 />
+
+                {/* Main Row Layout */}
                 <div className="flex flex-1 items-start justify-between">
-                  <div className="flex flex-col">
-                    <div className="font-bold flex text-">
-                      {firstTakeoffTime} - {lastLandingTime}
+                  {/* Left Column: Flight Time */}
+                  <div className="flex-1">
+                    <div className="font-bold">
+                      {formatTime(itinerary.segments[0].departure.at)} -{" "}
+                      {formatTime(
+                        itinerary.segments[itinerary.segments.length - 1]
+                          .arrival.at
+                      )}
                     </div>
+                    {/* Segment Details */}
                     {details && (
-                      <div
-                        className={cn(
-                          "flex items-center space-x-4",
-                          isMobile && "justify-between"
-                        )}
-                      >
+                      <div className="flex items-start space-x-4 mt-2">
                         {itinerary.segments.map((segment, segmentIndex) => (
                           <div
                             key={segmentIndex}
-                            className="flex items-center space-x-4"
+                            className="flex flex-col space-y-1"
                           >
-                            {/* Segment Details */}
                             <div className="text-sm text-gray-800">
                               <p>
                                 {segment.carrierCode} {segment.number}
@@ -201,22 +205,27 @@ const FlightResultCard = ({
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-col items-center text-sm font-bold ">
-                    {stopsText}
+
+                  {/* Middle Column: Stops and Layovers */}
+                  <div
+                    className={cn(
+                      "flex flex-col text-center",
+                      view === "details" && "mr-20",
+                      view === "search" && "mx-[10px]"
+                    )}
+                  >
+                    <div className="font-bold">{stopsText}</div>
                     {layoverText && (
-                      <>
-                        <div className="font-normal">{layoverText}</div>
-                        <div className="font-normal opacity-80">
-                          {itinerary.segments[0].arrival.iataCode}
-                        </div>
-                      </>
+                      <div className="text-sm text-gray-500">{layoverText}</div>
                     )}
                   </div>
-                  <div className="flex flex-col items-center">
-                    <div className="text-sm font-bold">
+
+                  {/* Right Column: Duration and Route */}
+                  <div className="flex flex-col text-center">
+                    <div className="font-bold">
                       {durationFormat(itinerary.duration)}
                     </div>
-                    <div className="text-sm opacity-80">
+                    <div className="text-sm text-gray-500">
                       {itinerary.segments[0].departure.iataCode} →{" "}
                       {
                         itinerary.segments[itinerary.segments.length - 1]

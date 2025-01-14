@@ -42,16 +42,16 @@ export const FlightClassSelector = ({
             </SelectTrigger>
             <SelectContent className="w-36">
               <SelectGroup>
-                <SelectItem value="economy" className="text-xs  pr-1 ">
+                <SelectItem value="ECONOMY" className="text-xs  pr-1 ">
                   Economy
                 </SelectItem>
-                <SelectItem value="premiumEconomy" className="text-xs pr-1 ">
+                <SelectItem value="PREMIUM_ECONOMY" className="text-xs pr-1 ">
                   Premium Economy
                 </SelectItem>
-                <SelectItem value="business" className="text-xs  pr-1 ">
+                <SelectItem value="BUSINESS" className="text-xs  pr-1 ">
                   Business
                 </SelectItem>
-                <SelectItem value="first" className="text-xs  pr-1 ">
+                <SelectItem value="FIRST" className="text-xs  pr-1 ">
                   First
                 </SelectItem>
               </SelectGroup>
