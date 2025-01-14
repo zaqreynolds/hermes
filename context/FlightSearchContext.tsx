@@ -9,15 +9,10 @@ type FlightSearchContextType = {
   setIsFlightSearchLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchState: React.Dispatch<React.SetStateAction<FlightSearchState>>;
   amadeusStatus: "ok" | "unavailable" | "checking";
-  handleSelectFlight: (
-    flight: FlightOffer,
-    direction: "departure" | "return"
-  ) => void;
+  handleSelectFlight: (flight: FlightOffer) => void;
   updateOffers: (
-    rawDepartureOffers: FlightOffer[],
-    rawReturnOffers: FlightOffer[],
-    decodedDepartureOffers: FlightOffer[],
-    decodedReturnOffers: FlightOffer[]
+    rawFlightOffers: FlightOffer[],
+    flightOffers: FlightOffer[]
   ) => void;
 };
 import { createContext, useState, ReactNode, useEffect } from "react";
@@ -35,12 +30,9 @@ export const defaultSearchState: FlightSearchState = {
   },
   travelClass: "ECONOMY",
   nonStop: false,
-  departureOffers: [],
-  returnOffers: [],
-  rawDepartureOffers: [],
-  rawReturnOffers: [],
-  selectedDeparture: null,
-  selectedReturn: null,
+  flightOffers: [],
+  rawFlightOffers: [],
+  selectedFlight: null,
   pricedFlight: null,
   priceAnalysis: null,
 };
@@ -82,41 +74,22 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
     checkAmadeusStatus();
   }, []);
 
-  const handleSelectFlight = (
-    flight: FlightOffer,
-    direction: "departure" | "return"
-  ) => {
-    const flightWithContext = {
-      ...flight,
-      context: direction, // Add "departure" or "return" context
-    };
+  const handleSelectFlight = (flight: FlightOffer) => {
     setSearchState((prev) => ({
       ...prev,
-      [direction === "departure" ? "selectedDeparture" : "selectedReturn"]:
-        prev[direction === "departure" ? "selectedDeparture" : "selectedReturn"]
-          ?.id === flight.id
-          ? null
-          : flightWithContext,
+      selectedFlight: prev.selectedFlight?.id === flight.id ? null : flight,
     }));
   };
 
   const updateOffers = (
-    rawDepartureOffers: FlightOffer[],
-    rawReturnOffers: FlightOffer[],
-    decodedDepartureOffers: FlightOffer[],
-    decodedReturnOffers: FlightOffer[]
+    rawFlightOffers: FlightOffer[],
+    flightOffers: FlightOffer[]
   ) => {
-    console.log("Raw Departure Offers (context):", rawDepartureOffers);
-    console.log("Raw Return Offers (context):", rawReturnOffers);
-    console.log("Decoded Departure Offers (context):", decodedDepartureOffers);
-    console.log("Decoded Return Offers (context):", decodedReturnOffers);
-
+    console.log("Updating Offers: ", { rawFlightOffers, flightOffers });
     setSearchState((prev) => ({
       ...prev,
-      rawDepartureOffers,
-      rawReturnOffers,
-      departureOffers: decodedDepartureOffers,
-      returnOffers: decodedReturnOffers,
+      rawFlightOffers,
+      flightOffers,
     }));
   };
 
