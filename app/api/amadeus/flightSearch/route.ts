@@ -4,7 +4,6 @@ import { compactFlightSearchSchema } from "../../../_views/flightSearchForm/flig
 import { Dictionaries, Itinerary, Segment, TravelerPricing } from "./types";
 import { CurrencyCode, FlightOffer, TravelClass } from "amadeus-ts";
 import { toPascalCase } from "@/lib/utils";
-import { OperatingFlight$1 } from "@/app/amadeusTypes";
 
 const decodeFlightOffer = (
   offer: FlightOffer,
@@ -131,3 +130,7 @@ export interface DecodedFlightOffer extends FlightOffer {
   itineraries: DecodedItinerary[]; // Use the extended DecodedItinerary type
   validatingAirlineCodes?: string[]; // Decoded airline codes
 }
+
+type OperatingFlight$1 = {
+  carrierCode: string;
+};
