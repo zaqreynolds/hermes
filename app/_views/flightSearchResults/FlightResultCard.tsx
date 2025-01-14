@@ -108,20 +108,14 @@ const FlightResultCard = ({
     );
   }
 
-  const firstSegment = flight.itineraries[0].segments[0];
-  const lastSegment =
-    flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
-  const firstTakeoffTime = formatTime(firstSegment.departure.at);
-  const lastLandingTime = formatTime(lastSegment.arrival.at);
-
   return (
     <Card
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg p-4 mb-1 border border-card hover:cursor-pointer hover:shadow-sm hover:border-accent",
+        "flex flex-col rounded-lg p-4 mb-1 border border-card  hover:shadow-sm ",
         isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50",
-        search && "w-96",
+        search && "w-96 hover:cursor-pointer hover:border-accent",
         details && "w-full"
       )}
     >
