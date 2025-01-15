@@ -85,7 +85,6 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
     rawFlightOffers: FlightOffer[],
     flightOffers: FlightOffer[]
   ) => {
-    console.log("Updating Offers: ", { rawFlightOffers, flightOffers });
     setSearchState((prev) => ({
       ...prev,
       rawFlightOffers,

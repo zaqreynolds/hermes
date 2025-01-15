@@ -22,8 +22,6 @@ export const FlightSearchResults = () => {
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultSearchState);
 
-  console.log("flightOffers", flightOffers);
-
   return (
     <>
       {!isDefaultState && (

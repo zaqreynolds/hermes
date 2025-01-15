@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import amadeus from "../amadeusClient";
 
 export const GET = async () => {
-  console.log("checking health");
   try {
     const response = await amadeus.referenceData.locations.get({
       keyword: "test",

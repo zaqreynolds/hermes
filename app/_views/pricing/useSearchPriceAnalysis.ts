@@ -32,7 +32,6 @@ const useSearchPriceAnalysis = () => {
         returnDate: params.returnDate?.split("T")[0], // Optional: strip time if returnDate exists
       };
 
-      console.log("Data being sent to price analysis API:", formattedParams);
       const response = await fetch("/api/amadeus/price", {
         method: "POST",
         body: JSON.stringify(formattedParams),
@@ -44,7 +43,7 @@ const useSearchPriceAnalysis = () => {
         throw new Error("Failed to fetch price analysis");
       }
       const result = await response.json();
-      console.log("Price analysis result:", result);
+
       setData(result);
     } catch (error) {
       if (error instanceof Error) {
