@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-// import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn, toPascalCase } from "@/lib/utils";
 import { FlightOffer } from "amadeus-ts";
 import airlinesData from "@/lib/airlines.json";
@@ -11,6 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { DecodedFlightOffer } from "@/app/api/amadeus/flightSearch/route";
 import { FlightPricingResponse } from "../pricing/useSearchPriceAnalysis";
+import { useEffect, useState } from "react";
 
 type FlightResultCardProps = {
   flight: DecodedFlightOffer;
@@ -24,9 +25,21 @@ const FlightResultCard = ({
   flight,
   isSelected,
   onSelect,
-  view,
+  view: initialView,
 }: FlightResultCardProps) => {
-  // const isMobile = useIsMobile();
+  const isMobile = useIsMobile();
+
+  const [view, setView] = useState<"search" | "details">(initialView);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    if (isSelected) {
+      setView("details");
+    } else {
+      setView(initialView);
+    }
+  }, [isSelected, initialView, isMobile]);
+
   const search = view === "search";
   const details = view === "details";
 
@@ -113,14 +126,22 @@ const FlightResultCard = ({
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg p-4 mb-1 border border-card  hover:shadow-sm ",
+        "flex flex-col rounded-lg mb-1 border border-card hover:shadow-sm",
         isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50",
-        search && "w-96 hover:cursor-pointer hover:border-accent",
-        details && "w-full"
+        search && !isMobile && "w-96 hover:cursor-pointer hover:border-accent",
+        details && "w-full",
+        search && isMobile && "w-full flex-1",
+        isMobile && "p-2",
+        !isMobile && "p-4"
       )}
     >
       {/* Airline and Price */}
-      <CardHeader className="flex-row justify-between items-center p-0">
+      <CardHeader
+        className={cn(
+          "flex-row justify-between items-center p-0",
+          isMobile && "mb-1"
+        )}
+      >
         <div className="flex items-center space-x-2">
           <div className="w-10 h-10 flex items-center justify-center rounded">
             <Image
@@ -166,13 +187,23 @@ const FlightResultCard = ({
                   icon={
                     itineraryIndex === 0 ? faPlaneDeparture : faPlaneArrival
                   }
-                  className="text-primary h-[35px] w-[35px] mr-[6px] opacity-50"
+                  className={cn(
+                    "text-primary opacity-50",
+                    !isMobile && "h-[35px] w-[35px] mr-[6px]",
+                    isMobile && !isSelected && "h-[30px] w-[30px] mr-[6px]",
+                    isMobile && isSelected && "h-[30px] w-[30px] mr-[4px]"
+                  )}
                 />
 
                 {/* Main Row Layout */}
                 <div className="flex flex-1 items-start justify-between">
                   {/* Left Column: Flight Time */}
-                  <div className="flex-1">
+                  <div
+                    className={cn(
+                      !(isMobile && isSelected) && "flex-1",
+                      isMobile && isSelected && "flex-1"
+                    )}
+                  >
                     <div className="font-bold">
                       {formatTime(itinerary.segments[0].departure.at)} -{" "}
                       {formatTime(
@@ -204,8 +235,9 @@ const FlightResultCard = ({
                   <div
                     className={cn(
                       "flex flex-col text-center",
-                      view === "details" && "mr-20",
-                      view === "search" && "mx-[10px]"
+                      view === "details" && !isMobile && "mr-20",
+                      view === "search" && "mx-[10px]",
+                      isMobile && isSelected && "w-[17%]"
                     )}
                   >
                     <div className="font-bold">{stopsText}</div>
@@ -215,7 +247,12 @@ const FlightResultCard = ({
                   </div>
 
                   {/* Right Column: Duration and Route */}
-                  <div className="flex flex-col text-center">
+                  <div
+                    className={cn(
+                      "flex flex-col text-center",
+                      isMobile && isSelected && "w-[30%]"
+                    )}
+                  >
                     <div className="font-bold">
                       {durationFormat(itinerary.duration)}
                     </div>

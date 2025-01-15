@@ -18,7 +18,7 @@ import { SwapLocationsButton } from "./formComponents/SwapLocationsButton";
 import { DateSelector } from "./formComponents/DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { LoaderCircleIcon } from "lucide-react";
 import {
   defaultSearchState,
@@ -27,9 +27,23 @@ import {
 import NonStopSwitch from "./formComponents/NonStopSwitch";
 import { Separator } from "@/components/ui/separator";
 import { FlightOffer } from "amadeus-ts";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  //push to router function
+  const pushToRouterBatch = (params: Record<string, string>) => {
+    const query = new URLSearchParams(searchParams.toString());
+    Object.entries(params).forEach(([key, value]) => {
+      query.set(key, value);
+    });
+    router.push(`${pathname}?${query.toString()}`);
+  };
 
   const form = useForm<z.infer<typeof flightSearchSchema>>({
     resolver: zodResolver(flightSearchSchema),
@@ -84,8 +98,106 @@ export const FlightSearchForm = () => {
       ...(returnDate && !oneWay && { returnDate: returnDate.toISOString() }),
     };
 
+    const buildQueryParams = (data: z.infer<typeof flightSearchSchema>) => {
+      const params: Record<string, string> = {
+        originIataCode: data.origin.iataCode,
+        originName: data.origin.name,
+        originCity: data.origin.address.cityName,
+        originCountry: data.origin.address.countryName,
+        destinationIataCode: data.destination.iataCode,
+        destinationName: data.destination.name,
+        destinationCity: data.destination.address.cityName,
+        destinationCountry: data.destination.address.countryName,
+        departureDate: data.departureDate.toISOString().split("T")[0],
+        travelers: JSON.stringify(data.travelers),
+        travelClass: data.travelClass || "",
+        nonStop: data.nonStop.toString(),
+        oneWay: data.oneWay.toString(),
+      };
+
+      if (!data.oneWay && data.returnDate) {
+        params.returnDate = data.returnDate.toISOString().split("T")[0];
+      }
+
+      return params;
+    };
+
+    const queryParams = buildQueryParams(data);
+
+    // Push all query params at once
+    pushToRouterBatch(queryParams);
+
     await searchFlights(searchParams);
   };
+
+  const isFirstLoad = useRef(true);
+  const hasParams = Array.from(searchParams.keys()).length > 0;
+  useEffect(() => {
+    // Function to parse query params into form values
+    const parseQueryParams = () => {
+      if (!hasParams) return null;
+      const travelers = searchParams.get("travelers")
+        ? JSON.parse(searchParams.get("travelers") || "{}")
+        : { adults: 1, children: 0, infants: 0 };
+
+      const formValues = {
+        origin: {
+          iataCode: searchParams.get("originIataCode") || "",
+          name: searchParams.get("originName") || "",
+          address: {
+            cityName: searchParams.get("originCity") || "",
+            countryName: searchParams.get("originCountry") || "",
+          },
+        },
+        destination: {
+          iataCode: searchParams.get("destinationIataCode") || "",
+          name: searchParams.get("destinationName") || "",
+          address: {
+            cityName: searchParams.get("destinationCity") || "",
+            countryName: searchParams.get("destinationCountry") || "",
+          },
+        },
+        departureDate: searchParams.get("departureDate")
+          ? new Date(searchParams.get("departureDate") as string)
+          : undefined,
+        returnDate: searchParams.get("returnDate")
+          ? new Date(searchParams.get("returnDate") as string)
+          : undefined,
+        travelers,
+        travelClass: searchParams.get("travelClass") || "",
+        nonStop: searchParams.get("nonStop") === "true",
+        oneWay: searchParams.get("oneWay") === "true",
+      };
+
+      return formValues;
+    };
+
+    if (isFirstLoad.current && hasParams) {
+      const parsedValues = parseQueryParams();
+
+      if (parsedValues) {
+        reset(parsedValues);
+      }
+
+      if (
+        parsedValues &&
+        parsedValues.origin.iataCode &&
+        parsedValues.destination.iataCode
+      ) {
+        searchFlights({
+          ...parsedValues,
+          origin: parsedValues.origin.iataCode,
+          destination: parsedValues.destination.iataCode,
+          departureDate:
+            parsedValues.departureDate?.toISOString().split("T")[0] || "",
+          returnDate:
+            parsedValues.returnDate?.toISOString().split("T")[0] || "",
+        });
+      }
+
+      isFirstLoad.current = false;
+    }
+  }, [searchParams, reset, searchFlights, hasParams]);
 
   useEffect(() => {
     if (flights) {

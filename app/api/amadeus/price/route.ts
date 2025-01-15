@@ -3,10 +3,8 @@ import amadeus from "../amadeusClient";
 import { CurrencyCode } from "amadeus-ts";
 
 export const POST = async (req: NextRequest) => {
-  console.log("starting price analysis");
   try {
     const body = await req.json();
-    console.log("Request body:", JSON.stringify(body, null, 2));
     const {
       flightOffer,
       origin,
@@ -16,8 +14,6 @@ export const POST = async (req: NextRequest) => {
       oneWay,
     } = body;
 
-    console.log("flightOffer structure:", JSON.stringify(flightOffer, null, 2));
-
     if (!flightOffer || !origin || !destination || !departureDate) {
       return NextResponse.json(
         { message: "Missing required parameters" },
@@ -26,12 +22,6 @@ export const POST = async (req: NextRequest) => {
     }
 
     const formattedDepartureDate = departureDate.split("T")[0]; // Strip time
-    const formattedReturnDate = returnDate?.split("T")[0]; // Strip time if returnDate exists
-
-    console.log("Formatted dates:", {
-      departureDate: formattedDepartureDate,
-      returnDate: formattedReturnDate,
-    });
 
     const itineraryPriceMetricsParams: {
       originIataCode: string;
@@ -50,20 +40,8 @@ export const POST = async (req: NextRequest) => {
 
     // Only add `returnDate` if the endpoint supports it
     if (!oneWay && returnDate) {
-      console.log("Removing returnDate for itineraryPriceMetrics");
       delete itineraryPriceMetricsParams.returnDate; // Comment this line out if returnDate is supported
     }
-
-    console.log("itineraryPriceMetricsParams:", itineraryPriceMetricsParams);
-
-    console.log("Payload sent to flightOffersPricing:", {
-      type: "flight-offers-pricing",
-      flightOffers: [flightOffer],
-    });
-    console.log(
-      "Payload sent to itineraryPriceMetrics:",
-      itineraryPriceMetricsParams
-    );
 
     const [flightOffersPriceResponse, flightPriceAnalysisResponse] =
       await Promise.all([
@@ -78,9 +56,6 @@ export const POST = async (req: NextRequest) => {
           itineraryPriceMetricsParams
         ),
       ]);
-
-    console.log("flightOffersPriceResponse:", flightOffersPriceResponse);
-    console.log("flightPriceAnalysisResponse:", flightPriceAnalysisResponse);
 
     const flightOffersPrice = flightOffersPriceResponse.data;
     const flightPriceAnalysis = flightPriceAnalysisResponse.data;

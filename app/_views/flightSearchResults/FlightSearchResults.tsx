@@ -6,9 +6,10 @@ import {
 import { FlightOffer } from "amadeus-ts";
 import { useContext } from "react";
 import FlightResultCard from "./FlightResultCard";
-// import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export const FlightSearchResults = () => {
   const { searchState, handleSelectFlight, isFlightSearchLoading } =
@@ -16,17 +17,17 @@ export const FlightSearchResults = () => {
 
   const flightOffers = searchState.flightOffers as FlightOffer[];
   const selectedFlight = searchState.selectedFlight;
-  // const isMobile = useIsMobile();
+  const isMobile = useIsMobile();
 
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultSearchState);
 
-  console.log("flightOffers", flightOffers);
-
   return (
-    <div className="flex flex-col mr-4">
+    <>
       {!isDefaultState && (
-        <div className="flex flex-col overflow-hidden">
+        <div
+          className={cn("flex flex-col overflow-hidden", !isMobile && "mr-4")}
+        >
           <h2 className="text-lg font-semibold mb-4">Select your flight:</h2>
           <div className="flex flex-col gap-1 overflow-y-auto overflow-x-hidden">
             {flightOffers.map((flight) => (
@@ -45,7 +46,7 @@ export const FlightSearchResults = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

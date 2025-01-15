@@ -9,6 +9,7 @@ import {
 } from "react";
 import FlightResultCard from "../flightSearchResults/FlightResultCard";
 import { FlightOffer } from "amadeus-ts";
+import { useIsMobile } from "@/hooks/use-mobile";
 // import { Button } from "@/components/ui/button";
 // import useSearchPriceAnalysis from "./useSearchPriceAnalysis";
 
@@ -16,6 +17,7 @@ const Pricing = () => {
   // const [isSubmitted, setIsSubmitted] = useState(false);
   const { searchState } = useContext(FlightSearchContext);
   const { selectedFlight } = searchState;
+  const isMobile = useIsMobile();
 
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultSearchState);
@@ -49,23 +51,25 @@ const Pricing = () => {
   // };
 
   return (
-    <div className="flex flex-col flex-1 w-full overflow-hidden">
-      {!isDefaultState && (
-        <>
-          <h2 className="text-lg font-semibold mb-1">Selected Flight:</h2>
-          {!selectedFlight && <div>Select a flight to continue...</div>}
-          {selectedFlight && (
-            <div className="flex w-full flex-col space-y-2">
-              <div className="w-full">
-                <FlightResultCard
-                  flight={selectedFlight as FlightOffer}
-                  view="details"
-                  // priceData={data || undefined}
-                />
-              </div>
-            </div>
-          )}
-          {/* <div className="flex w-full justify-end mt-4">
+    <>
+      {!isMobile && (
+        <div className="flex flex-col flex-1 w-full overflow-hidden">
+          {!isDefaultState && (
+            <>
+              <h2 className="text-lg font-semibold mb-1">Selected Flight:</h2>
+              {!selectedFlight && <div>Select a flight to continue...</div>}
+              {selectedFlight && (
+                <div className="flex w-full flex-col space-y-2">
+                  <div className="w-full">
+                    <FlightResultCard
+                      flight={selectedFlight as FlightOffer}
+                      view="details"
+                      // priceData={data || undefined}
+                    />
+                  </div>
+                </div>
+              )}
+              {/* <div className="flex w-full justify-end mt-4">
             {selectedFlight && (
               <Button
                 className="w-fit"
@@ -79,9 +83,11 @@ const Pricing = () => {
           {isSubmitted && !loading && error && (
             <div className="text-red-500 mt-2">Error: {error}</div>
           )} */}
-        </>
+            </>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
 
