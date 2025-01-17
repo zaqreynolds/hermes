@@ -18,7 +18,7 @@ import { SwapLocationsButton } from "./formComponents/SwapLocationsButton";
 import { DateSelector } from "./formComponents/DateSelector";
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useSearchFlights } from "./hooks/useSearchFlights";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { LoaderCircleIcon } from "lucide-react";
 import {
   defaultSearchState,
@@ -28,9 +28,15 @@ import NonStopSwitch from "./formComponents/NonStopSwitch";
 import { Separator } from "@/components/ui/separator";
 import { FlightOffer } from "amadeus-ts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ChevronUpIcon } from "@radix-ui/react-icons";
+import { cn } from "@/lib/utils";
 
 export const FlightSearchForm = () => {
   const { isMobile } = useScreenSize();
+  const [hideForm, setHideForm] = useState(false);
+  const [isRotated, setIsRotated] = useState(false);
+
+  console.log("hideForm", hideForm);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -128,10 +134,25 @@ export const FlightSearchForm = () => {
     pushToRouterBatch(queryParams);
 
     await searchFlights(searchParams);
+    setHideForm(true);
+    setIsRotated(true);
   };
 
   const isFirstLoad = useRef(true);
   const hasParams = Array.from(searchParams.keys()).length > 0;
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      setHideForm(true);
+      setIsRotated(true);
+    } else {
+      setHideForm(false);
+      setIsRotated(false);
+      setSearchState(defaultSearchState);
+      reset();
+    }
+  }, [pathname, reset, setSearchState]);
+
   useEffect(() => {
     // Function to parse query params into form values
     const parseQueryParams = () => {
@@ -219,97 +240,120 @@ export const FlightSearchForm = () => {
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center ">
-      <h2 className="text-xl font-semibold mb-4">Where are you going?</h2>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex w-full gap-1 pb-2 pr-1">
-            <RoundtripOneWaySelector control={form.control} />
-
-            <TravelerSelector control={form.control} isMobile={isMobile} />
-
-            <FlightClassSelector control={form.control} isMobile={isMobile} />
-            <div className=" flex-1" />
-            {!isMobile && <NonStopSwitch control={form.control} />}
-          </div>
-          <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
-            <LocationInput
-              control={form.control}
-              name="origin"
-              placeholder="From"
-              icon={
-                <FontAwesomeIcon
-                  icon={faPlaneDeparture}
-                  className="h-5 w-5 text-stone-600"
-                />
-              }
-              value={origin}
-              isMobile={isMobile}
+      <div className="flex w-full justify-between">
+        <h2 className="text-xl font-semibold mb-4">Where are you going?</h2>
+        {isMobile && (
+          <Button
+            variant="ghost"
+            className="[&_svg]:w-6 [&_svg]:h-6"
+            onClick={() => {
+              setIsRotated(!isRotated);
+              setHideForm(!hideForm);
+            }}
+          >
+            <ChevronUpIcon
+              className={cn(
+                "transform transition-transform rotate-180 duration-500",
+                isRotated &&
+                  "transform transition-transform rotate-0 duration-500"
+              )}
             />
+          </Button>
+        )}
+      </div>
 
-            <SwapLocationsButton
-              setValue={form.setValue}
-              getValues={form.getValues}
-              isMobile={isMobile}
-            />
+      {!hideForm && (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="flex w-full gap-1 pb-2 pr-1">
+              <RoundtripOneWaySelector control={form.control} />
 
-            <LocationInput
-              control={form.control}
-              name="destination"
-              placeholder="To"
-              icon={
-                <FontAwesomeIcon
-                  icon={faPlaneArrival}
-                  className="h-5 w-5 text-stone-600"
-                />
-              }
-              value={destination}
-              isMobile={isMobile}
-            />
-            <div className="flex w-full gap-2">
-              <DateSelector
+              <TravelerSelector control={form.control} isMobile={isMobile} />
+
+              <FlightClassSelector control={form.control} isMobile={isMobile} />
+              <div className=" flex-1" />
+              {!isMobile && <NonStopSwitch control={form.control} />}
+            </div>
+            <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
+              <LocationInput
                 control={form.control}
-                name="departureDate"
-                returnDate={returnDate}
+                name="origin"
+                placeholder="From"
+                icon={
+                  <FontAwesomeIcon
+                    icon={faPlaneDeparture}
+                    className="h-5 w-5 text-stone-600"
+                  />
+                }
+                value={origin}
+                isMobile={isMobile}
               />
 
-              {!oneWay && (
+              <SwapLocationsButton
+                setValue={form.setValue}
+                getValues={form.getValues}
+                isMobile={isMobile}
+              />
+
+              <LocationInput
+                control={form.control}
+                name="destination"
+                placeholder="To"
+                icon={
+                  <FontAwesomeIcon
+                    icon={faPlaneArrival}
+                    className="h-5 w-5 text-stone-600"
+                  />
+                }
+                value={destination}
+                isMobile={isMobile}
+              />
+              <div className="flex w-full gap-2">
                 <DateSelector
                   control={form.control}
-                  name="returnDate"
-                  departureDate={departureDate}
+                  name="departureDate"
+                  returnDate={returnDate}
                 />
-              )}
-            </div>
-          </div>
-          <div className="flex justify-end items-center space-x-2 mt-4">
-            {isMobile && (
-              <div className="flex">
-                <NonStopSwitch control={form.control} />
-              </div>
-            )}
-            {isDirty && (
-              <Button
-                variant="outline"
-                className="w-24 shadow-md border border-primary active:shadow-none"
-                onClick={() => {
-                  reset();
-                  setSearchState(defaultSearchState);
-                }}
-              >
-                Clear Search
-              </Button>
-            )}
 
-            <Button
-              className="w-20 shadow-md active:shadow-none"
-              type="submit"
-              disabled={isFlightSearchLoading}
-            >
-              {handleSearchStatus()}
-            </Button>
-          </div>
-        </form>
-      </Form>
+                {!oneWay && (
+                  <DateSelector
+                    control={form.control}
+                    name="returnDate"
+                    departureDate={departureDate}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end items-center space-x-2 mt-4">
+              {isMobile && (
+                <div className="flex">
+                  <NonStopSwitch control={form.control} />
+                </div>
+              )}
+              {isDirty && (
+                <Button
+                  variant="outline"
+                  className="w-24 shadow-md border border-primary active:shadow-none"
+                  onClick={() => {
+                    reset();
+                    setSearchState(defaultSearchState);
+                  }}
+                >
+                  Clear Search
+                </Button>
+              )}
+
+              <Button
+                className="w-20 shadow-md active:shadow-none"
+                type="submit"
+                disabled={isFlightSearchLoading}
+              >
+                {handleSearchStatus()}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
       <Separator className="bg-accent my-2" />
       {!offers.length && !isFlightSearchLoading && (
         <div className="flex flex-col items-center flex-grow w-full overflow-hidden">
