@@ -92,8 +92,8 @@ export const FlightSearchForm = () => {
 
     const searchParams = {
       ...rest,
-      origin: rest.origin.address.cityCode,
-      destination: rest.destination.address.cityCode,
+      origin: rest.origin.iataCode,
+      destination: rest.destination.iataCode,
       departureDate: rest.departureDate.toISOString(),
       ...(returnDate && !oneWay && { returnDate: returnDate.toISOString() }),
     };

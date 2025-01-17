@@ -3,23 +3,29 @@ import { z } from "zod";
 const locationSchema = z.object({
   address: z.object({
     cityName: z.string(),
-    cityCode: z.string(),
+    cityCode: z.string().optional().default(""),
     countryName: z.string(),
-    countryCode: z.string(),
-    stateCode: z.string().optional(),
+    countryCode: z.string().optional().default(""),
+    stateCode: z.string().optional().default(""),
   }),
-  analytics: z.object({
-    travelers: z.object({
-      score: z.number(),
-    }),
-  }),
-  detailedName: z.string(),
-  geoCode: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
-  }),
+  analytics: z
+    .object({
+      travelers: z.object({
+        score: z.number(),
+      }),
+    })
+    .optional()
+    .default({ travelers: { score: 0 } }),
+  detailedName: z.string().optional().default(""),
+  geoCode: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+    })
+    .optional()
+    .default({ latitude: 0, longitude: 0 }),
   iataCode: z.string(),
-  id: z.string(),
+  id: z.string().optional().default(""),
   name: z.string(),
   self: z
     .object({
@@ -27,9 +33,9 @@ const locationSchema = z.object({
       methods: z.array(z.string()),
     })
     .optional(),
-  subType: z.string().optional(),
-  timeZoneOffset: z.string().optional(),
-  type: z.string(),
+  subType: z.string().optional().default(""),
+  timeZoneOffset: z.string().optional().default(""),
+  type: z.string().optional().default(""),
 });
 
 export const flightSearchSchema = z.object({
