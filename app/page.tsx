@@ -8,11 +8,11 @@ export default function Home() {
   return (
     <div className="w-full flex overflow-hidden mt-1 px-4">
       <FlightSearchResultsToolBar />
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col">
         <Suspense fallback={<div>Loading Flight Search Form...</div>}>
           <FlightSearchForm />
         </Suspense>
-        <div className="flex flex-col w-fit overflow-auto">
+        <div className="flex w-fit overflow-auto">
           <Suspense fallback={<div>Loading Flight Search Results...</div>}>
             <FlightSearchResults />
           </Suspense>

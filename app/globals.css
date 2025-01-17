@@ -14,13 +14,14 @@ body {
 
 @layer base {
   :root {
-    --background: 30 20% 85%; /* Warm beige for background */
+    --background: 30 30% 93%; /* Warm beige for background */
+    --headerBG: 0 0% 100%;
     --foreground: 30 10% 30%; /* Dark brown for text */
     --card: 30 20% 90%;
     --card-foreground: 30 10% 15%;
     --popover: 30 20% 90%;
     --popover-foreground: 30 10% 15%;
-    --primary: 30 15% 20%; /* Deep brown for primary accents */
+    --primary: 30 5% 25%; /* Deep brown for primary accents */
     --primary-foreground: 0 0% 98%;
     --secondary: 30 10% 85%; /* Soft beige for secondary accents */
     --secondary-foreground: 30 10% 15%;

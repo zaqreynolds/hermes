@@ -36,8 +36,6 @@ export const FlightSearchForm = () => {
   const [hideForm, setHideForm] = useState(false);
   const [isRotated, setIsRotated] = useState(false);
 
-  console.log("hideForm", hideForm);
-
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -134,24 +132,22 @@ export const FlightSearchForm = () => {
     pushToRouterBatch(queryParams);
 
     await searchFlights(searchParams);
-    setHideForm(true);
-    setIsRotated(true);
+    if (isMobile) {
+      setHideForm(true);
+      setIsRotated(true);
+    }
   };
 
   const isFirstLoad = useRef(true);
   const hasParams = Array.from(searchParams.keys()).length > 0;
-
   useEffect(() => {
-    if (pathname !== "/") {
-      setHideForm(true);
-      setIsRotated(true);
-    } else {
+    if (pathname === "/") {
       setHideForm(false);
       setIsRotated(false);
       setSearchState(defaultSearchState);
       reset();
     }
-  }, [pathname, reset, setSearchState]);
+  }, [pathname, reset, setSearchState, hasParams]);
 
   useEffect(() => {
     // Function to parse query params into form values

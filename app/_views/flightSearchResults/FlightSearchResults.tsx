@@ -33,6 +33,8 @@ export const FlightSearchResults = () => {
       )
     : flightOffers;
 
+  const showSkeletons = isFlightSearchLoading && !filteredFlightOffers.length;
+
   return (
     <>
       {!isDefaultState && (
@@ -53,7 +55,7 @@ export const FlightSearchResults = () => {
             {flightOffers.length === 0 && !isFlightSearchLoading && (
               <div>No results yet</div>
             )}
-            {isFlightSearchLoading && <SkeletonFlightResultCards />}
+            {showSkeletons && <SkeletonFlightResultCards />}
           </div>
         </div>
       )}
