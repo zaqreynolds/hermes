@@ -1,5 +1,6 @@
 "use client";
 import AmadeusHealthDialog from "@/app/_views/AmadeusHealthDialog";
+import { DecodedFlightOffer } from "@/app/api/amadeus/flightSearch/route";
 import { FlightSearchState } from "@/app/types";
 import { FlightOffer } from "amadeus-ts";
 
@@ -14,6 +15,10 @@ type FlightSearchContextType = {
     rawFlightOffers: FlightOffer[],
     flightOffers: FlightOffer[]
   ) => void;
+  airlines: string[];
+  setAirlines: (airlines: string[]) => void;
+  selectedAirlines: string[];
+  setSelectedAirlines: (airlines: string[]) => void;
 };
 import { createContext, useState, ReactNode, useEffect } from "react";
 
@@ -45,6 +50,10 @@ export const FlightSearchContext = createContext<FlightSearchContextType>({
   amadeusStatus: "checking",
   handleSelectFlight: () => {},
   updateOffers: () => {},
+  airlines: [],
+  setAirlines: () => {},
+  selectedAirlines: [],
+  setSelectedAirlines: () => {},
 });
 
 export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
@@ -55,6 +64,8 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
   const [amadeusStatus, setAmadeusStatus] = useState<
     "ok" | "unavailable" | "checking"
   >("checking");
+  const [airlines, setAirlines] = useState<string[]>([]);
+  const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
 
   useEffect(() => {
     const checkAmadeusStatus = async () => {
@@ -92,6 +103,25 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  useEffect(() => {
+    const extractAirlines = (offers: DecodedFlightOffer[]) => {
+      const airlines = new Set<string>();
+      offers.forEach((offer) => {
+        offer.validatingAirlineCodes?.forEach((code) => {
+          airlines.add(code);
+        });
+      });
+      return Array.from(airlines);
+    };
+
+    if (searchState.flightOffers.length > 0) {
+      const extractedAirline = extractAirlines(searchState.flightOffers);
+      setAirlines(extractedAirline);
+    } else {
+      setAirlines([]);
+    }
+  }, [searchState.flightOffers]);
+
   return (
     <FlightSearchContext.Provider
       value={{
@@ -102,6 +132,10 @@ export const FlightSearchProvider = ({ children }: { children: ReactNode }) => {
         setIsFlightSearchLoading,
         amadeusStatus,
         handleSelectFlight,
+        airlines,
+        setAirlines,
+        selectedAirlines,
+        setSelectedAirlines,
       }}
     >
       {children}

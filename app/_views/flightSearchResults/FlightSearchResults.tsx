@@ -7,13 +7,16 @@ import { FlightOffer } from "amadeus-ts";
 import { useContext } from "react";
 import FlightResultCard from "./FlightResultCard";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export const FlightSearchResults = () => {
-  const { searchState, handleSelectFlight, isFlightSearchLoading } =
-    useContext(FlightSearchContext);
+  const {
+    searchState,
+    handleSelectFlight,
+    isFlightSearchLoading,
+    selectedAirlines,
+  } = useContext(FlightSearchContext);
 
   const flightOffers = searchState.flightOffers as FlightOffer[];
   const selectedFlight = searchState.selectedFlight;
@@ -21,6 +24,14 @@ export const FlightSearchResults = () => {
 
   const isDefaultState =
     JSON.stringify(searchState) === JSON.stringify(defaultSearchState);
+
+  const filteredFlightOffers = selectedAirlines.length
+    ? flightOffers.filter(
+        (flight) =>
+          flight.validatingAirlineCodes &&
+          selectedAirlines.includes(flight.validatingAirlineCodes[0])
+      )
+    : flightOffers;
 
   return (
     <>
@@ -30,7 +41,7 @@ export const FlightSearchResults = () => {
         >
           <h2 className="text-lg font-semibold mb-4">Select your flight:</h2>
           <div className="flex flex-col gap-1 overflow-y-auto overflow-x-hidden">
-            {flightOffers.map((flight) => (
+            {filteredFlightOffers.map((flight) => (
               <FlightResultCard
                 key={flight.id}
                 flight={flight}
