@@ -21,7 +21,7 @@ export const FlightSearchResultsToolBar = () => {
 
   return (
     <div className="hidden md:block w-56 h-auto mt-[210px] p-1 pr-1">
-      <p className="font-bold mb-1">Airlines</p>
+      {airlines.length > 0 && <p className="font-bold mb-1">Airlines</p>}
       {airlines.map((airline) => (
         <div key={airline} className="flex items-center mb-1">
           <Checkbox

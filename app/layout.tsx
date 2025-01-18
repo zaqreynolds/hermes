@@ -38,9 +38,7 @@ export default function RootLayout({
       >
         <main className="flex flex-col items-center sm:items-start h-screen bg-opacity-90 overflow-hidden">
           <h1 className="flex flex-shrink-0 w-full h-20 text-left text-3xl font-bold px-4 mb-2 bg-headerBG shadow-md items-center">
-            <Link href="/" className="flex items-center w-full h-full">
-              Hermes
-            </Link>
+            Hermes
           </h1>
           <FlightSearchProviderWrapper> {children}</FlightSearchProviderWrapper>
         </main>

@@ -140,14 +140,6 @@ export const FlightSearchForm = () => {
 
   const isFirstLoad = useRef(true);
   const hasParams = Array.from(searchParams.keys()).length > 0;
-  useEffect(() => {
-    if (pathname === "/") {
-      setHideForm(false);
-      setIsRotated(false);
-      setSearchState(defaultSearchState);
-      reset();
-    }
-  }, [pathname, reset, setSearchState, hasParams]);
 
   useEffect(() => {
     // Function to parse query params into form values
@@ -233,6 +225,10 @@ export const FlightSearchForm = () => {
       return "Search";
     }
   };
+
+  const isFormDirty =
+    form.formState.isDirty ||
+    JSON.stringify(searchState) !== JSON.stringify(defaultSearchState);
 
   return (
     <div className="flex flex-col w-full max-w-[1155px] justify-items-center ">
@@ -326,13 +322,27 @@ export const FlightSearchForm = () => {
                   <NonStopSwitch control={form.control} />
                 </div>
               )}
-              {isDirty && (
+              {isFormDirty && (
                 <Button
                   variant="outline"
                   className="w-24 shadow-md border border-primary active:shadow-none"
                   onClick={() => {
-                    reset();
+                    router.push("/");
                     setSearchState(defaultSearchState);
+                    form.reset({
+                      origin: undefined,
+                      destination: undefined,
+                      departureDate: undefined,
+                      returnDate: undefined,
+                      travelers: {
+                        adults: 1,
+                        children: 0,
+                        infants: 0,
+                      },
+                      travelClass: "",
+                      nonStop: false,
+                      oneWay: false,
+                    });
                   }}
                 >
                   Clear Search
