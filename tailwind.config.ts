@@ -13,8 +13,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "hsl(var(--background))",
-        headerBG: "hsl(var(--headerBG))",
+        background: {
+          DEFAULT: "hsl(var(--background))",
+          alt: "hsl(var(--background-alt))",
+        },
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",

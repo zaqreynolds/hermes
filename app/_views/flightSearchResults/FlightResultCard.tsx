@@ -126,8 +126,8 @@ const FlightResultCard = ({
       key={flight.id}
       onClick={onSelect}
       className={cn(
-        "flex flex-col rounded-lg mb-1 border border-card hover:shadow-sm",
-        isSelected && "border-stone-700 hover:border-stone-700 bg-stone-50",
+        "flex flex-col rounded-lg mb-1 border border-card bg-background-alt hover:shadow-md",
+        isSelected && "border-stone-700 hover:border-stone-700 bg-card",
         search && !isMobile && "w-96 hover:cursor-pointer hover:border-accent",
         details && "w-full",
         search && isMobile && "w-full flex-1",

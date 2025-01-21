@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <main className="flex flex-col items-center sm:items-start h-screen bg-opacity-90 overflow-hidden">
-          <h1 className="flex flex-shrink-0 w-full h-20 text-left text-3xl font-bold px-4 mb-2 bg-headerBG shadow-md items-center">
+          <h1 className="flex flex-shrink-0 w-full h-20 text-left text-3xl font-bold px-4 mb-2 bg-background-alt shadow-sm items-center">
             Hermes
           </h1>
           <FlightSearchProviderWrapper> {children}</FlightSearchProviderWrapper>

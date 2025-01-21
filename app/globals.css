@@ -14,40 +14,40 @@ body {
 
 @layer base {
   :root {
-    --background: 30 30% 93%; /* Warm beige for background */
-    --headerBG: 0 0% 100%;
-    --foreground: 30 10% 30%; /* Dark brown for text */
-    --card: 30 20% 90%;
-    --card-foreground: 30 10% 15%;
-    --popover: 30 20% 90%;
-    --popover-foreground: 30 10% 15%;
-    --primary: 30 5% 25%; /* Deep brown for primary accents */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 30 10% 85%; /* Soft beige for secondary accents */
-    --secondary-foreground: 30 10% 15%;
-    --muted: 30 15% 80%; /* Muted beige */
-    --muted-foreground: 30 10% 35%;
-    --accent: 30 20% 70%; /* Lighter sepia for accents */
-    --accent-foreground: 30 10% 15%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 30 15% 95%;
-    --input: 30 15% 75%;
-    --ring: 30 10% 25%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --background: 220 10% 96%; /* Light blue-gray */
+    --background-alt: 0 0% 100%; /* White */
+    --foreground: 220 20% 15%; /* Dark blue-gray for text */
+    --card: 220 8% 94%; /* Softer blue tone */
+    --card-foreground: 220 20% 15%; /* Darker blue-gray */
+    --popover: 220 20% 90%; /* Light gray-blue */
+    --popover-foreground: 220 20% 15%; /* Dark blue-gray */
+    --primary: 220 40% 15%; /* Dark blue */
+    --primary-foreground: 0 0% 98%; /* White */
+    --secondary: 145 20% 35%; /* Muted green */
+    --secondary-foreground: 0 0% 98%; /* White */
+    --muted: 220 10% 85%; /* Light blue-gray */
+    --muted-foreground: 220 20% 25%; /* Darker blue-gray */
+    --accent: 135 34% 59%; /* Green */
+    --accent-foreground: 0 0% 98%; /* White */
+    --destructive: 0 84.2% 60.2%; /* Red */
+    --destructive-foreground: 0 0% 98%; /* White */
+    --border: 220 20% 75%; /* Light blue */
+    --input: 220 20% 85%; /* Pale blue */
+    --ring: 145 40% 25%; /* Forest green */
+    --chart-1: 12 76% 61%; /* Coral */
+    --chart-2: 173 58% 39%; /* Green */
+    --chart-3: 197 37% 24%; /* Deep blue-green */
+    --chart-4: 43 74% 66%; /* Yellow-green */
+    --chart-5: 27 87% 67%; /* Lime */
     --radius: 0.5rem;
-    --sidebar-background: 30 20% 90%;
-    --sidebar-foreground: 30 10% 15%;
-    --sidebar-primary: 30 30% 35%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 30 10% 85%;
-    --sidebar-accent-foreground: 30 10% 15%;
-    --sidebar-border: 30 15% 75%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 220 20% 94%; /* Light blue-gray */
+    --sidebar-foreground: 220 20% 15%; /* Darker blue-gray */
+    --sidebar-primary: 220 30% 35%; /* Muted blue-gray */
+    --sidebar-primary-foreground: 0 0% 98%; /* White */
+    --sidebar-accent: 145 25% 35%; /* Forest green */
+    --sidebar-accent-foreground: 0 0% 98%; /* White */
+    --sidebar-border: 220 20% 75%; /* Light blue */
+    --sidebar-ring: 217.2 91.2% 59.8%; /* Vibrant blue */
   }
 
   .dark {
