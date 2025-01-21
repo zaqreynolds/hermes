@@ -313,16 +313,16 @@ export const FlightSearchForm = () => {
                 )}
               </div>
             </div>
-            <div className="flex justify-end items-center space-x-2 mt-4">
+            <div className="flex justify-end items-center space-x-2">
               {isMobile && (
-                <div className="flex">
+                <div className="flex mr-auto mt-[-20px]">
                   <NonStopSwitch control={form.control} />
                 </div>
               )}
               {isFormDirty && (
                 <Button
                   variant="outline"
-                  className="w-24 shadow-md border border-primary active:shadow-none"
+                  className="w-24 shadow-md border border-primary mt-4 active:shadow-none"
                   onClick={() => {
                     router.push("/");
                     setSearchState(defaultSearchState);
@@ -347,7 +347,7 @@ export const FlightSearchForm = () => {
               )}
 
               <Button
-                className="w-20 shadow-md active:shadow-none"
+                className="w-20 shadow-md mt-4 active:shadow-none"
                 type="submit"
                 disabled={isFlightSearchLoading}
               >

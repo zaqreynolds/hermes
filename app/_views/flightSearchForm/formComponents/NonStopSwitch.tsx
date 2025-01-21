@@ -15,7 +15,7 @@ const NonStopSwitch = ({ control }: NonStopSwitchProps) => {
       control={control}
       name="nonStop"
       render={({ field }) => (
-        <FormItem className="flex">
+        <FormItem className="flex hover:text-accent">
           <div className="flex items-center space-x-2">
             <Switch
               id="nonStop"
