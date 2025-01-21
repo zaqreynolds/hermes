@@ -3,7 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import FlightSearchProviderWrapper from "@/context/FlightSearchProviderWrapper";
-import Link from "next/link";
+import { ThemeProvider } from "./ThemeProvider";
+import { Header } from "@/components/Header";
 
 config.autoAddCss = false;
 
@@ -29,19 +30,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      // className="dark"
-    >
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="flex flex-col items-center sm:items-start h-screen bg-opacity-90 overflow-hidden">
-          <h1 className="flex flex-shrink-0 w-full h-20 text-left text-3xl font-bold px-4 mb-2 bg-background-alt shadow-sm items-center">
-            Hermes
-          </h1>
-          <FlightSearchProviderWrapper> {children}</FlightSearchProviderWrapper>
-        </main>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className="flex flex-col items-center sm:items-start h-screen bg-opacity-90 overflow-hidden">
+            <Header />
+            <FlightSearchProviderWrapper>
+              {children}
+            </FlightSearchProviderWrapper>
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
