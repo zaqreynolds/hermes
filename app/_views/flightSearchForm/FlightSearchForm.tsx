@@ -67,10 +67,7 @@ export const FlightSearchForm = () => {
     },
   });
 
-  const {
-    formState: { isDirty },
-    reset,
-  } = form;
+  const { reset } = form;
 
   const departureDate = form.watch("departureDate");
   const returnDate = form.watch("returnDate");
