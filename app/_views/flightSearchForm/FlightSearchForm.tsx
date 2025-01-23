@@ -308,7 +308,7 @@ export const FlightSearchForm = () => {
                 value={destination}
                 isMobile={isMobile}
               />
-              <div className="flex w-full justify-between">
+              <div className="flex w-full justify-between sm:space-x-2">
                 <DateSelector
                   control={form.control}
                   name="departureDate"
