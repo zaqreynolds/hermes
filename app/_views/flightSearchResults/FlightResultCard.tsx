@@ -219,7 +219,7 @@ const FlightResultCard = ({
                             key={segmentIndex}
                             className="flex flex-col space-y-1"
                           >
-                            <div className="text-sm text-gray-800">
+                            <div className="text-sm text-primary">
                               <p>
                                 {segment.carrierCode} {segment.number}
                               </p>
