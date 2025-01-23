@@ -35,7 +35,7 @@ export const FlightClassSelector = ({
             <SelectTrigger
               className={cn(
                 "text-xs hover:bg-accent",
-                isMobile ? "w-[125px]" : "w-36"
+                isMobile ? "w-full " : "w-36"
               )}
             >
               <SelectValue placeholder="Flight class" />

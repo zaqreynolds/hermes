@@ -228,8 +228,13 @@ export const FlightSearchForm = () => {
     JSON.stringify(searchState) !== JSON.stringify(defaultSearchState);
 
   return (
-    <div className="flex flex-col w-full max-w-[1155px] justify-items-center ">
-      <div className="flex w-full justify-between">
+    <div
+      className={cn(
+        "flex flex-col lg:max-w-[1155px] mx-auto ",
+        isMobile && "min-w-[92vw] "
+      )}
+    >
+      <div className="flex w-full justify-between items-center">
         <h2 className="text-xl font-semibold mb-4">Where are you going?</h2>
         {isMobile && (
           <Button
@@ -243,8 +248,7 @@ export const FlightSearchForm = () => {
             <ChevronUpIcon
               className={cn(
                 "transform transition-transform rotate-180 duration-500",
-                isRotated &&
-                  "transform transition-transform rotate-0 duration-500"
+                isRotated && "rotate-0 "
               )}
             />
           </Button>
@@ -254,14 +258,21 @@ export const FlightSearchForm = () => {
       {!hideForm && (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="flex w-full gap-1 pb-2 pr-1">
-              <RoundtripOneWaySelector control={form.control} />
+            <div className="flex w-full gap-2 pb-2">
+              <RoundtripOneWaySelector
+                control={form.control}
+                isMobile={isMobile}
+              />
 
               <TravelerSelector control={form.control} isMobile={isMobile} />
 
               <FlightClassSelector control={form.control} isMobile={isMobile} />
-              <div className=" flex-1" />
-              {!isMobile && <NonStopSwitch control={form.control} />}
+              {!isMobile && (
+                <>
+                  <div className={" flex-1"} />
+                  <NonStopSwitch control={form.control} />
+                </>
+              )}
             </div>
             <div className="relative flex flex-col justify-start pb-2 sm:flex-row gap-1 sm:gap-2">
               <LocationInput
@@ -297,7 +308,7 @@ export const FlightSearchForm = () => {
                 value={destination}
                 isMobile={isMobile}
               />
-              <div className="flex w-full gap-2">
+              <div className="flex w-full justify-between">
                 <DateSelector
                   control={form.control}
                   name="departureDate"

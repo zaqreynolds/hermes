@@ -13,6 +13,8 @@ import { Control } from "react-hook-form";
 import { z } from "zod";
 import { flightSearchSchema } from "../flightSearchSchema";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DateSelectorProps {
   control: Control<z.infer<typeof flightSearchSchema>>;
@@ -28,6 +30,8 @@ export const DateSelector = ({
   returnDate,
 }: DateSelectorProps) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const isMobile = useIsMobile();
 
   const handleDefaultText = (name: string) => {
     return name === "departureDate"
@@ -45,7 +49,11 @@ export const DateSelector = ({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-[177px] h-12 justify-start text-left text-xs"
+                className={cn(
+                  "h-12 justify-start text-left text-xs",
+                  isMobile && "w-[45vw]",
+                  !isMobile && "w-[177px]"
+                )}
               >
                 <CalendarIcon />
                 {field.value ? (

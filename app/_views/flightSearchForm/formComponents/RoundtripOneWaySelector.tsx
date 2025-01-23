@@ -2,7 +2,6 @@ import { Control } from "react-hook-form";
 import { z } from "zod";
 import { flightSearchSchema } from "../flightSearchSchema";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
-
 import {
   Select,
   SelectContent,
@@ -11,11 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export const RoundtripOneWaySelector = ({
   control,
+  isMobile,
 }: {
   control: Control<z.infer<typeof flightSearchSchema>>;
+  isMobile: boolean;
 }) => {
   return (
     <FormField
@@ -30,7 +32,13 @@ export const RoundtripOneWaySelector = ({
             defaultValue="roundtrip"
           >
             <FormControl>
-              <SelectTrigger className="w-24 text-xs mr-1 hover:bg-accent">
+              <SelectTrigger
+                className={cn(
+                  "text-xs mr-1 hover:bg-accent",
+                  isMobile && "w-full",
+                  !isMobile && "w-24 "
+                )}
+              >
                 <SelectValue>
                   {field.value ? "One-Way" : "Roundtrip"}
                 </SelectValue>
