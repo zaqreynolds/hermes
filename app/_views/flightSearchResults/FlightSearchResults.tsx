@@ -43,7 +43,10 @@ export const FlightSearchResults = () => {
     <>
       {!isDefaultState && (
         <div
-          className={cn("flex flex-col overflow-hidden", !isMobile && "mr-4")}
+          className={cn(
+            "flex flex-col overflow-hidden",
+            isMobile ? "w-full" : "flex-shrink-0 mr-4"
+          )}
         >
           <div className="flex justify-items-center mb-4">
             <h2 className="text-lg font-semibold  mr-auto">
@@ -86,7 +89,7 @@ const SkeletonFlightResultCards = () => (
     {[...Array(4)].map((_, i) => (
       <Skeleton
         key={i}
-        className="rounded-lg h-[206px] w-[384px] mb-1 flex-shrink-0"
+        className="rounded-lg h-[206px] w-[100%] sm:w-[384px] mb-1 flex-shrink-0"
       />
     ))}
   </>

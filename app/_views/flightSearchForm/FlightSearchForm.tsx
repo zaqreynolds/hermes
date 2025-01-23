@@ -369,7 +369,7 @@ export const FlightSearchForm = () => {
         </Form>
       )}
       <Separator className="bg-accent my-2" />
-      {!offers.length && !isFlightSearchLoading && (
+      {offers.length === 0 && !isFlightSearchLoading && (
         <div className="flex flex-col items-center flex-grow w-full overflow-hidden">
           <h2 className="flex text-lg font-semibold text-center mb-4">
             Search for flights above to get started...

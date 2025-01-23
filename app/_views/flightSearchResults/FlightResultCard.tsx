@@ -130,8 +130,7 @@ const FlightResultCard = ({
         isSelected && "border-stone-700 hover:border-stone-700 bg-card",
         search && !isMobile && "w-96 hover:cursor-pointer hover:border-accent",
         details && "w-full",
-        search && isMobile && "w-full flex-1",
-        isMobile && "p-2",
+        isMobile && "w-[100%] p-2",
         !isMobile && "p-4"
       )}
     >

@@ -12,7 +12,7 @@ export default function Home() {
         <Suspense fallback={<div>Loading Flight Search Form...</div>}>
           <FlightSearchForm />
         </Suspense>
-        <div className="flex w-fit overflow-auto">
+        <div className="flex w-full sm:w-fit overflow-auto">
           <Suspense fallback={<div>Loading Flight Search Results...</div>}>
             <FlightSearchResults />
           </Suspense>
