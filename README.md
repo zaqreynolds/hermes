@@ -38,6 +38,6 @@ This project was built to:
 - **Design**: Shadcn/UI components
 - **Deployment**: Vercel
 
-## Future Updates:
+## Future Updates
 
 - If Hermes gets approved to move from Amadeus Test to Amadeus Production, I will release price analysis features for each flight offer and ideally add price watching cron jobs for users including alerts for price drops!

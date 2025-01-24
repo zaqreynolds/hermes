@@ -44,14 +44,14 @@ export const DateSelector = ({
       control={control}
       name={name}
       render={({ field, fieldState }) => (
-        <FormItem>
+        <FormItem className={cn(isMobile && "flex-grow")}>
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
                   "h-12 justify-start text-left text-xs",
-                  isMobile && "w-[45vw]",
+                  isMobile && "w-full",
                   !isMobile && "w-[177px]"
                 )}
               >
