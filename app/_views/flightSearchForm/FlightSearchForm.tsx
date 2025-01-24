@@ -230,8 +230,8 @@ export const FlightSearchForm = () => {
   return (
     <div
       className={cn(
-        "flex flex-col lg:max-w-[1155px] mx-auto ",
-        isMobile && "min-w-[92vw] "
+        "flex flex-col lg:max-w-[1155px] mx-auto w-full",
+        isMobile && "max-w-none "
       )}
     >
       <div className="flex w-full justify-between items-center">
