@@ -43,6 +43,7 @@ export const TravelerCounter = ({
           disabled={count <= category.min}
           variant="outline"
           size="sm"
+          aria-label={`Decrease ${category.label}`}
         >
           -
         </Button>
@@ -52,6 +53,7 @@ export const TravelerCounter = ({
           disabled={!category.validateAdd(travelers) || count >= category.max}
           variant="outline"
           size="sm"
+          aria-label={`Increase ${category.label}`}
         >
           +
         </Button>
