@@ -1,5 +1,5 @@
 import { TRAVELER_CATEGORIES } from "./categories";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent, render } from "@testing-library/react";
 import { TravelerCounter } from "./TravelerCounter";
 
 test("incrementing the adult counter should increment the adult count", () => {
@@ -8,9 +8,20 @@ test("incrementing the adult counter should increment the adult count", () => {
   const adultCategory = TRAVELER_CATEGORIES.find(
     (category) => category.type === "adults"
   );
+
+  if (!adultCategory) {
+    throw new Error("Category 'adults' not found in TRAVELER_CATEGORIES");
+  }
+
   const initialTravelers = { adults: 1, children: 0, infants: 0 };
 
-  const wrapper = render(<TravelerCounter />);
+  render(
+    <TravelerCounter
+      category={adultCategory}
+      travelers={initialTravelers}
+      onChange={mockOnChange}
+    />
+  );
 
   // Act: Simulate a click to increment the counter
   const incrementButton = screen.getByLabelText(
